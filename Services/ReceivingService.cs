@@ -9,17 +9,13 @@ using System.Security.Claims;
 
 namespace CSMapi.Services
 {
-    public class ReceivingService : IReceivingService
+    public class ReceivingService : BaseService, IReceivingService
     {
-        private readonly AppDbContext _context;
-        private readonly IMapper _mapper;
         private readonly ReceivingValidator _receivingValidator;
         private readonly ReceivingQueries _receivingQueries;
         private readonly DocumentHelper _documentHelper;
-        public ReceivingService(AppDbContext context, IMapper mapper, ReceivingValidator receivingValidator, ReceivingQueries receivingQueries, DocumentHelper documentHelper)
+        public ReceivingService(AppDbContext context, IMapper mapper, ReceivingValidator receivingValidator, ReceivingQueries receivingQueries, DocumentHelper documentHelper) : base (context, mapper)
         {
-            _context = context;
-            _mapper = mapper;
             _receivingValidator = receivingValidator;
             _receivingQueries = receivingQueries;
             _documentHelper = documentHelper;

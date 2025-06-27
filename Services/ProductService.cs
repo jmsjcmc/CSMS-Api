@@ -8,16 +8,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CSMapi.Services
 {
-    public class ProductService : IProductService
+    public class ProductService : BaseService, IProductService
     {
-        private readonly AppDbContext _context;
-        private readonly IMapper _mapper;
         private readonly ProductValidator _productValidator;
         private readonly ProductQueries _productQueries;
-        public ProductService(AppDbContext context, IMapper mapper, ProductValidator productValidator, ProductQueries productQueries)
+        public ProductService(AppDbContext context, IMapper mapper, ProductValidator productValidator, ProductQueries productQueries) : base (context, mapper)
         {
-            _context = context;
-            _mapper = mapper;
             _productValidator = productValidator;
             _productQueries = productQueries;
         }

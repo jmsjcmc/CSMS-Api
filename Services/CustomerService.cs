@@ -8,16 +8,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CSMapi.Services
 {
-    public class CustomerService : ICustomerService
+    public class CustomerService : BaseService, ICustomerService
     {
-        private readonly AppDbContext _context;
-        private readonly IMapper _mapper;
         private readonly CustomerValidator _customerValidator;
         private readonly CustomerQueries _customerQueries;
-        public CustomerService(AppDbContext context, IMapper mapper, CustomerValidator customerValidator, CustomerQueries customerQueries)
+        public CustomerService(AppDbContext context, IMapper mapper, CustomerValidator customerValidator, CustomerQueries customerQueries) : base (context, mapper)
         {
-            _context = context;
-            _mapper = mapper;
             _customerValidator = customerValidator;
             _customerQueries = customerQueries;
         }

@@ -9,17 +9,13 @@ using System.Security.Claims;
 
 namespace CSMapi.Services
 {
-    public class UserService : IUserService
+    public class UserService : BaseService, IUserService
     {
-        private readonly AppDbContext _context;
-        private readonly IMapper _mapper;
         private readonly UserValidator _userValidator;
         private readonly AuthUserHelper _authHelper;
         private readonly UserQueries _userQueries;
-        public UserService(AppDbContext context, IMapper mapper, UserValidator userValidator, AuthUserHelper authHelper, UserQueries userQueries)
+        public UserService(AppDbContext context, IMapper mapper, UserValidator userValidator, AuthUserHelper authHelper, UserQueries userQueries) : base(context, mapper)
         {
-            _context = context;
-            _mapper = mapper;
             _userValidator = userValidator;
             _authHelper = authHelper;
             _userQueries = userQueries;

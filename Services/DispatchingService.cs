@@ -4,23 +4,18 @@ using CSMapi.Helpers.Queries;
 using CSMapi.Interfaces;
 using CSMapi.Models;
 using CSMapi.Validators;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace CSMapi.Services
 {
-    public class DispatchingService : IDispatchingService
+    public class DispatchingService : BaseService, IDispatchingService
     {
-        private readonly AppDbContext _context;
-        private readonly IMapper _mapper;
         private readonly DispatchingValidator _dispatchingValidator;
         private readonly DispatchingQueries _dispatchingQueries;
         private readonly DocumentHelper _documentHelper;
-        public DispatchingService(AppDbContext context, IMapper mapper, DispatchingValidator dispatchingValidator, DispatchingQueries dispatchingQueries, DocumentHelper documentHelper) 
+        public DispatchingService(AppDbContext context, IMapper mapper, DispatchingValidator dispatchingValidator, DispatchingQueries dispatchingQueries, DocumentHelper documentHelper) : base (context, mapper)
         {
-            _context = context;
-            _mapper = mapper;
             _dispatchingValidator = dispatchingValidator;
             _dispatchingQueries = dispatchingQueries;
             _documentHelper = documentHelper;

@@ -9,16 +9,12 @@ using System.Security.Claims;
 
 namespace CSMapi.Services
 {
-    public class ContractService : IContractService
+    public class ContractService : BaseService, IContractService
     {
-        private readonly AppDbContext _context;
-        private readonly IMapper _mapper;
         private readonly ContractValidator _contractValidator;
         private readonly ContractQueries _contractQueries;
-        public ContractService(AppDbContext context, IMapper mapper, ContractValidator contractValidator, ContractQueries contractQueries) 
+        public ContractService(AppDbContext context, IMapper mapper, ContractValidator contractValidator, ContractQueries contractQueries) : base (context, mapper)
         {
-            _context = context;
-            _mapper = mapper;
             _contractValidator = contractValidator;
             _contractQueries = contractQueries;
         }

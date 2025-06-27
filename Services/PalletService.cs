@@ -10,16 +10,12 @@ using System.Security.Claims;
 
 namespace CSMapi.Services
 {
-    public class PalletService : IPalletService
+    public class PalletService : BaseService, IPalletService
     {
-        private readonly AppDbContext _context;
-        private readonly IMapper _mapper;
         private readonly PalletValidator _palletValidator;
         private readonly PalletQueries _palletQueries;
-        public PalletService(AppDbContext context, IMapper mapper, PalletValidator palletValidator, PalletQueries palletQueries)
+        public PalletService(AppDbContext context, IMapper mapper, PalletValidator palletValidator, PalletQueries palletQueries) : base (context, mapper)
         {
-            _context = context;
-            _mapper = mapper;
             _palletValidator = palletValidator;
             _palletQueries = palletQueries;
         }
