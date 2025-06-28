@@ -4,7 +4,6 @@ using CSMapi.Helpers.Queries;
 using CSMapi.Interfaces;
 using CSMapi.Models;
 using CSMapi.Validators;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
@@ -18,6 +17,12 @@ namespace CSMapi.Services
         {
             _palletValidator = palletValidator;
             _palletQueries = palletQueries;
+        }
+        // [HttpGet("pallets/occupied/product-id")]
+        public async Task<List<ProductBasedOccupiedPalletResponse>> productbasedoccupiedpallets(int id)
+        {
+            var product = await _palletQueries.productbasedoccupiedpallets(id);
+            return _mapper.Map<List<ProductBasedOccupiedPalletResponse>>(product);
         }
         // [HttpGet("pallets/occupied")]
         public async Task<Pagination<OccupiedPalletResponse>> occupiedpallets(

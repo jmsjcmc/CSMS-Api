@@ -33,6 +33,12 @@
         public ProductOnlyResponse Product { get; set; }
         public List<RepalletizeDetailResponse> ReceivingDetail { get; set; }
     }
+
+    public class ProductBasedOccupiedPalletResponse
+    {
+        public int Id { get; set; }
+        public int Palletno { get; set; }
+    }
     public class PalletOnlyResponse
     {
         public int Id { get; set; }

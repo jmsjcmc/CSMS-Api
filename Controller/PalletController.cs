@@ -17,6 +17,19 @@ namespace CSMapi.Controller
             _palletExcel = palletExcel;
             _palletService = palletService;
         }
+        // Fetch all occupied pallets based on product id
+        [HttpGet("pallets/occupied/product-id")]
+        public async Task<ActionResult<List<ProductBasedOccupiedPalletResponse>>> productbasedoccupiedpallets(int id)
+        {
+            try
+            {
+                var response = await _palletService.productbasedoccupiedpallets(id);
+                return response;
+            } catch (Exception e)
+            {
+                return HandleException(e);
+            }
+        }
         // Fetch all occupied pallets
         [HttpGet("pallets/occupied")]
         public async Task<ActionResult<Pagination<OccupiedPalletResponse>>> occupiedpallets(

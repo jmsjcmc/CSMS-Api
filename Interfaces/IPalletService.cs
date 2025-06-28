@@ -6,6 +6,7 @@ namespace CSMapi.Interfaces
 {
     public interface IPalletService
     {
+        Task<List<ProductBasedOccupiedPalletResponse>> productbasedoccupiedpallets(int id);
         Task<Pagination<OccupiedPalletResponse>> occupiedpallets(
             int pageNumber = 1,
             int pageSize = 10,

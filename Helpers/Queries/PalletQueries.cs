@@ -10,6 +10,19 @@ namespace CSMapi.Helpers.Queries
         {
             _context = context;
         }
+        // Query for fetching all occupied pallets based on product id
+        public async Task<List<Pallet>> productbasedoccupiedpallets(int id)
+        {
+            return await _context.Pallets
+                .AsNoTracking()
+                .Include(p => p.DispatchDetail)
+                .Include(p => p.ReceivingDetail)
+                .ThenInclude(r => r.Receiving)
+                .ThenInclude(r => r.Product)
+                .Where(p => p.Occupied && p.ReceivingDetail.Any(r => r.Receiving.Productid == id))
+                .OrderByDescending(p => p.Id)
+                .ToListAsync();
+        }
         // Query for fetching all occupied palelts with optional filter for pallet number
         public IQueryable<Pallet> occupiedpalletsquery(string? searchTerm = null)
         {

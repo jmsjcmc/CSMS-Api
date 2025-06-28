@@ -38,7 +38,7 @@ namespace CSMapi.Services
         {
             await _contractValidator.ValidateFetchContract(id);
 
-            var contract = _contractQueries.getmethodcontractid(id);
+            var contract = await _contractQueries.getmethodcontractid(id);
 
             return _mapper.Map<ContractResponse>(contract);
         }
