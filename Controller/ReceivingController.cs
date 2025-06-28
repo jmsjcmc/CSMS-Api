@@ -110,7 +110,7 @@ namespace CSMapi.Controller
         }
         // Create receiving request
         [HttpPost("receiving")]
-        public async Task<ActionResult<ReceivingResponse>> addreceiving([FromForm] ReceivingRequest request, IFormFile file)
+        public async Task<ActionResult<ReceivingResponse>> addreceiving([FromForm] ReceivingRequest request, IFormFile? file)
         {
             try
             {

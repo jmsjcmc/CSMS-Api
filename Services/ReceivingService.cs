@@ -75,15 +75,19 @@ namespace CSMapi.Services
             };
         }
         // [HttpPost("receiving")]
-        public async Task<ReceivingResponse> addreceiving(ReceivingRequest request, IFormFile file, ClaimsPrincipal user)
+        public async Task<ReceivingResponse> addreceiving(ReceivingRequest request, IFormFile? file, ClaimsPrincipal user)
         {
             await _receivingValidator.ValidateReceivingRequest(request);
 
             var transaction = await _context.Database.BeginTransactionAsync();
+            string? path = null;
 
-            string fulleName = AuthUserHelper.GetFullName(user);
-            string path = await FileHelper.SaveReceivingFormAsync(file, fulleName);
-
+            if (file != null)
+            {
+                string fulleName = AuthUserHelper.GetFullName(user);
+                path = await FileHelper.SaveReceivingFormAsync(file, fulleName);
+            }
+           
             var details = request.ReceivingDetail;
 
             var positionId = request.ReceivingDetail
