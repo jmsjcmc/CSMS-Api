@@ -147,12 +147,12 @@ namespace CSMapi.Controller
         }
         // Remove specific customer without removing in Database (Soft Delete)
         [HttpPatch("customer/hide/{id}")]
-        public async Task<ActionResult> hidecustomer(int id)
+        public async Task<ActionResult<CustomerResponse>> hidecustomer(int id)
         {
             try
             {
-                await _customerService.hidecustomer(id);
-                return Ok("Customer removed.");
+                var response = await _customerService.hidecustomer(id);
+                return response;
             } catch (Exception e)
             {
                 return HandleException(e);
@@ -160,12 +160,12 @@ namespace CSMapi.Controller
         }
         // Delete specific customer in Database
         [HttpDelete("customer/delete/{id}")]
-        public async Task<ActionResult> deletecustomer(int id)
+        public async Task<ActionResult<CustomerResponse>> deletecustomer(int id)
         {
             try
             {
-                await _customerService.deletecustomer(id);
-                return Ok("Customer removed permanently.");
+                var response = await _customerService.deletecustomer(id);
+                return response;
             } catch (Exception e)
             {
                 return HandleException(e);

@@ -9,7 +9,7 @@ using System.Security.Claims;
 
 namespace CSMapi.Services
 {
-    public class PalletService : BaseService, IPalletService
+    public class PalletService : BaseService , IPalletService
     {
         private readonly PalletValidator _palletValidator;
         private readonly PalletQueries _palletQueries;
@@ -21,8 +21,8 @@ namespace CSMapi.Services
         // [HttpGet("pallets/occupied/product-id")]
         public async Task<List<ProductBasedOccupiedPalletResponse>> productbasedoccupiedpallets(int id)
         {
-            var product = await _palletQueries.productbasedoccupiedpallets(id);
-            return _mapper.Map<List<ProductBasedOccupiedPalletResponse>>(product);
+            var pallets = await _palletQueries.productbasedoccupiedpallets(id);
+            return _mapper.Map<List<ProductBasedOccupiedPalletResponse>>(pallets);
         }
         // [HttpGet("pallets/occupied")]
         public async Task<Pagination<OccupiedPalletResponse>> occupiedpallets(
@@ -89,12 +89,7 @@ namespace CSMapi.Services
             string? searchTerm = null)
         {
             var query = _palletQueries.palletsquery(searchTerm);
-            var totalCount = await query.CountAsync();
-
-            var pallets = await PaginationHelper.paginateandproject<Pallet, PalletResponse>(
-                query, pageNumber, pageSize, _mapper);
-
-            return PaginationHelper.paginatedresponse(pallets, totalCount, pageNumber, pageSize);
+            return await PaginationHelper.paginateandmap<Pallet, PalletResponse>(query, pageNumber, pageSize, _mapper);
         }
         // [HttpGet("pallet-positions")]
         public async Task<List<PalletPositionResponse>> allpalletpositions()
@@ -108,8 +103,7 @@ namespace CSMapi.Services
         {
             await _palletValidator.ValidateFetchColdStorage(id);
 
-            var cs = await _context.Coldstorages
-                .FirstOrDefaultAsync(c => c.Id == id);
+            var cs = await getcoldstoragedata(id);
 
             return _mapper.Map<ColdStorageResponse>(cs);
         }
@@ -118,9 +112,7 @@ namespace CSMapi.Services
         {
             await _palletValidator.ValidateFetchPosition(id);
 
-            var position = await _context.Palletpositions
-                .Include(p => p.Coldstorage)
-                .FirstOrDefaultAsync(p => p.Id == id);
+            var position = await getpalletpositiondata(id);
 
             return _mapper.Map<PalletPositionResponse>(position);
         }
@@ -129,12 +121,12 @@ namespace CSMapi.Services
         {
             await _palletValidator.ValidateFetchPallet(id);
 
-            var pallet = await _palletQueries.getmethodpalletid(id);
+            var pallet = await getpalletdata(id);
 
             return _mapper.Map<PalletResponse>(pallet);
         }
         // [HttpPost("pallet/repalletization")]
-        public async Task repalletize(RepalletizationRequest request, ClaimsPrincipal user)
+        public async Task<RepalletizationResponse> repalletize(RepalletizationRequest request, ClaimsPrincipal user)
         {
             var transaction = await _context.Database.BeginTransactionAsync();
             var repalletize = _mapper.Map<Repalletization>(request);
@@ -215,6 +207,8 @@ namespace CSMapi.Services
             
             await _context.SaveChangesAsync();
             await transaction.CommitAsync();
+
+            return await repalletizationResponse(repalletize.Id);
         }
         // [HttpPost("cold-storage")]
         public async Task<ColdStorageResponse> addcoldstorage(ColdStorageRequest request)
@@ -242,7 +236,7 @@ namespace CSMapi.Services
             _context.Pallets.Add(pallet);
             await _context.SaveChangesAsync();
 
-            var savedPallet = await _palletQueries.getmethodpalletid(pallet.Id);
+            var savedPallet = await getpalletdata(pallet.Id);
 
             return _mapper.Map<PalletResponse>(savedPallet);
         }
@@ -256,11 +250,7 @@ namespace CSMapi.Services
             _context.Palletpositions.Add(position);
             await _context.SaveChangesAsync();
 
-            var savedPosition = await _context.Palletpositions
-                .AsNoTracking()
-                .Include(p => p.Coldstorage)
-                .FirstOrDefaultAsync(p => p.Id == position.Id);
-
+            var savedPosition = await getpalletpositiondata(position.Id);
             return _mapper.Map<PalletPositionResponse>(savedPosition);
         }
         // [HttpPatch("cold-storage/update/{id}")]
@@ -272,7 +262,7 @@ namespace CSMapi.Services
 
             await _context.SaveChangesAsync();
 
-            return _mapper.Map<ColdStorageResponse>(cs);
+            return await coldstorageResponse(cs.Id);
         }
         // [HttpPatch("pallet/update/{id}")]
         public async Task<PalletResponse> updatepallet(PalletRequest request, int id, ClaimsPrincipal user)
@@ -287,11 +277,7 @@ namespace CSMapi.Services
 
             await _context.SaveChangesAsync();
 
-            var updatedPallet = await _context.Pallets
-                .AsNoTracking()
-                .FirstOrDefaultAsync(p => p.Id == pallet.Id);
-
-            return _mapper.Map<PalletResponse>(updatedPallet);
+            return await palletResponse(pallet.Id);
         }
         // [HttpPatch("pallet-position/update/{id}")]
         public async Task<PalletPositionResponse> updateposition(PalletPositionRequest request, int id)
@@ -302,12 +288,7 @@ namespace CSMapi.Services
 
             await _context.SaveChangesAsync();
 
-            var updatedPosition = await _context.Palletpositions
-                .AsNoTracking()
-                .Include(p => p.Coldstorage)
-                .FirstOrDefaultAsync(p => p.Id == position.Id);
-
-            return _mapper.Map<PalletPositionResponse>(updatedPosition);
+            return await positionResponse(position.Id);
         }
         // [HttpPatch("cold-storage/toggle-active")]
         public async Task<ColdStorageResponse> cstoggleactive(int id)
@@ -349,7 +330,7 @@ namespace CSMapi.Services
             return _mapper.Map<PalletOnlyResponse>(pallet);
         }
         // [HttpPatch("pallet/hide/{id}")]
-        public async Task hidepallet(int id)
+        public async Task<PalletResponse> hidepallet(int id)
         {
             var pallet = await getpalletid(id);
 
@@ -357,9 +338,11 @@ namespace CSMapi.Services
 
             _context.Pallets.Update(pallet);
             await _context.SaveChangesAsync();
+
+            return await palletResponse(pallet.Id);
         }
         // [HttpPatch("pallet-position/hide/{id}")]
-        public async Task hideposition(int id)
+        public async Task<PalletPositionResponse> hideposition(int id)
         {
             var position = await getpalletpositionid(id);
 
@@ -367,45 +350,87 @@ namespace CSMapi.Services
 
             _context.Palletpositions.Update(position);
             await _context.SaveChangesAsync();
+
+            return await positionResponse(position.Id);
         }
         // [HttpDelete("cold-storage/delete/{id}")]
-        public async Task deletecoldstorage(int id)
+        public async Task<ColdStorageResponse> deletecoldstorage(int id)
         {
             var cs = await getcoldstorageid(id);
 
             _context.Coldstorages.Remove(cs);
             await _context.SaveChangesAsync();
+
+            return await coldstorageResponse(cs.Id);
         }
         // [HttpDelete("pallet/delete/{id}")]
-        public async Task deletepallet(int id)
+        public async Task<PalletResponse> deletepallet(int id)
         {
             var pallet = await getpalletid(id);
 
             _context.Pallets.Remove(pallet);
             await _context.SaveChangesAsync();
+
+            return await palletResponse(pallet.Id);
         }
         // [HttpDelete("pallet-position/delete/{id}")]
-        public async Task deleteposition(int id)
+        public async Task<PalletPositionResponse> deleteposition(int id)
         {
             var position = await getpalletpositionid(id);
 
             _context.Palletpositions.Remove(position);
             await _context.SaveChangesAsync();
+
+            return await positionResponse(position.Id);
         }
         // Helpers
         private async Task<Pallet?> getpalletid(int id)
         {
             return await _palletQueries.patchmethodpalletid(id);
         }
-
         private async Task<PalletPosition?> getpalletpositionid(int id)
         {
             return await _palletQueries.patchmethodpositionid(id);
         }
-
         private async Task<ColdStorage?> getcoldstorageid(int id)
         {
             return await _palletQueries.patchmethodcoldstorageid(id);
+        }
+        private async Task<Pallet?> getpalletdata(int id)
+        {
+            return await _palletQueries.getmethodpalletid(id);
+        }
+        private async Task<PalletPosition?> getpalletpositiondata(int id)
+        {
+            return await _palletQueries.getmethodpositionid(id);
+        }
+        private async Task<ColdStorage?> getcoldstoragedata(int id)
+        {
+            return await _palletQueries.getmethodcoldstorageid(id);
+        }
+        private async Task<Repalletization?> getrepalletizationdata(int id)
+        {
+            return await _palletQueries.getmethodrepalletizationid(id);
+        }
+        private async Task<PalletResponse> palletResponse(int id)
+        {
+            var response = await getpalletdata(id);
+            return _mapper.Map<PalletResponse>(response);
+        }
+        private async Task<RepalletizationResponse> repalletizationResponse(int id)
+        {
+            var response = await getrepalletizationdata(id);
+            return _mapper.Map<RepalletizationResponse>(response);
+        }
+        private async Task<PalletPositionResponse> positionResponse(int id)
+        {
+            var response = await getpalletpositiondata(id);
+            return _mapper.Map<PalletPositionResponse>(response);
+        }
+        private async Task<ColdStorageResponse> coldstorageResponse(int id)
+        {
+            var response = await getcoldstoragedata(id);
+            return _mapper.Map<ColdStorageResponse>(response);
         }
     }
 }

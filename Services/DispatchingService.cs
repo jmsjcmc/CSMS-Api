@@ -9,12 +9,12 @@ using System.Security.Claims;
 
 namespace CSMapi.Services
 {
-    public class DispatchingService : BaseService, IDispatchingService
+    public class DispatchingService : BaseService , IDispatchingService
     {
         private readonly DispatchingValidator _dispatchingValidator;
         private readonly DispatchingQueries _dispatchingQueries;
         private readonly DocumentHelper _documentHelper;
-        public DispatchingService(AppDbContext context, IMapper mapper, DispatchingValidator dispatchingValidator, DispatchingQueries dispatchingQueries, DocumentHelper documentHelper) : base (context, mapper)
+        public DispatchingService(AppDbContext context, IMapper mapper, DispatchingValidator dispatchingValidator, DispatchingQueries dispatchingQueries, DocumentHelper documentHelper) : base(context, mapper)
         {
             _dispatchingValidator = dispatchingValidator;
             _dispatchingQueries = dispatchingQueries;
@@ -27,11 +27,7 @@ namespace CSMapi.Services
             string? searchTerm = null)
         {
             var query = _dispatchingQueries.pendingdispatchingquery(searchTerm);
-            var totalCount = await query.CountAsync();
-            var dispatchings = await PaginationHelper.paginateandproject<Dispatching, DispatchingResponse>(
-                query, pageNumber, pageSize, _mapper);
-
-            return PaginationHelper.paginatedresponse(dispatchings, totalCount, pageNumber, pageSize);
+            return await PaginationHelper.paginateandmap<Dispatching, DispatchingResponse>(query, pageNumber, pageSize, _mapper);
         }
         // [HttpGet("dispatchings")]
         public async Task<Pagination<DispatchingResponse>> alldispatched(
@@ -41,11 +37,7 @@ namespace CSMapi.Services
         {
 
             var query = _dispatchingQueries.dispatchedquery(searchTerm);
-            var totalCount = await query.CountAsync();
-            var dispatchings = await PaginationHelper.paginateandproject<Dispatching, DispatchingResponse>(
-                query, pageNumber, pageSize, _mapper);
-
-            return PaginationHelper.paginatedresponse(dispatchings, totalCount, pageNumber, pageSize);
+            return await PaginationHelper.paginateandmap<Dispatching, DispatchingResponse>(query, pageNumber, pageSize, _mapper);
         }
         // [HttpGet("dispatching/generate-documentNo")]
         public async Task<DocumentNumberResponse> generatedocumentnumber()
@@ -79,7 +71,7 @@ namespace CSMapi.Services
         // [HttpGet("dispatching/{id}")]
         public async Task<DispatchingResponse> getdispatch(int id)
         {
-            var dispatching = await _dispatchingQueries.getmethoddispatchingid(id);
+            var dispatching = await getdispatchingdata(id);
 
             return _mapper.Map<DispatchingResponse>(dispatching);
         }
@@ -147,7 +139,7 @@ namespace CSMapi.Services
             await _context.SaveChangesAsync();
             await transaction.CommitAsync();
 
-            return _mapper.Map<DispatchingResponse>(dispatch);
+            return await dispatchingResponse(dispatch.Id);
         }
         // [HttpPost("dispatching")]
         public async Task<DispatchingResponse> addsingledispatch(DispatchingRequest request, ClaimsPrincipal user)
@@ -228,7 +220,7 @@ namespace CSMapi.Services
             await _context.SaveChangesAsync();
             await transaction.CommitAsync();
 
-            return _mapper.Map<DispatchingResponse>(dispatch);
+            return await dispatchingResponse(dispatch.Id);
         }
         // [HttpPatch("dispatching/update/{id}")]
         public async Task<DispatchingResponse> updatedispatch(ClaimsPrincipal user, DispatchingRequest request, int id)
@@ -241,8 +233,7 @@ namespace CSMapi.Services
             dispatching.Updatedon = TimeHelper.GetPhilippineStandardTime();
 
             await _context.SaveChangesAsync();
-            var updatedDispatching = await _dispatchingQueries.getmethoddispatchingid(dispatching.Id);
-            return _mapper.Map<DispatchingResponse>(updatedDispatching);
+            return await dispatchingResponse(dispatching.Id);
         }
         // [HttpPatch("dispatching/time-start-end")]
         public async Task<DispatchingTimeStartEndResponse> addtimestartend (string timeStart, string timeEnd, int id, ClaimsPrincipal user)
@@ -270,11 +261,10 @@ namespace CSMapi.Services
             _context.Dispatchings.Update(dispatching);
             await _context.SaveChangesAsync();
 
-            var updatedDispatching = await _dispatchingQueries.getmethoddispatchingid(dispatching.Id);
-            return _mapper.Map<DispatchingResponse>(updatedDispatching);
+            return await dispatchingResponse(dispatching.Id);
         }
         // [HttpPatch("dispatching/hide/{id}")]
-        public async Task hidedispatch(int id)
+        public async Task<DispatchingResponse> hidedispatch(int id)
         {
             var dispatching = await getdispatchingid(id);
 
@@ -282,14 +272,18 @@ namespace CSMapi.Services
 
             _context.Dispatchings.Update(dispatching);
             await _context.SaveChangesAsync();
+
+            return await dispatchingResponse(dispatching.Id);
         }
         // [HttpDelete("dispatching/delete/{id}")]
-        public async Task deletedispatch(int id)
+        public async Task<DispatchingResponse> deletedispatch(int id)
         {
             var dispatching = await getdispatchingid(id);
 
             _context.Dispatchings.Remove(dispatching);
             await _context.SaveChangesAsync();
+
+            return await dispatchingResponse(dispatching.Id);
         }
         // Helpers
         private void RequestStatusUpdate(ClaimsPrincipal user, Dispatching dispatching, string status, string? note = null)
@@ -309,10 +303,18 @@ namespace CSMapi.Services
                     break;
             }
         }
-        
         private async Task<Dispatching?> getdispatchingid(int id)
         {
             return await _dispatchingQueries.patchmethoddispatchingid(id);
+        }
+        private async Task<Dispatching?> getdispatchingdata(int id)
+        {
+            return await _dispatchingQueries.getmethoddispatchingid(id);
+        }
+        private async Task<DispatchingResponse> dispatchingResponse(int id)
+        {
+            var response = await getdispatchingdata(id);
+            return _mapper.Map<DispatchingResponse>(response);
         }
     }
 }

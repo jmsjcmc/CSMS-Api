@@ -9,7 +9,7 @@ using System.Security.Claims;
 
 namespace CSMapi.Services
 {
-    public class ReceivingService : BaseService, IReceivingService
+    public class ReceivingService : BaseService , IReceivingService
     {
         private readonly ReceivingValidator _receivingValidator;
         private readonly ReceivingQueries _receivingQueries;
@@ -29,12 +29,7 @@ namespace CSMapi.Services
             string? status = null)
         {
             var query = _receivingQueries.receivingsquery(searchTerm, category, status);
-            var totalCount = await query.CountAsync();
-
-            var receivings = await PaginationHelper.paginateandproject<Receiving, ReceivingResponse>(
-                query, pageNumber, pageSize, _mapper);
-
-            return PaginationHelper.paginatedresponse(receivings, totalCount, pageNumber, pageSize);
+            return await PaginationHelper.paginateandmap<Receiving, ReceivingResponse>(query, pageNumber, pageSize, _mapper);
         }
         // [HttpGet("receivings/pending")]
         public async Task<Pagination<ReceivingResponse>> allpendings(
@@ -43,17 +38,12 @@ namespace CSMapi.Services
             string? category = null)
         {
             var query = _receivingQueries.pendingreceivingsquery(category);
-            var totalCount = await query.CountAsync();
-
-            var receivings = await PaginationHelper.paginateandproject<Receiving, ReceivingResponse>(
-                query, pageNumber, pageSize, _mapper);
-
-            return PaginationHelper.paginatedresponse(receivings, totalCount, pageNumber, pageSize);
+            return await PaginationHelper.paginateandmap<Receiving, ReceivingResponse>(query, pageNumber, pageSize, _mapper);
         }
         // [HttpGet("receiving/{id}")]
         public async Task<ReceivingResponse> getreceiving(int id)
         {
-            var receiving = await _receivingQueries.getmethodreceivingid(id);
+            var receiving = await getreceivingdata(id);
 
             return _mapper.Map<ReceivingResponse>(receiving);
         }
@@ -137,7 +127,7 @@ namespace CSMapi.Services
             await _context.SaveChangesAsync();
             await transaction.CommitAsync();
 
-            var savedReceiving = await _receivingQueries.getmethodreceivingid(receiving.Id);
+            var savedReceiving = await getreceivingdata(receiving.Id);
 
             return _mapper.Map<ReceivingResponse>(savedReceiving);
         }
@@ -173,26 +163,28 @@ namespace CSMapi.Services
 
             await _context.SaveChangesAsync();
 
-            var updatedReceiving = await _receivingQueries.getmethodreceivingid(receiving.Id);
-
-            return _mapper.Map<ReceivingResponse>(updatedReceiving);
+            return await receivingResponse(receiving.Id);
         }
         // [HttpPatch("receiving/hide/{id}")]
-        public async Task hidereceiving(int id)
+        public async Task<ReceivingResponse> hidereceiving(int id)
         {
             var receiving = await getreceivingid(id);
 
             receiving.Removed = true;
             _context.Receivings.Update(receiving);
             await _context.SaveChangesAsync();
+
+            return await receivingResponse(receiving.Id);
         }
         // [HttpDelete("receiving/delete/{id}")]
-        public async Task deletereceiving(int id)
+        public async Task<ReceivingResponse> deletereceiving(int id)
         {
             var receiving = await getreceivingid(id);
 
             _context.Receivings.Remove(receiving);
             await _context.SaveChangesAsync();
+
+            return await receivingResponse(receiving.Id);
         }
         // Helpers
         private void RequestStatusUpdate(ClaimsPrincipal user, Receiving receiving, string status, string? note = null)
@@ -215,10 +207,18 @@ namespace CSMapi.Services
                     break;
             }
         }
-
        private async Task<Receiving?> getreceivingid(int id)
         {
             return await _receivingQueries.patchmethodreceivingid(id);
+        }
+        private async Task<Receiving?> getreceivingdata(int id)
+        {
+            return await _receivingQueries.getmethodreceivingid(id);
+        }
+        private async Task<ReceivingResponse> receivingResponse(int id)
+        {
+            var response = await getreceivingdata(id);
+            return _mapper.Map<ReceivingResponse>(response);
         }
     }
 }

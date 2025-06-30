@@ -11,7 +11,7 @@ namespace CSMapi.Helpers.Queries
             _context = context;
         }
         // Query for fetching all contracts with optional filter for lesseecompany
-        public IQueryable<Contract?> contractsquery(string? searchTerm = null)
+        public IQueryable<Contract> contractsquery(string? searchTerm = null)
         {
             var query = _context.Contracts
                   .AsNoTracking()
@@ -31,12 +31,15 @@ namespace CSMapi.Helpers.Queries
             return await _context.Contracts
                 .AsNoTracking()
                 .Include(c => c.Leasedpremises)
+                .Include(c => c.Creator)
                 .FirstOrDefaultAsync(c => c.Id == id);
         }
         // Query for fetching specific contract for PATCH/PUT/DELETE methods
         public async Task<Contract?> patchmethodcontractid(int id)
         {
             return await _context.Contracts
+                    .Include(c => c.Leasedpremises)
+                    .Include(c => c.Creator)
                     .FirstOrDefaultAsync(c => c.Id == id);
         }
     }

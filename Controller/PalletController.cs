@@ -383,12 +383,12 @@ namespace CSMapi.Controller
         }
         // Remove specific pallet without removing in Database (Soft Delete)
         [HttpPatch("pallet/hide/{id}")]
-        public async Task<ActionResult> hidepallet(int id)
+        public async Task<ActionResult<PalletResponse>> hidepallet(int id)
         {
             try
             {
-                await _palletService.hidepallet(id);
-                return Ok("Pallet removed.");
+                var response = await _palletService.hidepallet(id);
+                return response;
             } catch (Exception e)
             {
                 return HandleException(e);
@@ -396,12 +396,12 @@ namespace CSMapi.Controller
         }
         // Remove specific pallet position without removing in Database (Soft Delete)
         [HttpPatch("pallet-position/hide/{id}")]
-        public async Task<ActionResult> hideposition(int id)
+        public async Task<ActionResult<PalletPositionResponse>> hideposition(int id)
         {
             try
             {
-                await _palletService.hideposition(id);
-                return Ok("Position removed.");
+                var response = await _palletService.hideposition(id);
+                return response;
             } catch (Exception e)
             {
                 return HandleException(e);
@@ -409,12 +409,12 @@ namespace CSMapi.Controller
         }
         // Delete specific cold storage in Database
         [HttpDelete("cold-storage/delete/{id}")]
-        public async Task<ActionResult> deletecoldstorage(int id)
+        public async Task<ActionResult<ColdStorageResponse>> deletecoldstorage(int id)
         {
             try
             {
-                await _palletService.deletecoldstorage(id);
-                return Ok("Cold Storage removed permanently.");
+                var response = await _palletService.deletecoldstorage(id);
+                return response;
             } catch (Exception e)
             {
                 return HandleException(e);
@@ -422,12 +422,12 @@ namespace CSMapi.Controller
         }
         // Delete specific pallet in Database
         [HttpDelete("pallet/delete/{id}")]
-        public async Task<ActionResult> deletepallet(int id)
+        public async Task<ActionResult<PalletResponse>> deletepallet(int id)
         {
             try
             {
-                await _palletService.deletepallet(id);
-                return Ok("Pallet removed permanently.");
+                var response = await _palletService.deletepallet(id);
+                return response;
             } catch (Exception e)
             {
                 return HandleException(e);
@@ -435,12 +435,12 @@ namespace CSMapi.Controller
         }
         // Delete specific pallet position in Database
         [HttpDelete("pallet-position/delete/{id}")]
-        public async Task<ActionResult> deleteposition(int id)
+        public async Task<ActionResult<PalletPositionResponse>> deleteposition(int id)
         {
             try
             {
-                await _palletService.deleteposition(id);
-                return Ok("Position removed permanently.");
+                var response = await _palletService.deleteposition(id);
+                return response;
             } catch (Exception e)
             {
                 return HandleException(e);

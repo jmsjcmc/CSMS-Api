@@ -23,8 +23,8 @@
         public ColdStorage Coldstorage { get; set; }
         public string Wing { get; set; }
         public string Floor { get; set; }
-        public string Column { get; set; }
-        public string Side { get; set; }
+        public string? Column { get; set; }
+        public string? Side { get; set; }
         public bool Hidden { get; set; }
         public bool Removed { get; set; }
         public ICollection<ReceivingDetail> ReceivingDetail { get; set; }

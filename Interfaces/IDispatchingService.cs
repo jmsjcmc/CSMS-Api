@@ -21,7 +21,7 @@ namespace CSMapi.Interfaces
         Task<DispatchingTimeStartEndResponse> addtimestartend(string timeStart, string timeEnd, int id, ClaimsPrincipal user);
         Task<DispatchingResponse> request(ClaimsPrincipal user, string status, int documentId, string? note = null);
         Task<DispatchingResponse> updatedispatch(ClaimsPrincipal user, DispatchingRequest request, int id);
-        Task hidedispatch(int id);
-        Task deletedispatch(int id);
+        Task<DispatchingResponse> hidedispatch(int id);
+        Task<DispatchingResponse> deletedispatch(int id);
     }
 }

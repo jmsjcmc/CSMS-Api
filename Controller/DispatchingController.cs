@@ -161,12 +161,12 @@ namespace CSMapi.Controller
         }
         // Remove specific dispatching request without removing in Database (Soft Delete)
         [HttpPatch("dispatching/hide/{id}")]
-        public async Task<ActionResult> hidedispatch(int id)
+        public async Task<ActionResult<DispatchingResponse>> hidedispatch(int id)
         {
             try
             {
-                await _dispatchingService.hidedispatch(id);
-                return Ok("Dispatching File removed.");
+                var response = await _dispatchingService.hidedispatch(id);
+                return response;
             } catch (Exception e)
             {
                 return HandleException(e);
@@ -174,12 +174,12 @@ namespace CSMapi.Controller
         }
         // Delete specific dispatching request in Database
         [HttpDelete("dispatching/delete/{id}")]
-        public async Task<ActionResult> deletedispatch(int id)
+        public async Task<ActionResult<DispatchingResponse>> deletedispatch(int id)
         {
             try
             {
-                await _dispatchingService.deletedispatch(id);
-                return Ok("Dispatchig File removed permanently.");
+                var response = await _dispatchingService.deletedispatch(id);
+                return response;
             } catch (Exception e)
             {
                 return HandleException(e);

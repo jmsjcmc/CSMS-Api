@@ -50,6 +50,7 @@ namespace CSMapi.Helpers
             CreateMap<ColdStorage, ColdStorageResponse>();
             // Contracts Mapping
             CreateMap<ContractRequest, Contract>()
+                .ForMember(d => d.Leasedpremises, o => o.MapFrom(s => s.LeasedPremise))
                 .ForMember(d => d.Createdon, o => o.Ignore())
                 .ForMember(d => d.Creatorid, o => o.Ignore())
                 .ForMember(d => d.Updatedon, o => o.Ignore())
@@ -121,7 +122,6 @@ namespace CSMapi.Helpers
             CreateMap<Product, ProductWithReceivingResponse>()
                 .ForMember(d => d.Overallweight, o => o.Ignore())
                 .ForMember(d => d.Temperature, o => o.Ignore())
-                .ForMember(d => d.Productiondate, o => o.Ignore())
                 .ForMember(d => d.Customer, o => o.MapFrom(s => s.Customer))
                 .ForMember(d => d.ReceivingDetail, o => o.MapFrom((s, d, dm, c) =>
                     s.Receiving
@@ -196,6 +196,16 @@ namespace CSMapi.Helpers
             CreateMap<User, UserResponse>();
 
             CreateMap<User, UserEsignResponse>();
+            // Repalletization Mapping
+            CreateMap<RepalletizationRequest, Repalletization>()
+                .ForMember(d => d.RepalletizationDetail, o => o.MapFrom(s => s.RepalletizationDetail));
+
+            CreateMap<Repalletization, RepalletizationResponse>()
+                .ForMember(d => d.RepalletizationDetail, o => o.MapFrom(s => s.RepalletizationDetail));
+            // Repalletization Detail Mapping
+            CreateMap<RepalletizationDetailRequest, RepalletizationDetail>();
+
+            CreateMap<RepalletizationDetail, RepalletizationDetailResponse>();
         }
     }
 }

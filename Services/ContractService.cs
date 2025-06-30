@@ -9,12 +9,14 @@ using System.Security.Claims;
 
 namespace CSMapi.Services
 {
-    public class ContractService : BaseService, IContractService
+    public class ContractService : BaseService , IContractService
     {
+       
         private readonly ContractValidator _contractValidator;
         private readonly ContractQueries _contractQueries;
         public ContractService(AppDbContext context, IMapper mapper, ContractValidator contractValidator, ContractQueries contractQueries) : base (context, mapper)
         {
+           
             _contractValidator = contractValidator;
             _contractQueries = contractQueries;
         }
@@ -24,21 +26,15 @@ namespace CSMapi.Services
             int pageSize = 10,
             string? searchTerm = null)
         {
-
             var query = _contractQueries.contractsquery(searchTerm);
-            var totalCount = await query.CountAsync();
-
-            var contracts = await PaginationHelper.paginateandproject<Contract, ContractResponse>(
-                query, pageNumber, pageSize, _mapper);
-
-            return PaginationHelper.paginatedresponse(contracts, totalCount, pageNumber, pageSize);
+            return await PaginationHelper.paginateandmap<Contract, ContractResponse>(query, pageNumber, pageSize, _mapper);
         }
         // [HttpGet("contract/{id}")]
         public async Task<ContractResponse> getcontract(int id)
         {
             await _contractValidator.ValidateFetchContract(id);
 
-            var contract = await _contractQueries.getmethodcontractid(id);
+            var contract = await getcontractdata(id);
 
             return _mapper.Map<ContractResponse>(contract);
         }
@@ -54,9 +50,7 @@ namespace CSMapi.Services
             _context.Contracts.Add(contract);
             await _context.SaveChangesAsync();
 
-            var savedContract = await _contractQueries.getmethodcontractid(contract.Id);
-
-            return _mapper.Map<ContractResponse>(savedContract);
+            return await contractResponse(contract.Id);
         }
         // [HttpPatch("contract/update/{id}")]
         public async Task<ContractResponse> updatecontract(ContractRequest request, int id, ClaimsPrincipal user)
@@ -69,12 +63,10 @@ namespace CSMapi.Services
 
             await _context.SaveChangesAsync();
 
-            var updatedContract = await _contractQueries.getmethodcontractid(contract.Id);
-
-            return _mapper.Map<ContractResponse>(updatedContract);
+            return await contractResponse(contract.Id);
         }
         // [HttpPatch("contract/hide/{id}")]
-        public async Task hidecontract(int id)
+        public async Task<ContractResponse> hidecontract(int id)
         {
             var contract = await getcontractid(id);
 
@@ -82,19 +74,32 @@ namespace CSMapi.Services
 
             _context.Contracts.Update(contract);
             await _context.SaveChangesAsync();
+
+            return await contractResponse(contract.Id);
         }
         // [HttpDelete("contract/delete/{id}")]
-        public async Task deletecontract(int id)
+        public async Task<ContractResponse> deletecontract(int id)
         {
             var contract = await getcontractid(id);
 
             _context.Contracts.Remove(contract);
             await _context.SaveChangesAsync();
+
+            return await contractResponse(contract.Id);
         }
-        // Helper
+        // Helpers
         private async Task<Contract?> getcontractid(int id)
         {
             return await _contractQueries.patchmethodcontractid(id);
+        }
+        private async Task<Contract?> getcontractdata(int id)
+        {
+            return await _contractQueries.getmethodcontractid(id);
+        }
+        private async Task<ContractResponse> contractResponse(int id)
+        {
+            var response = await getcontractdata(id);
+            return _mapper.Map<ContractResponse>(response);
         }
     }
 }

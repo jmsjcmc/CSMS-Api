@@ -33,7 +33,7 @@ namespace CSMapi.Interfaces
         Task<ProductResponse> addproduct(ProductRequest request);
         Task<ProductResponse> updateproduct(ProductRequest request, int id);
         Task<ProductActiveResponse> toggleactive(int id);
-        Task hideproduct(int id);
-        Task deleteproduct(int id);
+        Task<ProductResponse> hideproduct(int id);
+        Task<ProductResponse> deleteproduct(int id);
     }
 }

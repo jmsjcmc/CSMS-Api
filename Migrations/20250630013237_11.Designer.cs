@@ -4,6 +4,7 @@ using CSMapi;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CSMapi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250630013237_11")]
+    partial class _11
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -475,6 +478,7 @@ namespace CSMapi.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Column")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Csid")
@@ -491,6 +495,7 @@ namespace CSMapi.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Side")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Wing")
@@ -870,11 +875,11 @@ namespace CSMapi.Migrations
                             Id = 1,
                             Businessunit = "ABFI Central Office",
                             Businessunitlocation = "Binugao, Toril, Davao City",
-                            Createdon = new DateTime(2025, 6, 30, 9, 44, 49, 428, DateTimeKind.Unspecified).AddTicks(4695),
+                            Createdon = new DateTime(2025, 6, 30, 9, 32, 37, 308, DateTimeKind.Unspecified).AddTicks(5068),
                             Department = "Cisdevo",
                             Firstname = "James Jecemeco",
                             Lastname = "Tabilog",
-                            Password = "$2a$11$VNcNUhZEKuEir.VI2dgyIuv23hlivOMf.DhEVFCQP3MFnJ8WZbtC6",
+                            Password = "$2a$11$yN9t5QQcKA0SrTxAfeS8XOrSq5FZ1xcRsVYvEx4s02jJCS3s05rgG",
                             Position = "Software Developer",
                             Removed = false,
                             Role = "Admin, User, Approver",
@@ -885,11 +890,11 @@ namespace CSMapi.Migrations
                             Id = 2,
                             Businessunit = "SubZero Ice and Cold Storage Inc",
                             Businessunitlocation = "Binugao, Toril, Davao City",
-                            Createdon = new DateTime(2025, 6, 30, 9, 44, 49, 791, DateTimeKind.Unspecified).AddTicks(173),
+                            Createdon = new DateTime(2025, 6, 30, 9, 32, 37, 482, DateTimeKind.Unspecified).AddTicks(4793),
                             Department = "Executive",
                             Firstname = "Shiela",
                             Lastname = "Hernando",
-                            Password = "$2a$11$zz.VKEiTD4RbjnA3VZEr9.oePVKLSXHNzseFn7bHS2oZpqu9iX09W",
+                            Password = "$2a$11$QcKJNagu5WDVO4cBjPafOuVSj26r3y2BMqxmHR3DzzkTR1JgbvOCC",
                             Position = "Senior Operations Manager",
                             Removed = false,
                             Role = "Approver",
@@ -900,11 +905,11 @@ namespace CSMapi.Migrations
                             Id = 3,
                             Businessunit = "ABFI Central Office",
                             Businessunitlocation = "Binugao, Toril, Davao City",
-                            Createdon = new DateTime(2025, 6, 30, 9, 44, 49, 994, DateTimeKind.Unspecified).AddTicks(5140),
+                            Createdon = new DateTime(2025, 6, 30, 9, 32, 37, 658, DateTimeKind.Unspecified).AddTicks(9668),
                             Department = "Cisdevo",
                             Firstname = "Jerecho",
                             Lastname = "Asilum",
-                            Password = "$2a$11$MJeqht7newU2LJqu5xx5/ew4.DuK.7KPnpYxGZoFpFXUdeTfrJ.re",
+                            Password = "$2a$11$L2waGscoNU4dW22.XllZ/uT8jcf4tpWR2Tt5N3.quoZ5/E3aEJt2i",
                             Position = "Software Developer",
                             Removed = false,
                             Role = "Admin, User, Approver",

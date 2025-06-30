@@ -10,7 +10,7 @@ namespace CSMapi.Helpers.Queries
         {
             _context = context;
         }
-        // Query for fetching all occupied pallets based on product id
+        // Query for fetching all filtered pallets based on product id
         public async Task<List<Pallet>> productbasedoccupiedpallets(int id)
         {
             return await _context.Pallets
@@ -19,11 +19,11 @@ namespace CSMapi.Helpers.Queries
                 .Include(p => p.ReceivingDetail)
                 .ThenInclude(r => r.Receiving)
                 .ThenInclude(r => r.Product)
-                .Where(p => p.Occupied && p.ReceivingDetail.Any(r => r.Receiving.Productid == id))
+                .Where(p => p.Occupied && p.ReceivingDetail.Any(r => r.Receiving.Product.Id == id))
                 .OrderByDescending(p => p.Id)
                 .ToListAsync();
         }
-        // Query for fetching all occupied palelts with optional filter for pallet number
+        // Query for fetching all occupied pallets with optional filter for pallet number
         public IQueryable<Pallet> occupiedpalletsquery(string? searchTerm = null)
         {
             var query = _context.Pallets
@@ -101,6 +101,22 @@ namespace CSMapi.Helpers.Queries
             return await _context.Coldstorages
                     .AsNoTracking()
                     .FirstOrDefaultAsync(c => c.Id == id);
+        }
+        // Query for fetching specific pallet position for GET method
+        public async Task<PalletPosition?> getmethodpositionid(int id)
+        {
+            return await _context.Palletpositions
+                .AsNoTracking()
+                .Include(p => p.Coldstorage)
+                .FirstOrDefaultAsync(p => p.Id == id);
+        }
+        // Query for fetching specific repalletization for GET method
+        public async Task<Repalletization?> getmethodrepalletizationid(int id)
+        {
+            return await _context.Repalletizations
+                .AsNoTracking()
+                .Include(r => r.RepalletizationDetail)
+                .FirstOrDefaultAsync(r => r.Id == id);
         }
         // Query for fetching pallet positions based on cs id
         public async Task<List<PalletPosition>> getpositionsbasedoncs(int id)

@@ -97,7 +97,6 @@ namespace CSMapi
 
             modelBuilder.Entity<Contract>(entity =>
             {
-
                 entity.HasMany(c => c.Leasedpremises)
                 .WithOne(l => l.Contract)
                 .HasForeignKey(l => l.Contractid)

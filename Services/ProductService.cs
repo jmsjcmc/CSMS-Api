@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CSMapi.Services
 {
-    public class ProductService : BaseService, IProductService
+    public class ProductService : BaseService , IProductService
     {
         private readonly ProductValidator _productValidator;
         private readonly ProductQueries _productQueries;
@@ -31,12 +31,7 @@ namespace CSMapi.Services
             string? searchTerm = null)
         {
             var query = _productQueries.productsquery(searchTerm);
-            var totalCount = await query.CountAsync();
-
-            var products = await PaginationHelper.paginateandproject<Product, ProductResponse>(
-                query, pageNumber, pageSize, _mapper);
-
-            return PaginationHelper.paginatedresponse(products, totalCount, pageNumber, pageSize);
+            return await PaginationHelper.paginateandmap<Product, ProductResponse>(query, pageNumber, pageSize, _mapper);
         }
         // [HttpGet("products/company-inventory/as-of")]
         public async Task<Pagination<ProductWithReceivingAndDispatchingResponse>> customerbasedproducts_asof(
@@ -87,7 +82,7 @@ namespace CSMapi.Services
         // [HttpGet("product/{id}")]
         public async Task<ProductResponse> getproduct(int id)
         {
-            var product = await _productQueries.getmethodproductid(id);
+            var product = await getproductdata(id);
 
             return _mapper.Map<ProductResponse>(product);
         }
@@ -161,7 +156,6 @@ namespace CSMapi.Services
             }
 
             var temperature = received.Temperature;
-            var productiontDate = received.Productiondate;
             var overallWeight = product.Receiving
                 .Where(r => r.Received)
                 .Sum(r => r.Overallweight);
@@ -170,7 +164,6 @@ namespace CSMapi.Services
             response.ReceivingDetail = receivingDetailsResponse;
             response.Overallweight = Math.Round(overallWeight, 2);
             response.Temperature = temperature;
-            response.Productiondate = productiontDate;
             return response;
         }
         // [HttpPost("product")]
@@ -195,7 +188,7 @@ namespace CSMapi.Services
 
             await _context.SaveChangesAsync();
 
-            return _mapper.Map<ProductResponse>(product);
+            return await productResponse(product.Id);
         }
         // [HttpPatch("product/toggle-active")]
         public async Task<ProductActiveResponse> toggleactive (int id)
@@ -210,7 +203,7 @@ namespace CSMapi.Services
             return _mapper.Map<ProductActiveResponse>(product);
         }
         // [HttpPatch("product/hide/{id}")]
-        public async Task hideproduct(int id)
+        public async Task<ProductResponse> hideproduct(int id)
         {
             var product = await getproductid(id);
 
@@ -218,19 +211,32 @@ namespace CSMapi.Services
 
             _context.Products.Update(product);
             await _context.SaveChangesAsync();
+
+            return await productResponse(product.Id);
         }
         // [HttpDelete("product/delete/{id}")]
-        public async Task deleteproduct(int id)
+        public async Task<ProductResponse> deleteproduct(int id)
         {
             var product = await getproductid(id);
 
             _context.Products.Remove(product);
             await _context.SaveChangesAsync();
+
+            return await productResponse(product.Id);
         }
-        // Helper
+        // Helpers
         private async Task<Product?> getproductid(int id)
         {
             return await _productQueries.patchmethodproductid(id);
+        }
+        private async Task<Product?> getproductdata(int id)
+        {
+            return await _productQueries.getmethodproductid(id);
+        }
+        private async Task<ProductResponse> productResponse(int id)
+        {
+            var response = await getproductdata(id);
+            return _mapper.Map<ProductResponse>(response);
         }
     }
 }

@@ -28,7 +28,7 @@ namespace CSMapi.Helpers.Queries
                 .ToListAsync();
         }
         // Query for fetching all pending dispatching request with optional filter for category
-        public IQueryable<Dispatching?> pendingdispatchingquery(string? searchTerm = null)
+        public IQueryable<Dispatching> pendingdispatchingquery(string? searchTerm = null)
         {
             var query = _context.Dispatchings
                    .AsNoTracking()
@@ -46,7 +46,7 @@ namespace CSMapi.Helpers.Queries
             return query;
         }
         // Query for fetching all dispatched with optional filter for category
-        public IQueryable<Dispatching?> dispatchedquery(string? searchTerm = null)
+        public IQueryable<Dispatching> dispatchedquery(string? searchTerm = null)
         {
             var query = _context.Dispatchings
                    .AsNoTracking()

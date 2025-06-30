@@ -10,16 +10,17 @@ namespace CSMapi.Helpers.Excel
             "Category", "Document Number", "Product Name",
             "Expiration Date", "Cv Number", "Plate Number",
             "Arrival Date", "Unloading Start", "Unloading End",
-            "Overall Weight", "Temperature", "Production Date",
-            "Note", "Date Received", "Date Declined",
-            "Pending", "Received", "Declined",
-            "Requestor", "Approver"
+            "Overall Weight", "Temperature", "Note",
+            "Date Received", "Date Declined", "Pending", 
+            "Received", "Declined", "Requestor",
+            "Approver"
         };
         public readonly string[] detailHeader =
         {
             "Product Name", "Pallet Number", "Wing",
             "Floor", "Column", "Side",
-            "Quantity", "Total Weight", "Full Dispatched", "Partial Dispatched"
+            "Production Date", "Quantity", "Total Weight",
+            "Full Dispatched", "Partial Dispatched"
         };
         public ReceivingExcel(AppDbContext context) : base (context)
         {
@@ -71,7 +72,6 @@ namespace CSMapi.Helpers.Excel
                     receiving.Unloadingend,
                     receiving.Overallweight, 
                     receiving.Temperature, 
-                    receiving.Productiondate?.ToString("MM-dd-yyyy"),
                     receiving.Note, 
                     receiving.Datereceived,
                     receiving.Datedeclined,
@@ -118,6 +118,7 @@ namespace CSMapi.Helpers.Excel
                         receivingDetail.PalletPosition.Floor, 
                         receivingDetail.PalletPosition.Column, 
                         receivingDetail.PalletPosition.Side,
+                        receivingDetail.Productiondate.ToString("MM-dd-yyyy"),
                         receivingDetail.Quantityinapallet, 
                         receivingDetail.Totalweight,
                         receivingDetail.Fulldispatched,

@@ -11,7 +11,7 @@ namespace CSMapi.Helpers.Queries
             _context = context;
         }
         // Query for fetching customers with optional filter for company name
-        public IQueryable<Customer?> customeronlyquery(string? searchTerm = null)
+        public IQueryable<Customer> customeronlyquery(string? searchTerm = null)
         {
             var query = _context.Customers
                    .AsNoTracking()

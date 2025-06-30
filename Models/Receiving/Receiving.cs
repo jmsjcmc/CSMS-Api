@@ -15,7 +15,6 @@
         public string Unloadingend { get; set; }
         public double Overallweight { get; set; }
         public string? Temperature { get; set; }
-        public DateTime? Productiondate { get; set; }
         public string? Receivingform { get; set; }
         public string? Note { get; set; }
         public int Requestorid { get; set; }
@@ -42,6 +41,7 @@
         public Pallet Pallet { get; set; }
         public int Positionid { get; set; }
         public PalletPosition PalletPosition { get; set; }
+        public DateTime Productiondate { get; set; }
         public int Quantityinapallet { get; set; }
         public double Totalweight { get; set; }
         public bool Received { get; set; }

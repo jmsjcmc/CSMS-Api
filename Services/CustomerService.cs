@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CSMapi.Services
 {
-    public class CustomerService : BaseService, ICustomerService
+    public class CustomerService : BaseService , ICustomerService
     {
         private readonly CustomerValidator _customerValidator;
         private readonly CustomerQueries _customerQueries;
@@ -24,11 +24,7 @@ namespace CSMapi.Services
             string? searchTerm = null)
         {
             var query = _customerQueries.customeronlyquery(searchTerm);
-            var totalCount = await query.CountAsync();
-            var customers = await PaginationHelper.paginateandproject<Customer, CustomerResponse>(
-                query, pageNumber, pageSize, _mapper);
-
-            return PaginationHelper.paginatedresponse(customers, totalCount, pageNumber, pageSize);
+            return await PaginationHelper.paginateandmap<Customer, CustomerResponse>(query, pageNumber, pageSize, _mapper);
         }
         // [HttpGet("customers/active")]
         public async Task<List<CustomerResponse>> allactivecustomers()
@@ -40,7 +36,7 @@ namespace CSMapi.Services
         // [HttpGet("customer/{id}")]
         public async Task<CustomerResponse> getcustomer(int id)
         {
-            var customer = await _customerQueries.getmethodcustomerid(id);
+            var customer = await getcustomerdata(id);
 
             return _mapper.Map<CustomerResponse>(customer);
         }
@@ -55,7 +51,7 @@ namespace CSMapi.Services
             _context.Customers.Add(customer);
             await _context.SaveChangesAsync();
 
-            return _mapper.Map<CustomerResponse>(customer);
+            return await customerResponse(customer.Id);
         }
         // [HttpPatch("customer/update/{id}")]
         public async Task<CustomerResponse> updatecustomer(CustomerRequest request, int id)
@@ -65,9 +61,7 @@ namespace CSMapi.Services
             _mapper.Map(request, customer);
             await _context.SaveChangesAsync();
 
-            var updatedCustomer = await _customerQueries.getmethodcustomerid(customer.Id);
-
-            return _mapper.Map<CustomerResponse>(updatedCustomer);
+            return await customerResponse(customer.Id);
         }
         // [HttpPatch("customer/toggle-active")]
         public async Task<CustomerResponse> toggleactive(int id)
@@ -79,10 +73,10 @@ namespace CSMapi.Services
             _context.Customers.Update(customer);
             await _context.SaveChangesAsync();
 
-            return _mapper.Map<CustomerResponse>(customer);
+            return await customerResponse(customer.Id);
         }
         // [HttpPatch("customer/hide/{id}")]
-        public async Task hidecustomer(int id)
+        public async Task<CustomerResponse> hidecustomer(int id)
         {
             var customer = await getcustomerid(id);
 
@@ -90,19 +84,32 @@ namespace CSMapi.Services
 
             _context.Customers.Update(customer);
             await _context.SaveChangesAsync();
+
+            return await customerResponse(customer.Id);
         }
         // [HttpDelete("customer/delete/{id}")]
-        public async Task deletecustomer(int id)
+        public async Task<CustomerResponse> deletecustomer(int id)
         {
             var customer = await getcustomerid(id);
 
             _context.Customers.Remove(customer);
             await _context.SaveChangesAsync();
+
+            return await customerResponse(customer.Id);
         }
         // Helper
         private async Task<Customer?> getcustomerid(int id)
         {
             return await _customerQueries.patchmethodcustomerid(id);
+        }
+        private async Task<Customer?> getcustomerdata(int id)
+        {
+            return await _customerQueries.getmethodcustomerid(id);
+        }
+        private async Task<CustomerResponse> customerResponse(int id)
+        {
+            var response = await getcustomerdata(id);
+            return _mapper.Map<CustomerResponse>(response);
         }
     }
 }

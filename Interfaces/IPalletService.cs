@@ -22,7 +22,7 @@ namespace CSMapi.Interfaces
         Task<ColdStorageResponse> getcoldstorage(int id);
         Task<PalletPositionResponse> getposition(int id);
         Task<PalletResponse> getpallet(int id);
-        Task repalletize(RepalletizationRequest request, ClaimsPrincipal user);
+        Task<RepalletizationResponse> repalletize(RepalletizationRequest request, ClaimsPrincipal user);
         Task<ColdStorageResponse> addcoldstorage(ColdStorageRequest request);
         Task<PalletResponse> addpallet(PalletRequest request, ClaimsPrincipal user);
         Task<PalletPositionResponse> addposition(PalletPositionRequest request);
@@ -32,10 +32,10 @@ namespace CSMapi.Interfaces
         Task<ColdStorageResponse> cstoggleactive(int id);
         Task<PalletOnlyResponse> toggleoccupy(int id, ClaimsPrincipal user);
         Task<PalletOnlyResponse> toggleactive(int id, ClaimsPrincipal user);
-        Task hidepallet(int id);
-        Task hideposition(int id);
-        Task deletecoldstorage(int id);
-        Task deletepallet(int id);
-        Task deleteposition(int id);
+        Task<PalletResponse> hidepallet(int id);
+        Task<PalletPositionResponse> hideposition(int id);
+        Task<ColdStorageResponse> deletecoldstorage(int id);
+        Task<PalletResponse> deletepallet(int id);
+        Task<PalletPositionResponse> deleteposition(int id);
     }
 }

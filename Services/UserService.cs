@@ -9,12 +9,12 @@ using System.Security.Claims;
 
 namespace CSMapi.Services
 {
-    public class UserService : BaseService, IUserService
+    public class UserService : BaseService , IUserService
     {
         private readonly UserValidator _userValidator;
         private readonly AuthUserHelper _authHelper;
         private readonly UserQueries _userQueries;
-        public UserService(AppDbContext context, IMapper mapper, UserValidator userValidator, AuthUserHelper authHelper, UserQueries userQueries) : base(context, mapper)
+        public UserService(AppDbContext context, IMapper mapper, UserValidator userValidator, AuthUserHelper authHelper, UserQueries userQueries) : base (context, mapper)
         {
             _userValidator = userValidator;
             _authHelper = authHelper;
@@ -27,12 +27,7 @@ namespace CSMapi.Services
             string? searchTerm = null)
         {
             var query = _userQueries.usersquery(searchTerm);
-            var totalCount = await query.CountAsync();
-
-            var users = await PaginationHelper.paginateandproject<User, UserResponse>(
-                query, pageNumber, pageSize, _mapper);
-
-            return PaginationHelper.paginatedresponse(users, totalCount, pageNumber, pageSize);
+            return await PaginationHelper.paginateandmap<User, UserResponse>(query, pageNumber, pageSize, _mapper);
         }
         // [HttpGet("roles")]
         public async Task<List<RoleResponse>> allroles()
@@ -51,14 +46,14 @@ namespace CSMapi.Services
         // [HttpGet("user/{id}")]
         public async Task<UserResponse> getuser(int id)
         {
-            var user = await _userQueries.getmethoduserid(id);
+            var user = await getuserdata(id);
 
             return _mapper.Map<UserResponse>(user);
         }
         // [HttpGet("role/{id}")]
         public async Task<RoleResponse> getrole(int id)
         {
-            var role = await _userQueries.getmethodroleid(id);
+            var role = await getroledata(id);
 
             return _mapper.Map<RoleResponse>(role);
         }
@@ -135,7 +130,7 @@ namespace CSMapi.Services
             _mapper.Map(request, role);
             await _context.SaveChangesAsync();
 
-            return _mapper.Map<RoleResponse>(role);
+            return await roleResponse(role.Id);
         }
         // [HttpPatch("user/update/{id}")]
         public async Task<UserResponse> updateuser(UserRequest request, int id)
@@ -152,7 +147,7 @@ namespace CSMapi.Services
 
             await _context.SaveChangesAsync();
 
-            return _mapper.Map<UserResponse>(user);
+            return await userResponse(user.Id);
         }
         // [HttpPatch("user/e-signature/{id}")]
         public async Task<UserEsignResponse> addesign(IFormFile file, int id, ClaimsPrincipal requestor)
@@ -172,7 +167,7 @@ namespace CSMapi.Services
             return _mapper.Map<UserEsignResponse>(user);
         }
         // [HttpPatch("user/hide/{id}")]
-        public async Task hideuser(int id)
+        public async Task<UserResponse> hideuser(int id)
         {
             var user = await getuserid(id);
 
@@ -180,9 +175,11 @@ namespace CSMapi.Services
 
             _context.Users.Update(user);
             await _context.SaveChangesAsync();
+
+            return await userResponse(user.Id);
         }
         // [HttpPatch("role/hide/{id}")]
-        public async Task hiderole(int id)
+        public async Task<RoleResponse> hiderole(int id)
         {
             var role = await getroleid(id);
 
@@ -190,22 +187,28 @@ namespace CSMapi.Services
 
             _context.Roles.Update(role);
             await _context.SaveChangesAsync();
+
+            return await roleResponse(role.Id);
         }
         // [HttpDelete("user/delete/{id}")]
-        public async Task deleteuser(int id)
+        public async Task<UserResponse> deleteuser(int id)
         {
             var user = await getuserid(id);
 
             _context.Users.Remove(user);
             await _context.SaveChangesAsync();
+
+            return await userResponse(user.Id);
         }
         // [HttpDelete("role/delete/{id}")]
-        public async Task deleterole(int id)
+        public async Task<RoleResponse> deleterole(int id)
         {
             var role = await getroleid(id);
 
             _context.Roles.Remove(role);
             await _context.SaveChangesAsync();
+
+            return await roleResponse(role.Id);
         }
         // Helpers
         private async Task<string> GetValidRoleNames(List<string> roles)
@@ -224,7 +227,6 @@ namespace CSMapi.Services
 
             return roleNames;
         }
-
         private async Task<User?> getuserid(int id)
         {
             return await _userQueries.patchmethoduserid(id);
@@ -233,6 +235,25 @@ namespace CSMapi.Services
         private async Task<Role?> getroleid(int id)
         {
             return await _userQueries.patchmethodroleid(id);
+        }
+
+        private async Task<User?> getuserdata(int id)
+        {
+             return await _userQueries.getmethoduserid(id);
+        }
+        private async Task<Role?> getroledata(int id)
+        {
+            return await _userQueries.getmethodroleid(id);
+        }
+        private async Task<UserResponse> userResponse(int id)
+        {
+            var response = await getuserdata(id);
+            return _mapper.Map<UserResponse>(response);
+        }
+        private async Task<RoleResponse> roleResponse(int id)
+        {
+            var response = await getroledata(id);
+            return _mapper.Map<RoleResponse>(response);
         }
     }
 }

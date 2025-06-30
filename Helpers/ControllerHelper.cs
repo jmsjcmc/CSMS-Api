@@ -24,10 +24,12 @@ namespace CSMapi.Helpers
             };
         }
     }
+
     public abstract class BaseService
     {
         protected readonly AppDbContext _context;
         protected readonly IMapper _mapper;
+
         protected BaseService(AppDbContext context, IMapper mapper)
         {
             _context = context;

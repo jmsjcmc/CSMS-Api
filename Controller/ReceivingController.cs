@@ -149,12 +149,12 @@ namespace CSMapi.Controller
         }
         // Remove specific receiving request without removing in Database (Soft Delete) 
         [HttpPatch("receiving/hide/{id}")]
-        public async Task<ActionResult> hidereceiving(int id)
+        public async Task<ActionResult<ReceivingResponse>> hidereceiving(int id)
         {
             try
             {
-                await _receivingService.hidereceiving(id);
-                return Ok("Receiving File removed.");
+                var response = await _receivingService.hidereceiving(id);
+                return response;
             } catch (Exception e)
             {
                 return HandleException(e);
@@ -162,18 +162,16 @@ namespace CSMapi.Controller
         }
         // Delete specific receiving request in Database
         [HttpDelete("receiving/delete/{id}")]
-        public async Task<ActionResult> deletereceiving(int id)
+        public async Task<ActionResult<ReceivingResponse>> deletereceiving(int id)
         {
             try
             {
-                await _receivingService.deletereceiving(id);
-                return Ok("Request removed permanently.");
+                var response = await _receivingService.deletereceiving(id);
+                return response;
             } catch (Exception e)
             {
                 return HandleException(e);
             }
         }
-
-        
     }
 }

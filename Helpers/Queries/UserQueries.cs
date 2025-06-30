@@ -11,7 +11,7 @@ namespace CSMapi.Helpers.Queries
             _context = context;
         }
         // Query for fetching all users with optional filter for last name
-        public IQueryable<User?> usersquery (string? searchTerm = null)
+        public IQueryable<User> usersquery (string? searchTerm = null)
         {
             var query = _context.Users
                     .AsNoTracking()

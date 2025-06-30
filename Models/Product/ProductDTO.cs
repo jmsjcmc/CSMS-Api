@@ -83,7 +83,6 @@
         public string Unit { get; set; }
         public double Overallweight { get; set; }
         public string? Temperature { get; set; }
-        public DateTime? Productiondate { get; set; }
         public CustomerResponse Customer { get; set; }
         public List<ProductReceivingDetailResponse> ReceivingDetail { get; set; }
     }

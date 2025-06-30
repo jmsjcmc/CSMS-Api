@@ -14,7 +14,7 @@ namespace CSMapi.Interfaces
         Task<CustomerResponse> addcustomer(CustomerRequest request);
         Task<CustomerResponse> updatecustomer(CustomerRequest request, int id);
         Task<CustomerResponse> toggleactive(int id);
-        Task hidecustomer(int id);
-        Task deletecustomer(int id);
+        Task<CustomerResponse> hidecustomer(int id);
+        Task<CustomerResponse> deletecustomer(int id);
     }
 }

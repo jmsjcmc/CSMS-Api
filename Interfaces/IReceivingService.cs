@@ -21,7 +21,7 @@ namespace CSMapi.Interfaces
         Task<ReceivingResponse> addreceiving(ReceivingRequest request, IFormFile file, ClaimsPrincipal user);
         Task<ReceivingResponse> request(ClaimsPrincipal user, string status, int documentId, string? note = null);
         Task<ReceivingResponse> updatereceiving(ReceivingRequest request, IFormFile? file, int id, ClaimsPrincipal user);
-        Task hidereceiving(int id);
-        Task deletereceiving(int id);
+        Task<ReceivingResponse> hidereceiving(int id);
+        Task<ReceivingResponse> deletereceiving(int id);
     }
 }

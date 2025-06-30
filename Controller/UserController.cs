@@ -180,12 +180,12 @@ namespace CSMapi.Controller
         }
         // Remove specific user without removing in Database (Soft Delete)
         [HttpPatch("user/hide/{id}")]
-        public async Task<ActionResult> hideuser(int id)
+        public async Task<ActionResult<UserResponse>> hideuser(int id)
         {
             try
             {
-                await _userService.hideuser(id);
-                return Ok("User removed.");
+                var response = await _userService.hideuser(id);
+                return response;
             } catch (Exception e)
             {
                 return HandleException(e);
@@ -193,12 +193,12 @@ namespace CSMapi.Controller
         }
         // Remove specific role without removing in Database (Soft Delete)
         [HttpPatch("role/hide/{id}")]
-        public async Task<ActionResult> hiderole(int id)
+        public async Task<ActionResult<RoleResponse>> hiderole(int id)
         {
             try
             {
-                await _userService.hiderole(id);
-                return Ok("Role removed.");
+                var response = await _userService.hiderole(id);
+                return response;
             } catch (Exception e)
             {
                 return HandleException(e);
@@ -206,12 +206,12 @@ namespace CSMapi.Controller
         }
         // Delete specific user in Database
         [HttpDelete("user/delete/{id}")]
-        public async Task<ActionResult> deleteuser(int id)
+        public async Task<ActionResult<UserResponse>> deleteuser(int id)
         {
             try
             {
-                await _userService.deleteuser(id);
-                return Ok("User removed permanently.");
+                var response = await _userService.deleteuser(id);
+                return response;
             }
             catch (Exception e)
             {
@@ -220,12 +220,12 @@ namespace CSMapi.Controller
         }
         // Delete specific role in Database
         [HttpDelete("role/delete/{id}")]
-        public async Task<ActionResult> deleterole(int id)
+        public async Task<ActionResult<RoleResponse>> deleterole(int id)
         {
             try
             {
-                await _userService.deleterole(id);
-                return Ok("Role removed permanently.");
+                var response = await _userService.deleterole(id);
+                return response;
             } catch (Exception e)
             {
                 return HandleException(e);

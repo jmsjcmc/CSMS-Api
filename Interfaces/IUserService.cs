@@ -21,9 +21,9 @@ namespace CSMapi.Interfaces
         Task<RoleResponse> updaterole(RoleRequest request, int id);
         Task<UserResponse> updateuser(UserRequest request, int id);
         Task <UserEsignResponse> addesign(IFormFile file, int id, ClaimsPrincipal requestor);
-        Task hideuser(int id);
-        Task hiderole(int id);
-        Task deleteuser(int id);
-        Task deleterole(int id);
+        Task<UserResponse> hideuser(int id);
+        Task<RoleResponse> hiderole(int id);
+        Task<UserResponse> deleteuser(int id);
+        Task<RoleResponse> deleterole(int id);
     }
 }

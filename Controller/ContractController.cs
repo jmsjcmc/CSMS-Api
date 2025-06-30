@@ -51,7 +51,6 @@ namespace CSMapi.Controller
             {
                 var response = await _contractService.addcontract(request, User);
                 return response;
-
             } catch (Exception e)
             {
                 return HandleException(e);
@@ -73,12 +72,12 @@ namespace CSMapi.Controller
         }
         // Remove specific contract without removing in Database (Soft Delete)
         [HttpPatch("contract/hide/{id}")]
-        public async Task<ActionResult> hidecontract(int id)
+        public async Task<ActionResult<ContractResponse>> hidecontract(int id)
         {
             try
             {
-                await _contractService.hidecontract(id);
-                return Ok("Contract removed.");
+                var response = await _contractService.hidecontract(id);
+                return response;
             } catch (Exception e)
             {
                 return HandleException(e);
@@ -86,12 +85,12 @@ namespace CSMapi.Controller
         }
         // Delete specific contract in Database
         [HttpDelete("contract/delete/{id}")]
-        public async Task<ActionResult> deletecontract(int id)
+        public async Task<ActionResult<ContractResponse>> deletecontract(int id)
         {
             try
             {
-                await _contractService.deletecontract(id);
-                return Ok("Contract removed permanently.");
+                var response = await _contractService.deletecontract(id);
+                return response;
             } catch (Exception e)
             {
                 return HandleException(e);

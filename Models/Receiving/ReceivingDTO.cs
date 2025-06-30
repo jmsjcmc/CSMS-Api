@@ -15,7 +15,6 @@ namespace CSMapi.Models
         public string Unloadingend { get; set; }
         public double Overallweight { get; set; }
         public string? Temperature { get; set; }
-        public DateTime? Productiondate { get; set; }
         public string DetailJson { get; set; }
         [NotMapped]
         public List<ReceivingDetailRequest> ReceivingDetail
@@ -40,7 +39,6 @@ namespace CSMapi.Models
         public string Unloadingend { get; set; }
         public double Overallweight { get; set; }
         public string? Temperature { get; set; }
-        public DateTime? Productiondate { get; set; } = null;
         public string Receivingform { get; set; }
         public string Note { get; set; }
         public DateTime Createdon { get; set; }
@@ -61,6 +59,7 @@ namespace CSMapi.Models
     {
         public int Palletid { get; set; }
         public int Positionid { get; set; }
+        public DateTime Productiondate { get; set; }
         public int Quantityinapallet { get; set; }
         public double Totalweight { get; set; }
     }
@@ -69,6 +68,7 @@ namespace CSMapi.Models
     {
         public int Id { get; set; }
         public int Receivingid { get; set; }
+        public DateTime Productiondate { get; set; }
         public int Quantityinapallet { get; set; }
         public double Totalweight { get; set; }
         public bool Received { get; set; }
@@ -77,32 +77,28 @@ namespace CSMapi.Models
         public PalletResponse Pallet { get; set; }
         public PalletPositionResponse Position { get; set; }
     }
-
     public class RepalletizeDetailResponse
     {
         public int Id { get; set; }
         public int Quantityinapallet { get; set; }
     }
-
     public class ProductReceivingDetailResponse
     {
         public int Id { get; set; }
+        public DateTime Productiondate { get; set; }
         public int Quantityinapallet { get; set; }
         public double Totalweight { get; set; }
         public PalletResponse Pallet { get; set; }
         public PalletPositionResponse Position { get; set; }
     }
-
     public class DocumentNumberResponse
     {
         public string Documentno { get; set; }
     }
-
     public class DocumentRequest
     {
         public string Documentno { get; set; }
     }
-
     public class DocumentResponse
     {
         public int Id { get; set; }

@@ -237,12 +237,12 @@ namespace CSMapi.Controller
         }
         // Remove specific product without removing in Database (Soft Delete)
         [HttpPatch("product/hide/{id}")]
-        public async Task<ActionResult> hideproduct(int id)
+        public async Task<ActionResult<ProductResponse>> hideproduct(int id)
         {
             try
             {
-                await _productService.hideproduct(id);
-                return Ok("Success.");
+                var response = await _productService.hideproduct(id);
+                return response;
             } catch (Exception e)
             {
                 return HandleException(e);
@@ -250,12 +250,12 @@ namespace CSMapi.Controller
         }
         // Delete specific product in Database
         [HttpDelete("product/delete/{id}")]
-        public async Task<ActionResult> deleteproduct(int id)
+        public async Task<ActionResult<ProductResponse>> deleteproduct(int id)
         {
             try
             {
-                await _productService.deleteproduct(id);
-                return Ok("Success,");
+                var response = await _productService.deleteproduct(id);
+                return response;
             } catch (Exception e)
             {
                 return HandleException(e);
