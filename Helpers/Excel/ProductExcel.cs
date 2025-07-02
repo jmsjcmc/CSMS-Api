@@ -45,7 +45,7 @@ namespace CSMapi.Helpers.Excel
                 workSheet.Cell(i, 5).Value = sku[random.Next(sku.Length)];
                 workSheet.Cell(i, 6).Value = "Fresh Goods";
                 workSheet.Cell(i, 7).Value = selectedPackaging;
-                workSheet.Cell(i, 8).Value = deliveryUnit[random.Next(deliveryUnit.Length)];
+                workSheet.Cell(i, 8).Value = "Box";
                 workSheet.Cell(i, 9).Value = random.Next(1, 100);
                 workSheet.Cell(i, 10).Value = selectedPackaging;
                 workSheet.Cell(i, 11).Value = Math.Round(random.NextDouble() * 50 + 1, 2);
@@ -93,6 +93,9 @@ namespace CSMapi.Helpers.Excel
             foreach (var row in rows)
             {
                 var companyName = row.Cell(1).GetValue<string>();
+                var categoryName = row.Cell(6).GetValue<string>();
+                var category = await _context.Categories
+                    .FirstOrDefaultAsync(c => c.Name.ToLower() == categoryName.ToLower());
                 var customer = await _context.Customers
                     .FirstOrDefaultAsync(c => c.Companyname.ToLower() == companyName.ToLower());
                 products.Add(new Product
@@ -102,7 +105,7 @@ namespace CSMapi.Helpers.Excel
                     Productname = row.Cell(3).GetValue<string>(),
                     Variant = row.Cell(4).GetValue<string>(),
                     Sku = row.Cell(5).GetValue<string>(),
-                    Category = row.Cell(6).GetValue<string>(),
+                    Categoryid = category.Id,
                     Productpackaging = row.Cell(7).GetValue<string>(),
                     Deliveryunit = row.Cell(8).GetValue<string>(),
                     Quantity = row.Cell(9).GetValue<int>(),

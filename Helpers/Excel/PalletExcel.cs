@@ -34,7 +34,7 @@ namespace CSMapi.Helpers.Excel
 
             for (int i = 2; i <= 100; i++)
             {
-                workSheet.Cell(i, 1).Value = "Wood";
+                workSheet.Cell(i, 1).Value = "Plastic";
                 workSheet.Cell(i, 2).Value = 123123 + i;
             }
 

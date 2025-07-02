@@ -3,7 +3,8 @@
     public class Product
     {
         public int Id { get; set; }
-        public string Category { get; set; }
+        public int Categoryid { get; set; }
+        public Category Category { get; set; }
         public int Customerid { get; set; }
         public Customer Customer { get; set; }
         public string Productcode { get; set; }

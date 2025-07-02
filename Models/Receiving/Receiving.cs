@@ -14,7 +14,6 @@
         public string Unloadingstart { get; set; }
         public string Unloadingend { get; set; }
         public double Overallweight { get; set; }
-        public string? Temperature { get; set; }
         public string? Receivingform { get; set; }
         public string? Note { get; set; }
         public int Requestorid { get; set; }

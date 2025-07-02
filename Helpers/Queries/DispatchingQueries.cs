@@ -28,40 +28,68 @@ namespace CSMapi.Helpers.Queries
                 .ToListAsync();
         }
         // Query for fetching all pending dispatching request with optional filter for category
-        public IQueryable<Dispatching> pendingdispatchingquery(string? searchTerm = null)
+        public IQueryable<Dispatching> pendingdispatchingquery(int? id)
         {
-            var query = _context.Dispatchings
+            if (id.HasValue)
+            {
+                var query = _context.Dispatchings
                    .AsNoTracking()
                    .Include(d => d.Document)
                    .Include(d => d.Product)
                    .ThenInclude(p => p.Customer)
                    .Include(d => d.Dispatchingdetails)
                    .OrderByDescending(d => d.Createdon)
-                   .Where(d => d.Pending && !d.Removed)
+                   .Where(d => d.Pending && !d.Removed && d.Product.Category.Id == id)
                    .AsQueryable();
-            if (!string.IsNullOrWhiteSpace(searchTerm))
-            {
-                query = query.Where(d => d.Product.Category == searchTerm);
+
+                return query;
             }
-            return query;
+            else
+            {
+                var query = _context.Dispatchings
+                  .AsNoTracking()
+                  .Include(d => d.Document)
+                  .Include(d => d.Product)
+                  .ThenInclude(p => p.Customer)
+                  .Include(d => d.Dispatchingdetails)
+                  .OrderByDescending(d => d.Createdon)
+                  .Where(d => d.Pending && !d.Removed)
+                  .AsQueryable();
+
+                return query;
+            }
         }
         // Query for fetching all dispatched with optional filter for category
-        public IQueryable<Dispatching> dispatchedquery(string? searchTerm = null)
+        public IQueryable<Dispatching> dispatchedquery(int? id)
         {
-            var query = _context.Dispatchings
+            if (id.HasValue)
+            {
+                var query = _context.Dispatchings
                    .AsNoTracking()
                    .Include(d => d.Document)
                    .Include(d => d.Product)
                    .ThenInclude(p => p.Customer)
                    .Include(d => d.Dispatchingdetails)
-                   .Where(d => !d.Removed)
+                   .Where(d => !d.Removed && d.Product.Category.Id == id)
                    .OrderByDescending(d => d.Createdon)
                    .AsQueryable();
-            if (!string.IsNullOrWhiteSpace(searchTerm))
-            {
-                query = query.Where(d => d.Product.Category == searchTerm);
+
+                return query;
             }
-            return query;
+            else
+            {
+                var query = _context.Dispatchings
+                  .AsNoTracking()
+                  .Include(d => d.Document)
+                  .Include(d => d.Product)
+                  .ThenInclude(p => p.Customer)
+                  .Include(d => d.Dispatchingdetails)
+                  .Where(d => !d.Removed)
+                  .OrderByDescending(d => d.Createdon)
+                  .AsQueryable();
+
+                return query;
+            }
         }
         // Query for fetching specific dispatching based on document ID
         public async Task<Dispatching?> getdispatchingbasedondocumentid(int documentId)

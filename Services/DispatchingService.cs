@@ -24,19 +24,19 @@ namespace CSMapi.Services
         public async Task<Pagination<DispatchingResponse>> allpendings(
             int pageNumber = 1,
             int pageSize = 10,
-            string? searchTerm = null)
+            int? id = null)
         {
-            var query = _dispatchingQueries.pendingdispatchingquery(searchTerm);
+            var query = _dispatchingQueries.pendingdispatchingquery(id);
             return await PaginationHelper.paginateandmap<Dispatching, DispatchingResponse>(query, pageNumber, pageSize, _mapper);
         }
         // [HttpGet("dispatchings")]
         public async Task<Pagination<DispatchingResponse>> alldispatched(
             int pageNumber = 1,
             int pageSize = 10,
-            string? searchTerm = null)
+            int? id = null)
         {
 
-            var query = _dispatchingQueries.dispatchedquery(searchTerm);
+            var query = _dispatchingQueries.dispatchedquery(id);
             return await PaginationHelper.paginateandmap<Dispatching, DispatchingResponse>(query, pageNumber, pageSize, _mapper);
         }
         // [HttpGet("dispatching/generate-documentNo")]

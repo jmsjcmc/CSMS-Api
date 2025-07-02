@@ -14,7 +14,6 @@ namespace CSMapi.Models
         public string Unloadingstart { get; set; }
         public string Unloadingend { get; set; }
         public double Overallweight { get; set; }
-        public string? Temperature { get; set; }
         public string DetailJson { get; set; }
         [NotMapped]
         public List<ReceivingDetailRequest> ReceivingDetail
@@ -38,7 +37,6 @@ namespace CSMapi.Models
         public string Unloadingstart { get; set; }
         public string Unloadingend { get; set; }
         public double Overallweight { get; set; }
-        public string? Temperature { get; set; }
         public string Receivingform { get; set; }
         public string Note { get; set; }
         public DateTime Createdon { get; set; }
@@ -120,7 +118,6 @@ namespace CSMapi.Models
         public string Unloadingstart { get; set; }
         public string Unloadingend { get; set; }
         public double Overallweight { get; set; }
-        public string Temperature { get; set; }
         public DateTime Productiondate { get; set; }
         public string Receivingform { get; set; }
         public string Note { get; set; }

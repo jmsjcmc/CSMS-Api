@@ -26,6 +26,7 @@ namespace CSMapi
         public DbSet<Pallet> Pallets { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<Category> Categories { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -108,6 +109,10 @@ namespace CSMapi
                 entity.HasOne(p => p.Customer)
                 .WithMany(p => p.Product)
                 .HasForeignKey(p => p.Customerid);
+
+                entity.HasOne(p => p.Category)
+                .WithMany(p => p.Product)
+                .HasForeignKey(p => p.Categoryid);
             });
 
             modelBuilder.Entity<PalletPosition>(d =>

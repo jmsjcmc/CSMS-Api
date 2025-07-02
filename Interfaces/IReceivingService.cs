@@ -10,12 +10,12 @@ namespace CSMapi.Interfaces
             int pageNumber = 1,
             int pageSize = 10,
             string? searchTerm = null,
-            string? category = null,
+            int? categoryId = null,
             string? status = null);
         Task<Pagination<ReceivingResponse>> allpendings(
             int pageNumber = 1,
             int pageSize = 10,
-            string? category = null);
+            int? id = null);
         Task<ReceivingResponse> getreceiving(int id);
         Task<DocumentNumberResponse> generatedocumentnumber(string category);
         Task<ReceivingResponse> addreceiving(ReceivingRequest request, IFormFile file, ClaimsPrincipal user);

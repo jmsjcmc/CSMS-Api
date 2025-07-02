@@ -97,7 +97,7 @@ namespace CSMapi.Services
 
             return await customerResponse(customer.Id);
         }
-        // Helper
+        // Helpers
         private async Task<Customer?> getcustomerid(int id)
         {
             return await _customerQueries.patchmethodcustomerid(id);

@@ -10,9 +10,9 @@ namespace CSMapi.Helpers.Excel
             "Category", "Document Number", "Product Name",
             "Expiration Date", "Cv Number", "Plate Number",
             "Arrival Date", "Unloading Start", "Unloading End",
-            "Overall Weight", "Temperature", "Note",
-            "Date Received", "Date Declined", "Pending", 
-            "Received", "Declined", "Requestor",
+            "Overall Weight", "Note", "Date Received",
+            "Date Declined", "Pending", "Received",
+            "Declined", "Requestor",
             "Approver"
         };
         public readonly string[] detailHeader =
@@ -71,7 +71,6 @@ namespace CSMapi.Helpers.Excel
                     receiving.Unloadingstart, 
                     receiving.Unloadingend,
                     receiving.Overallweight, 
-                    receiving.Temperature, 
                     receiving.Note, 
                     receiving.Datereceived,
                     receiving.Datedeclined,

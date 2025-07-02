@@ -2,7 +2,7 @@
 {
     public class ProductRequest
     {
-        public string Category { get; set; }
+        public int Categoryid { get; set; }
         public int Customerid { get; set; }
         public string Productcode { get; set; }
         public string Productname { get; set; }
@@ -19,7 +19,6 @@
     public class ProductResponse
     {
         public int Id { get; set; }
-        public string Category { get; set; }
         public string Productcode { get; set; }
         public string Productname { get; set; }
         public string Variant { get; set; }
@@ -32,6 +31,7 @@
         public string Unit { get; set; }
         public bool Active { get; set; }
         public bool Removed { get; set; }
+        public CategoryResponse Category { get; set; }
         public CustomerResponse Customer { get; set; }
     }
     public class ProductActiveResponse
@@ -44,7 +44,6 @@
     public class ProductOnlyResponse
     {
         public int Id { get; set; }
-        public string Category { get; set; }
         public string Productcode { get; set; }
         public string Productname { get; set; }
         public string Variant { get; set; }
@@ -57,6 +56,7 @@
         public string Unit { get; set; }
         public bool Active { get; set; }
         public bool Removed { get; set; }
+        public CategoryResponse Category { get; set; }
     }
 
     public class ProductCodeResponse
@@ -82,7 +82,6 @@
         public double Weight { get; set; }
         public string Unit { get; set; }
         public double Overallweight { get; set; }
-        public string? Temperature { get; set; }
         public CustomerResponse Customer { get; set; }
         public List<ProductReceivingDetailResponse> ReceivingDetail { get; set; }
     }

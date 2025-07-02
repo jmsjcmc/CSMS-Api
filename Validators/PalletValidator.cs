@@ -32,7 +32,6 @@ namespace CSMapi.Validators
                 throw new ArgumentException("Pallet Number required and must be greater than zero.");
             }
         }
-
         public async Task ValidatePalletUpdateRequest(PalletRequest request, int id)
         {
             var pallet = await _context.Pallets

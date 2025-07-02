@@ -19,11 +19,11 @@ namespace CSMapi.Controller
         }
         // Fetch all products without pagination
         [HttpGet("products/list")]
-        public async Task<ActionResult<List<ProductOnlyResponse>>> productslist(string category)
+        public async Task<ActionResult<List<ProductOnlyResponse>>> productslist(int id)
         {
             try
             {
-                var response = await _productService.productslist(category);
+                var response = await _productService.productslist(id);
                 return response;
             } catch (Exception e)
             {

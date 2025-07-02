@@ -46,17 +46,22 @@ namespace CSMapi.Services
                         .Where(d => d.Receivingdetailid == receivingDetail.Id)
                         .SumAsync(d => (int?)d.Quantity) ?? 0;
 
-                    int repalletizedQuantity = await _context.Repalletizationdetails
+                    int repalletizedFromQuantity = await _context.Repalletizationdetails
+                        .Include(r => r.Repalletization)
+                        .Where(r => r.Repalletization.Frompalletid == pallet.Id &&
+                        r.Receivingdetailid == receivingDetail.Id)
+                        .SumAsync(r => (int?)r.Quantitymoved) ?? 0;
+
+                    int repalletizedToQuantity = await _context.Repalletizationdetails
                         .Include(r => r.Repalletization)
                         .Where(r => r.Repalletization.Topalletid == pallet.Id &&
                         r.Receivingdetailid != receivingDetail.Id)
                         .SumAsync(r => (int?)r.Quantitymoved) ?? 0;
 
-                    int remainingQuantity = receivingDetail.Quantityinapallet - dispatchedQuantity + repalletizedQuantity;
+                    int remainingQuantity = receivingDetail.Quantityinapallet - dispatchedQuantity - repalletizedFromQuantity + repalletizedToQuantity ;
                     receivingDetail.Quantityinapallet = remainingQuantity;
                 }
             }
-
             return PaginationHelper.paginatedresponse(pallets, totalCount, pageNumber, pageSize);
         }
         // [HttpGet("pallets/active")]
@@ -136,46 +141,16 @@ namespace CSMapi.Services
             _context.Repalletizations.Add(repalletize);
             await _context.SaveChangesAsync();
 
-            var fromPalletDetail = await _context.Receivingdetails
-                .Where(r => r.Palletid == request.Frompalletid)
-                .ToListAsync();
-
-            int fromPalletRemainingQuantity = 0;
-            foreach (var detail in fromPalletDetail)
-            {
-                var totalRepalletized = await _context.Repalletizationdetails
-                    .Where(r => r.Receivingdetailid == detail.Id)
-                    .SumAsync(r => (int?)r.Quantitymoved) ?? 0;
-
-                var totalDispatched = await _context.Dispatchingdetails
-                    .Where(d => d.Receivingdetailid == detail.Id)
-                    .SumAsync(d => (int?)d.Quantity) ?? 0;
-
-                fromPalletRemainingQuantity += detail.Quantityinapallet - totalRepalletized - totalDispatched;
-            }
-            int totalQuantityMoved = 0;
             foreach (var detail in request.RepalletizationDetail)
             {
                 var origin = await _context.Receivingdetails
-                    .Include(r => r.Receiving)
-                    .Include(r => r.Pallet)
-                    .Include(r => r.RepalletizationDetail)
                     .FirstOrDefaultAsync(r => r.Id == detail.Receivingdetailid && r.Palletid == request.Frompalletid);
 
-                var totalRepalletizedQuantity = await _context.Repalletizationdetails
-                    .Where(r => r.Receivingdetailid == origin.Id)
-                    .SumAsync(r => (int?)r.Quantitymoved) ?? 0;
-
-                var totalOriginDispatchedQuantity = await _context.Dispatchingdetails
-                    .Where(d => d.Receivingdetailid == origin.Id)
-                    .SumAsync(d => (int?)d.Quantity) ?? 0;
-
-                var remainingOriginQuantity = origin.Quantityinapallet - totalOriginDispatchedQuantity - totalRepalletizedQuantity;
+                if (origin == null) continue;
 
                 var unitWeight = origin.Quantityinapallet > 0
                     ? origin.Totalweight / origin.Quantityinapallet
                     : 0;
-
                 var weightToMove = Math.Round(unitWeight * detail.Quantitymoved, 2);
 
                 _context.Repalletizationdetails.Add(new RepalletizationDetail
@@ -185,26 +160,48 @@ namespace CSMapi.Services
                     Quantitymoved = detail.Quantitymoved,
                     Weightmoved = weightToMove
                 });
-
-                totalQuantityMoved += fromPalletRemainingQuantity;
             }
 
-            if (totalQuantityMoved == fromPalletRemainingQuantity)
+            await _context.SaveChangesAsync();
+
+            var totalOriginal = await _context.Receivingdetails
+                .Where(r => r.Palletid == request.Frompalletid)
+                .SumAsync(r => (int?)r.Quantityinapallet) ?? 0;
+
+            var receivingDetailIds = await _context.Receivingdetails
+                .Where(r => r.Palletid == request.Frompalletid)
+                .Select(r => r.Id)
+                .ToListAsync();
+
+            var totalRepalletized = await _context.Repalletizationdetails
+                .Where(rd => receivingDetailIds.Contains(rd.Receivingdetailid))
+                .SumAsync(rd => (int?)rd.Quantitymoved) ?? 0;
+
+            var totalDispatched = await _context.Dispatchingdetails
+                .Where(dd => receivingDetailIds.Contains(dd.Receivingdetailid))
+                .SumAsync(dd => (int?)dd.Quantity) ?? 0;
+
+            var newRemaining = totalOriginal - totalRepalletized - totalDispatched;
+
+            if (newRemaining == 0)
             {
                 var pallet = await _context.Pallets
                     .FirstOrDefaultAsync(p => p.Id == request.Frompalletid);
-                var firstDetail = fromPalletDetail.FirstOrDefault();
-
-                var positionId = firstDetail.Positionid;
-
-                var position = await _context.Palletpositions
-                    .FirstOrDefaultAsync(p => p.Id == positionId);
-
-                position.Hidden = false;
                 pallet.Occupied = false;
 
+                var positionId = await _context.Receivingdetails
+                    .Where(r => r.Palletid == request.Frompalletid)
+                    .Select(r => r.Positionid)
+                    .FirstOrDefaultAsync();
+
+                if (positionId != null)
+                {
+                    var position = await _context.Palletpositions
+                        .FirstOrDefaultAsync(p => p.Id == positionId);
+                    position.Hidden = false;
+                }
             }
-            
+
             await _context.SaveChangesAsync();
             await transaction.CommitAsync();
 

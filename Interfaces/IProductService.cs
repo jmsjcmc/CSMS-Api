@@ -5,7 +5,7 @@ namespace CSMapi.Interfaces
 {
     public interface IProductService
     {
-        Task<List<ProductOnlyResponse>> productslist(string category);
+        Task<List<ProductOnlyResponse>> productslist(int id);
         Task<Pagination<ProductResponse>> allproducts(
             int pageNumber = 1,
             int pageSize = 10,

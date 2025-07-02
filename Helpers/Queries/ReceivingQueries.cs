@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using CSMapi.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace CSMapi.Helpers.Queries
 {
@@ -29,68 +30,112 @@ namespace CSMapi.Helpers.Queries
                 .ToListAsync();
         }
         // Query for fetching all receivings with optional filter for document number, category, and status
-        public IQueryable<Receiving> receivingsquery(
+        public async Task<IQueryable<Receiving>> receivingsquery(
             string? searchTerm = null,
-            string? category = null,
+            int? categoryId = null,
             string? status = null)
         {
-            var query = _context.Receivings
-                   .AsNoTracking()
+            if (categoryId.HasValue)
+            {
+                var query = _context.Receivings
+                    .AsNoTracking()
                    .Include(r => r.Document)
                    .Include(r => r.Product)
                    .ThenInclude(p => p.Customer)
                    .Include(r => r.Receivingdetails)
-                   .Where(r => !r.Removed)
+                   .Where(r => !r.Removed && r.Product.Category.Id == categoryId)
                    .OrderByDescending(r => r.Createdon)
                    .AsQueryable();
 
-            if (!string.IsNullOrWhiteSpace(searchTerm))
-            {
-                query = query.Where(r => r.Document.Documentno == searchTerm);
-            }
-
-            if (!string.IsNullOrWhiteSpace(category))
-            {
-                query = query.Where(r => r.Product.Category == category);
-            }
-
-            if (!string.IsNullOrWhiteSpace(status))
-            {
-                switch (status.ToLower())
+                if (!string.IsNullOrWhiteSpace(searchTerm))
                 {
-                    case "pending":
-                        query = query.Where(r => r.Pending);
-                        break;
-                    case "received":
-                        query = query.Where(r => r.Received);
-                        break;
-                    case "declined":
-                        query = query.Where(r => r.Declined);
-                        break;
+                    query = query.Where(r => r.Document.Documentno == searchTerm);
                 }
-            }
+                if (!string.IsNullOrWhiteSpace(status))
+                {
+                    switch (status.ToLower())
+                    {
+                        case "pending":
+                            query = query.Where(r => r.Pending);
+                            break;
+                        case "received":
+                            query = query.Where(r => r.Received);
+                            break;
+                        case "declined":
+                            query = query.Where(r => r.Declined);
+                            break;
+                    }
+                }
 
-            return query;
+                return query;
+            }
+            else
+            {
+                var query = _context.Receivings
+                       .AsNoTracking()
+                       .Include(r => r.Document)
+                       .Include(r => r.Product)
+                       .ThenInclude(p => p.Customer)
+                       .Include(r => r.Receivingdetails)
+                       .Where(r => !r.Removed)
+                       .OrderByDescending(r => r.Createdon)
+                       .AsQueryable();
+
+                if (!string.IsNullOrWhiteSpace(searchTerm))
+                {
+                    query = query.Where(r => r.Document.Documentno == searchTerm);
+                }
+
+                if (!string.IsNullOrWhiteSpace(status))
+                {
+                    switch (status.ToLower())
+                    {
+                        case "pending":
+                            query = query.Where(r => r.Pending);
+                            break;
+                        case "received":
+                            query = query.Where(r => r.Received);
+                            break;
+                        case "declined":
+                            query = query.Where(r => r.Declined);
+                            break;
+                    }
+                }
+
+                return query;
+            }
         }
         // Query for fetching all pending receivings with optional filter for category
-        public IQueryable<Receiving> pendingreceivingsquery(string? category = null)
+        public IQueryable<Receiving> pendingreceivingsquery(int? id = null)
         {
-            var query = _context.Receivings
+            if (id.HasValue)
+            {
+                var query = _context.Receivings
                     .AsNoTracking()
                     .Include(r => r.Document)
                     .Include(r => r.Product)
                     .ThenInclude(p => p.Customer)
                     .Include(r => r.Receivingdetails)
-                    .Where(r => r.Pending && !r.Removed)
+                    .Where(r => r.Pending && !r.Removed && r.Product.Category.Id == id)
                     .OrderByDescending(r => r.Createdon)
                     .AsQueryable();
 
-            if (!string.IsNullOrWhiteSpace(category))
-            {
-                query = query.Where(r => r.Product.Category == category);
+                return query;
             }
+            else
+            {
+                var query = _context.Receivings
+                        .AsNoTracking()
+                        .Include(r => r.Document)
+                        .Include(r => r.Product)
+                        .ThenInclude(p => p.Customer)
+                        .Include(r => r.Receivingdetails)
+                        .Where(r => r.Pending && !r.Removed)
+                        .OrderByDescending(r => r.Createdon)
+                        .AsQueryable();
 
-            return query;
+                return query;
+            }
         }
         // Query for fetching specific receiving for GET method
         public async Task<Receiving?> getmethodreceivingid(int id)

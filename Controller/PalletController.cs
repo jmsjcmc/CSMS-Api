@@ -218,13 +218,12 @@ namespace CSMapi.Controller
         }
         // Repalletize product
         [HttpPost("pallet/repalletization")]
-        public async Task<ActionResult> repalletization([FromBody] RepalletizationRequest request)
+        public async Task<ActionResult<RepalletizationResponse>> repalletization([FromBody] RepalletizationRequest request)
         {
             try
             {
-                await _palletService.repalletize(request, User);
-                return Ok("Success.");
-
+                var response = await _palletService.repalletize(request, User);
+                return response;
             } catch (Exception e)
             {
                 return HandleException(e);

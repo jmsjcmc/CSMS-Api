@@ -24,11 +24,11 @@ namespace CSMapi.Controller
         public async Task<ActionResult<Pagination<DispatchingResponse>>> allpendings(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 10,
-            [FromQuery] string? searchTerm = null)
+            [FromQuery] int? id = null)
         {
             try
             {
-                var response = await _dispatchingService.allpendings(pageNumber, pageSize, searchTerm);
+                var response = await _dispatchingService.allpendings(pageNumber, pageSize, id);
                 return response;
             } catch (Exception e)
             {
@@ -40,11 +40,11 @@ namespace CSMapi.Controller
         public async Task<ActionResult<Pagination<DispatchingResponse>>> alldispatched(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 10,
-            [FromQuery] string? searchTerm = null)
+            [FromQuery] int? id = null)
         {
             try
             {
-                var response = await _dispatchingService.alldispatched(pageNumber, pageSize, searchTerm);
+                var response = await _dispatchingService.alldispatched(pageNumber, pageSize, id);
                 return response;
             } catch (Exception e)
             {

@@ -108,6 +108,7 @@ namespace CSMapi.Helpers
             CreateMap<Product, ProductCodeResponse>();
 
             CreateMap<Product, ProductWithReceivingAndDispatchingResponse>()
+                .ForMember(d => d.Category, o => o.MapFrom(s => s.Category))
                 .ForMember(d => d.Customer, o => o.MapFrom(s => s.Customer))
                 .ForMember(d => d.Receiving, o => o.MapFrom(s => s.Receiving))
                 .ForMember(d => d.Dispatching, o => o.MapFrom(s => s.Dispatching));
@@ -115,13 +116,15 @@ namespace CSMapi.Helpers
             CreateMap<Product, ProductActiveResponse>();
 
             CreateMap<Product, ProductResponse>()
+                .ForMember(d => d.Category, o => o.MapFrom(s => s.Category))
                 .ForMember(d => d.Customer, o => o.MapFrom(s => s.Customer));
 
-            CreateMap<Product, ProductOnlyResponse>();
+            CreateMap<Product, ProductOnlyResponse>()
+                .ForMember(d => d.Category, o => o.MapFrom(s => s.Category));
 
             CreateMap<Product, ProductWithReceivingResponse>()
+                .ForMember(d => d.Category, o => o.MapFrom(s => s.Category))
                 .ForMember(d => d.Overallweight, o => o.Ignore())
-                .ForMember(d => d.Temperature, o => o.Ignore())
                 .ForMember(d => d.Customer, o => o.MapFrom(s => s.Customer))
                 .ForMember(d => d.ReceivingDetail, o => o.MapFrom((s, d, dm, c) =>
                     s.Receiving
@@ -133,6 +136,7 @@ namespace CSMapi.Helpers
                 )));
 
             CreateMap<Product, ProductSummary>()
+                .ForMember(d => d.Category, o => o.MapFrom(s => s.Category))
                 .ForMember(d => d.Companyname, o => o.MapFrom(s => s.Customer.Companyname));
             // Repalletizations Mapping
             CreateMap<RepalletizationRequest, Repalletization>()
@@ -206,6 +210,10 @@ namespace CSMapi.Helpers
             CreateMap<RepalletizationDetailRequest, RepalletizationDetail>();
 
             CreateMap<RepalletizationDetail, RepalletizationDetailResponse>();
+            // Category Mapping
+            CreateMap<CategoryRequest, Category>();
+
+            CreateMap<Category, CategoryResponse>();
         }
     }
 }

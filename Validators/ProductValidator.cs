@@ -6,9 +6,9 @@ namespace CSMapi.Validators
     {
         public async Task ValidateProductRequest(ProductRequest request)
         {
-            if (string.IsNullOrWhiteSpace(request.Category))
+            if (request.Categoryid <= 0)
             {
-                throw new ArgumentException("Category required.");
+                throw new ArgumentException("Category Id required.");
             }
 
             if (request.Customerid < 0)

@@ -14,6 +14,20 @@ namespace CSMapi.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "Categories",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Removed = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Categories", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Coldstorages",
                 columns: table => new
                 {
@@ -111,8 +125,8 @@ namespace CSMapi.Migrations
                     Csid = table.Column<int>(type: "int", nullable: false),
                     Wing = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Floor = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Column = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Side = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Column = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Side = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Hidden = table.Column<bool>(type: "bit", nullable: false),
                     Removed = table.Column<bool>(type: "bit", nullable: false)
                 },
@@ -133,6 +147,7 @@ namespace CSMapi.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    Categoryid = table.Column<int>(type: "int", nullable: false),
                     Customerid = table.Column<int>(type: "int", nullable: false),
                     Productcode = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Productname = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -150,6 +165,12 @@ namespace CSMapi.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Products", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Products_Categories_Categoryid",
+                        column: x => x.Categoryid,
+                        principalTable: "Categories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Products_Customers_Customerid",
                         column: x => x.Customerid,
@@ -251,7 +272,6 @@ namespace CSMapi.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Category = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Productid = table.Column<int>(type: "int", nullable: false),
                     Documentid = table.Column<int>(type: "int", nullable: false),
                     Dispatchdate = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -309,7 +329,6 @@ namespace CSMapi.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Category = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Documentid = table.Column<int>(type: "int", nullable: false),
                     Productid = table.Column<int>(type: "int", nullable: false),
                     Expirationdate = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -319,8 +338,6 @@ namespace CSMapi.Migrations
                     Unloadingstart = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Unloadingend = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Overallweight = table.Column<double>(type: "float", nullable: false),
-                    Temperature = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Productiondate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Receivingform = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Note = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Requestorid = table.Column<int>(type: "int", nullable: false),
@@ -332,7 +349,6 @@ namespace CSMapi.Migrations
                     Pending = table.Column<bool>(type: "bit", nullable: false),
                     Received = table.Column<bool>(type: "bit", nullable: false),
                     Declined = table.Column<bool>(type: "bit", nullable: false),
-                    Dispatched = table.Column<bool>(type: "bit", nullable: false),
                     Removed = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -393,6 +409,7 @@ namespace CSMapi.Migrations
                     Receivingid = table.Column<int>(type: "int", nullable: false),
                     Palletid = table.Column<int>(type: "int", nullable: false),
                     Positionid = table.Column<int>(type: "int", nullable: false),
+                    Productiondate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Quantityinapallet = table.Column<int>(type: "int", nullable: false),
                     Totalweight = table.Column<double>(type: "float", nullable: false),
                     Received = table.Column<bool>(type: "bit", nullable: false),
@@ -471,7 +488,8 @@ namespace CSMapi.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Repalletizationid = table.Column<int>(type: "int", nullable: false),
                     Receivingdetailid = table.Column<int>(type: "int", nullable: false),
-                    Quantitymoved = table.Column<int>(type: "int", nullable: false)
+                    Quantitymoved = table.Column<int>(type: "int", nullable: false),
+                    Weightmoved = table.Column<double>(type: "float", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -521,9 +539,9 @@ namespace CSMapi.Migrations
                 columns: new[] { "Id", "Businessunit", "Businessunitlocation", "Createdon", "Department", "Esignature", "Firstname", "Lastname", "Password", "Position", "Removed", "Role", "Updatedon", "Username" },
                 values: new object[,]
                 {
-                    { 1, "ABFI Central Office", "Binugao, Toril, Davao City", new DateTime(2025, 6, 16, 9, 18, 50, 319, DateTimeKind.Unspecified).AddTicks(1498), "Cisdevo", null, "James Jecemeco", "Tabilog", "$2a$11$p3ZHKynOJ4exuV5zk8yu3eWCsq7ms0RPQ0wXESwo/drpTmZbTMCue", "Software Developer", false, "Admin, User, Approver", null, "211072" },
-                    { 2, "SubZero Ice and Cold Storage Inc", "Binugao, Toril, Davao City", new DateTime(2025, 6, 16, 9, 18, 50, 504, DateTimeKind.Unspecified).AddTicks(420), "Executive", null, "Shiela", "Hernando", "$2a$11$g5fqjHZ7edXcFVSNTV6x8eEDCRua/Q1mUbyU80Gifei5YsPNpOK3O", "Senior Operations Manager", false, "Approver", null, "211073" },
-                    { 3, "ABFI Central Office", "Binugao, Toril, Davao City", new DateTime(2025, 6, 16, 9, 18, 50, 684, DateTimeKind.Unspecified).AddTicks(3991), "Cisdevo", null, "Jerecho", "Asilum", "$2a$11$5NM/7itrfzPscz2s/dNORePrUcoezgDl2joBzzTZMmav1RBhAGBOm", "Software Developer", false, "Admin, User, Approver", null, "211028" }
+                    { 1, "ABFI Central Office", "Binugao, Toril, Davao City", new DateTime(2025, 7, 1, 9, 48, 15, 544, DateTimeKind.Unspecified).AddTicks(2693), "Cisdevo", null, "James Jecemeco", "Tabilog", "$2a$11$rTgN2hzO.eTYKilpvZyxtuHKLpRhxhoUkxpXYUc9POoPI1xhPWIlG", "Software Developer", false, "Admin, User, Approver", null, "211072" },
+                    { 2, "SubZero Ice and Cold Storage Inc", "Binugao, Toril, Davao City", new DateTime(2025, 7, 1, 9, 48, 15, 714, DateTimeKind.Unspecified).AddTicks(1847), "Executive", null, "Shiela", "Hernando", "$2a$11$9rYgbQ94Ahpk92rTKFk3meZTpA5amF9CspSCotconJv5lKFUL5M8W", "Senior Operations Manager", false, "Approver", null, "211073" },
+                    { 3, "ABFI Central Office", "Binugao, Toril, Davao City", new DateTime(2025, 7, 1, 9, 48, 15, 882, DateTimeKind.Unspecified).AddTicks(7563), "Cisdevo", null, "Jerecho", "Asilum", "$2a$11$T.kiYx.zU/fY7HXE0aRkP.dSjNNhsk1T2mHtYgHN8fmIiL4fCkaTy", "Software Developer", false, "Admin, User, Approver", null, "211028" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -585,6 +603,11 @@ namespace CSMapi.Migrations
                 name: "IX_Pallets_Creatorid",
                 table: "Pallets",
                 column: "Creatorid");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Products_Categoryid",
+                table: "Products",
+                column: "Categoryid");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Products_Customerid",
@@ -690,6 +713,9 @@ namespace CSMapi.Migrations
 
             migrationBuilder.DropTable(
                 name: "Users");
+
+            migrationBuilder.DropTable(
+                name: "Categories");
 
             migrationBuilder.DropTable(
                 name: "Customers");

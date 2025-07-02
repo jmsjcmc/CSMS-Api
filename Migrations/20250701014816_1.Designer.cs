@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CSMapi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250619010141_7")]
-    partial class _7
+    [Migration("20250701014816_1")]
+    partial class _1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,26 @@ namespace CSMapi.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("CSMapi.Models.Category", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("Removed")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Categories");
+                });
 
             modelBuilder.Entity("CSMapi.Models.ColdStorage", b =>
                 {
@@ -265,10 +285,6 @@ namespace CSMapi.Migrations
                     b.Property<int?>("Approverid")
                         .HasColumnType("int");
 
-                    b.Property<string>("Category")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("Createdon")
                         .HasColumnType("datetime2");
 
@@ -482,7 +498,6 @@ namespace CSMapi.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Column")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Csid")
@@ -499,7 +514,6 @@ namespace CSMapi.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Side")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Wing")
@@ -523,6 +537,9 @@ namespace CSMapi.Migrations
 
                     b.Property<bool>("Active")
                         .HasColumnType("bit");
+
+                    b.Property<int>("Categoryid")
+                        .HasColumnType("int");
 
                     b.Property<int>("Customerid")
                         .HasColumnType("int");
@@ -570,6 +587,8 @@ namespace CSMapi.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Categoryid");
+
                     b.HasIndex("Customerid");
 
                     b.ToTable("Products");
@@ -589,10 +608,6 @@ namespace CSMapi.Migrations
                     b.Property<DateTime>("Arrivaldate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Category")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("Createdon")
                         .HasColumnType("datetime2");
 
@@ -607,9 +622,6 @@ namespace CSMapi.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("Declined")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("Dispatched")
                         .HasColumnType("bit");
 
                     b.Property<int>("Documentid")
@@ -634,9 +646,6 @@ namespace CSMapi.Migrations
                     b.Property<int>("Productid")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("Productiondate")
-                        .HasColumnType("datetime2");
-
                     b.Property<bool>("Received")
                         .HasColumnType("bit");
 
@@ -648,9 +657,6 @@ namespace CSMapi.Migrations
 
                     b.Property<int>("Requestorid")
                         .HasColumnType("int");
-
-                    b.Property<string>("Temperature")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Unloadingend")
                         .IsRequired()
@@ -695,6 +701,9 @@ namespace CSMapi.Migrations
 
                     b.Property<int>("Positionid")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("Productiondate")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("Quantityinapallet")
                         .HasColumnType("int");
@@ -882,11 +891,11 @@ namespace CSMapi.Migrations
                             Id = 1,
                             Businessunit = "ABFI Central Office",
                             Businessunitlocation = "Binugao, Toril, Davao City",
-                            Createdon = new DateTime(2025, 6, 19, 9, 1, 41, 43, DateTimeKind.Unspecified).AddTicks(6229),
+                            Createdon = new DateTime(2025, 7, 1, 9, 48, 15, 544, DateTimeKind.Unspecified).AddTicks(2693),
                             Department = "Cisdevo",
                             Firstname = "James Jecemeco",
                             Lastname = "Tabilog",
-                            Password = "$2a$11$8NPwg7iH1m6OrGXwPgPmH.VwjQkf2MK/y/YicWvq6MtBzc14qfcsq",
+                            Password = "$2a$11$rTgN2hzO.eTYKilpvZyxtuHKLpRhxhoUkxpXYUc9POoPI1xhPWIlG",
                             Position = "Software Developer",
                             Removed = false,
                             Role = "Admin, User, Approver",
@@ -897,11 +906,11 @@ namespace CSMapi.Migrations
                             Id = 2,
                             Businessunit = "SubZero Ice and Cold Storage Inc",
                             Businessunitlocation = "Binugao, Toril, Davao City",
-                            Createdon = new DateTime(2025, 6, 19, 9, 1, 41, 216, DateTimeKind.Unspecified).AddTicks(9430),
+                            Createdon = new DateTime(2025, 7, 1, 9, 48, 15, 714, DateTimeKind.Unspecified).AddTicks(1847),
                             Department = "Executive",
                             Firstname = "Shiela",
                             Lastname = "Hernando",
-                            Password = "$2a$11$ZTwsFWjB6jYY2ZD1lTCCPe9UXA3FBvJc1kXmke8N7rAq3QsPiMRTe",
+                            Password = "$2a$11$9rYgbQ94Ahpk92rTKFk3meZTpA5amF9CspSCotconJv5lKFUL5M8W",
                             Position = "Senior Operations Manager",
                             Removed = false,
                             Role = "Approver",
@@ -912,11 +921,11 @@ namespace CSMapi.Migrations
                             Id = 3,
                             Businessunit = "ABFI Central Office",
                             Businessunitlocation = "Binugao, Toril, Davao City",
-                            Createdon = new DateTime(2025, 6, 19, 9, 1, 41, 391, DateTimeKind.Unspecified).AddTicks(1781),
+                            Createdon = new DateTime(2025, 7, 1, 9, 48, 15, 882, DateTimeKind.Unspecified).AddTicks(7563),
                             Department = "Cisdevo",
                             Firstname = "Jerecho",
                             Lastname = "Asilum",
-                            Password = "$2a$11$ftnpMKb.2v3X.KUBeFJSD.UVj6IGo8qEcWwoz.eV4o69Aqmb..xIy",
+                            Password = "$2a$11$T.kiYx.zU/fY7HXE0aRkP.dSjNNhsk1T2mHtYgHN8fmIiL4fCkaTy",
                             Position = "Software Developer",
                             Removed = false,
                             Role = "Admin, User, Approver",
@@ -1038,11 +1047,19 @@ namespace CSMapi.Migrations
 
             modelBuilder.Entity("CSMapi.Models.Product", b =>
                 {
+                    b.HasOne("CSMapi.Models.Category", "Category")
+                        .WithMany("Product")
+                        .HasForeignKey("Categoryid")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("CSMapi.Models.Customer", "Customer")
                         .WithMany("Product")
                         .HasForeignKey("Customerid")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Category");
 
                     b.Navigation("Customer");
                 });
@@ -1135,6 +1152,11 @@ namespace CSMapi.Migrations
                     b.Navigation("Receivingdetail");
 
                     b.Navigation("Repalletization");
+                });
+
+            modelBuilder.Entity("CSMapi.Models.Category", b =>
+                {
+                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("CSMapi.Models.ColdStorage", b =>

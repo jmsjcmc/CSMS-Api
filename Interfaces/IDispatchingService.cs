@@ -9,11 +9,11 @@ namespace CSMapi.Interfaces
         Task<Pagination<DispatchingResponse>> allpendings(
             int pageNumber = 1,
             int pageSize = 10,
-            string? searchTerm = null);
+            int? id = null);
         Task<Pagination<DispatchingResponse>> alldispatched(
             int pageNumber = 1,
             int pageSize = 10,
-            string? searchTerm = null);
+            int? id = null);
         Task<DocumentNumberResponse> generatedocumentnumber();
         Task<DispatchingResponse> getdispatch(int id);
         Task<DispatchingResponse> addmultipledispatch(DispatchingRequest request, ClaimsPrincipal user);

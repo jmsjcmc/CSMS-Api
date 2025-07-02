@@ -22,6 +22,26 @@ namespace CSMapi.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("CSMapi.Models.Category", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("Removed")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Categories");
+                });
+
             modelBuilder.Entity("CSMapi.Models.ColdStorage", b =>
                 {
                     b.Property<int>("Id")
@@ -515,9 +535,8 @@ namespace CSMapi.Migrations
                     b.Property<bool>("Active")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Category")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Categoryid")
+                        .HasColumnType("int");
 
                     b.Property<int>("Customerid")
                         .HasColumnType("int");
@@ -564,6 +583,8 @@ namespace CSMapi.Migrations
                         .HasColumnType("float");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Categoryid");
 
                     b.HasIndex("Customerid");
 
@@ -633,9 +654,6 @@ namespace CSMapi.Migrations
 
                     b.Property<int>("Requestorid")
                         .HasColumnType("int");
-
-                    b.Property<string>("Temperature")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Unloadingend")
                         .IsRequired()
@@ -870,11 +888,11 @@ namespace CSMapi.Migrations
                             Id = 1,
                             Businessunit = "ABFI Central Office",
                             Businessunitlocation = "Binugao, Toril, Davao City",
-                            Createdon = new DateTime(2025, 6, 30, 9, 44, 49, 428, DateTimeKind.Unspecified).AddTicks(4695),
+                            Createdon = new DateTime(2025, 7, 1, 9, 48, 15, 544, DateTimeKind.Unspecified).AddTicks(2693),
                             Department = "Cisdevo",
                             Firstname = "James Jecemeco",
                             Lastname = "Tabilog",
-                            Password = "$2a$11$VNcNUhZEKuEir.VI2dgyIuv23hlivOMf.DhEVFCQP3MFnJ8WZbtC6",
+                            Password = "$2a$11$rTgN2hzO.eTYKilpvZyxtuHKLpRhxhoUkxpXYUc9POoPI1xhPWIlG",
                             Position = "Software Developer",
                             Removed = false,
                             Role = "Admin, User, Approver",
@@ -885,11 +903,11 @@ namespace CSMapi.Migrations
                             Id = 2,
                             Businessunit = "SubZero Ice and Cold Storage Inc",
                             Businessunitlocation = "Binugao, Toril, Davao City",
-                            Createdon = new DateTime(2025, 6, 30, 9, 44, 49, 791, DateTimeKind.Unspecified).AddTicks(173),
+                            Createdon = new DateTime(2025, 7, 1, 9, 48, 15, 714, DateTimeKind.Unspecified).AddTicks(1847),
                             Department = "Executive",
                             Firstname = "Shiela",
                             Lastname = "Hernando",
-                            Password = "$2a$11$zz.VKEiTD4RbjnA3VZEr9.oePVKLSXHNzseFn7bHS2oZpqu9iX09W",
+                            Password = "$2a$11$9rYgbQ94Ahpk92rTKFk3meZTpA5amF9CspSCotconJv5lKFUL5M8W",
                             Position = "Senior Operations Manager",
                             Removed = false,
                             Role = "Approver",
@@ -900,11 +918,11 @@ namespace CSMapi.Migrations
                             Id = 3,
                             Businessunit = "ABFI Central Office",
                             Businessunitlocation = "Binugao, Toril, Davao City",
-                            Createdon = new DateTime(2025, 6, 30, 9, 44, 49, 994, DateTimeKind.Unspecified).AddTicks(5140),
+                            Createdon = new DateTime(2025, 7, 1, 9, 48, 15, 882, DateTimeKind.Unspecified).AddTicks(7563),
                             Department = "Cisdevo",
                             Firstname = "Jerecho",
                             Lastname = "Asilum",
-                            Password = "$2a$11$MJeqht7newU2LJqu5xx5/ew4.DuK.7KPnpYxGZoFpFXUdeTfrJ.re",
+                            Password = "$2a$11$T.kiYx.zU/fY7HXE0aRkP.dSjNNhsk1T2mHtYgHN8fmIiL4fCkaTy",
                             Position = "Software Developer",
                             Removed = false,
                             Role = "Admin, User, Approver",
@@ -1026,11 +1044,19 @@ namespace CSMapi.Migrations
 
             modelBuilder.Entity("CSMapi.Models.Product", b =>
                 {
+                    b.HasOne("CSMapi.Models.Category", "Category")
+                        .WithMany("Product")
+                        .HasForeignKey("Categoryid")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("CSMapi.Models.Customer", "Customer")
                         .WithMany("Product")
                         .HasForeignKey("Customerid")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Category");
 
                     b.Navigation("Customer");
                 });
@@ -1123,6 +1149,11 @@ namespace CSMapi.Migrations
                     b.Navigation("Receivingdetail");
 
                     b.Navigation("Repalletization");
+                });
+
+            modelBuilder.Entity("CSMapi.Models.Category", b =>
+                {
+                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("CSMapi.Models.ColdStorage", b =>

@@ -18,9 +18,9 @@ namespace CSMapi.Services
             _productQueries = productQueries;
         }
         // [HttpGet("products/list")]
-        public async Task<List<ProductOnlyResponse>> productslist(string category)
+        public async Task<List<ProductOnlyResponse>> productslist(int id)
         {
-            var products = await _productQueries.productlistquery(category);
+            var products = await _productQueries.productlistquery(id);
 
             return _mapper.Map<List<ProductOnlyResponse>>(products);
         }
@@ -129,20 +129,32 @@ namespace CSMapi.Services
                     .Where(d => d.Receivingdetailid == receivingDetail.Id)
                     .SumAsync(d => (double?)d.Totalweight) ?? 0;
 
-                var totalRepalletizedQuantity = await _context.Repalletizationdetails
+                var totalRepalletizedFromQuantity = await _context.Repalletizationdetails
+                    .Include(r => r.Repalletization)
+                    .Where(r => r.Repalletization.Frompalletid == receivingDetail.Palletid &&
+                    r.Receivingdetailid == receivingDetail.Id)
+                    .SumAsync(r => (int?)r.Quantitymoved) ?? 0;
+
+                var totalRepalletizedToQuantity = await _context.Repalletizationdetails
                     .Include(r => r.Repalletization)
                     .Where(r => r.Repalletization.Topalletid == receivingDetail.Palletid &&
                     r.Receivingdetailid != receivingDetail.Id)
                     .SumAsync(r => (int?)r.Quantitymoved) ?? 0;
 
-                var totalRepalletizedWeight = await _context.Repalletizationdetails
+                var totalRepalletizedFromWeight = await _context.Repalletizationdetails
+                    .Include(r => r.Repalletization)
+                    .Where(r => r.Repalletization.Frompalletid == receivingDetail.Palletid &&
+                    r.Receivingdetailid == receivingDetail.Id)
+                    .SumAsync(r => (double?)r.Weightmoved) ?? 0;
+
+                var totalRepalletizedToWeight = await _context.Repalletizationdetails
                     .Include(r => r.Repalletization)
                     .Where(r => r.Repalletization.Topalletid == receivingDetail.Palletid &&
                     r.Receivingdetailid != receivingDetail.Id)
                     .SumAsync(r => (double?)r.Weightmoved) ?? 0;
 
-                var remainingQuantity = receivingDetail.Quantityinapallet - totalDispatchedQuantity + totalRepalletizedQuantity;
-                var remainingWeight = Math.Round(receivingDetail.Totalweight - totalDispatchedWeight + totalRepalletizedWeight, 2);
+                var remainingQuantity = receivingDetail.Quantityinapallet - totalDispatchedQuantity - totalRepalletizedFromQuantity + totalRepalletizedToQuantity;
+                var remainingWeight = Math.Round(receivingDetail.Totalweight - totalRepalletizedFromWeight + totalRepalletizedToWeight, 2);
 
                 if (remainingQuantity <= 0) continue;
 
@@ -155,7 +167,6 @@ namespace CSMapi.Services
                 receivingDetailsResponse.Add(detailResponse);
             }
 
-            var temperature = received.Temperature;
             var overallWeight = product.Receiving
                 .Where(r => r.Received)
                 .Sum(r => r.Overallweight);
@@ -163,7 +174,6 @@ namespace CSMapi.Services
             var response = _mapper.Map<ProductWithReceivingResponse>(product);
             response.ReceivingDetail = receivingDetailsResponse;
             response.Overallweight = Math.Round(overallWeight, 2);
-            response.Temperature = temperature;
             return response;
         }
         // [HttpPost("product")]

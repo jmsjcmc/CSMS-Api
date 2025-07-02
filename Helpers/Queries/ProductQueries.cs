@@ -18,6 +18,7 @@ namespace CSMapi.Helpers.Queries
         {
             var query = _context.Products
                 .AsNoTracking()
+                .Include(p => p.Category)
                 .Include(p => p.Customer)
                 .Include(p => p.Receiving)
                 .ThenInclude(r => r.Document)
@@ -45,6 +46,7 @@ namespace CSMapi.Helpers.Queries
         {
             var query = _context.Products
                 .AsNoTracking()
+                .Include(p => p.Category)
                 .Include(p => p.Customer)
                 .Include(p => p.Receiving)
                 .ThenInclude(r => r.Document)
@@ -77,12 +79,13 @@ namespace CSMapi.Helpers.Queries
             return query;
         }
         // Query for fetching all products with related customers
-        public async Task<List<Product>?> productlistquery(string category)
+        public async Task<List<Product>?> productlistquery(int id)
         {
             return await _context.Products
                   .AsNoTracking()
+                  .Include(p => p.Category)
                   .Include(p => p.Customer)
-                  .Where(p => p.Category == category)
+                  .Where(p => p.Category.Id == id)
                   .OrderByDescending(p => p.Id)
                   .ToListAsync();
         }
@@ -91,6 +94,7 @@ namespace CSMapi.Helpers.Queries
         {
             var query = _context.Products
                   .AsNoTracking()
+                  .Include(p => p.Category)
                   .Include(p => p.Customer)
                   .OrderByDescending(p => p.Id)
                   .AsQueryable();
@@ -106,6 +110,7 @@ namespace CSMapi.Helpers.Queries
         {
             return await _context.Products
                    .AsNoTracking()
+                   .Include(p => p.Category)
                    .Include(p => p.Customer)
                    .FirstOrDefaultAsync(p => p.Productcode == productCode);
         }
@@ -114,6 +119,7 @@ namespace CSMapi.Helpers.Queries
         {
             return await _context.Products
                    .AsNoTracking()
+                   .Include(p => p.Category)
                    .Include(p => p.Receiving)
                    .ThenInclude(r => r.Receivingdetails)
                    .Where(p => p.Receiving.Any(r => r.Received))
@@ -124,6 +130,7 @@ namespace CSMapi.Helpers.Queries
         {
             return await _context.Products
                 .AsNoTracking()
+                .Include(p => p.Category)
                 .Include(p => p.Customer)
                 .Include(p => p.Receiving)
                 .ThenInclude(r => r.Receivingdetails)
@@ -140,6 +147,7 @@ namespace CSMapi.Helpers.Queries
         {
             return await _context.Products
                   .AsNoTracking()
+                  .Include(p => p.Category)
                   .Include(p => p.Customer)
                   .FirstOrDefaultAsync(p => p.Id == id);
         }
@@ -147,6 +155,7 @@ namespace CSMapi.Helpers.Queries
         public async Task<Product?> patchmethodproductid(int id)
         {
             return await _context.Products
+                .Include(p => p.Category)
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
     }

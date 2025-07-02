@@ -25,19 +25,19 @@ namespace CSMapi.Services
             int pageNumber = 1,
             int pageSize = 10,
             string? searchTerm = null,
-            string? category = null,
+            int? categoryId = null,
             string? status = null)
         {
-            var query = _receivingQueries.receivingsquery(searchTerm, category, status);
+            var query = await _receivingQueries.receivingsquery(searchTerm, categoryId, status);
             return await PaginationHelper.paginateandmap<Receiving, ReceivingResponse>(query, pageNumber, pageSize, _mapper);
         }
         // [HttpGet("receivings/pending")]
         public async Task<Pagination<ReceivingResponse>> allpendings(
             int pageNumber = 1,
             int pageSize = 10,
-            string? category = null)
+            int? id = null)
         {
-            var query = _receivingQueries.pendingreceivingsquery(category);
+            var query = _receivingQueries.pendingreceivingsquery(id);
             return await PaginationHelper.paginateandmap<Receiving, ReceivingResponse>(query, pageNumber, pageSize, _mapper);
         }
         // [HttpGet("receiving/{id}")]

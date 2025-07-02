@@ -26,12 +26,12 @@ namespace CSMapi.Controller
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 10,
             [FromQuery] string? searchTerm = null,
-            [FromQuery] string? category = null,
+            [FromQuery] int? categoryId = null,
             [FromQuery] string? status = null)
         {
             try
             {
-                var response = await _receivingService.allreceivings(pageNumber, pageSize, searchTerm, category, status);
+                var response = await _receivingService.allreceivings(pageNumber, pageSize, searchTerm, categoryId, status);
                 return response;
             } catch (Exception e)
             {
@@ -43,11 +43,11 @@ namespace CSMapi.Controller
         public async Task<ActionResult<Pagination<ReceivingResponse>>> allpendings(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 10,
-            [FromQuery] string? category = null)
+            [FromQuery] int? id = null)
         {
             try
             {
-                var response = await _receivingService.allpendings(pageNumber, pageSize, category);
+                var response = await _receivingService.allpendings(pageNumber, pageSize, id);
                 return response;
             } catch (Exception e)
             {

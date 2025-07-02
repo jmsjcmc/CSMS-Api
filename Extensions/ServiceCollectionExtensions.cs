@@ -40,6 +40,7 @@ namespace CSMapi.Extensions
             service.AddScoped<CustomerService>();
             service.AddScoped<PalletService>();
             service.AddScoped<ProductService>();
+            service.AddScoped<CategoryService>();
             // Queries
             service.AddScoped<ContractQueries>();
             service.AddScoped<CustomerQueries>();
@@ -48,6 +49,7 @@ namespace CSMapi.Extensions
             service.AddScoped<ProductQueries>();
             service.AddScoped<ReceivingQueries>();
             service.AddScoped<UserQueries>();
+            service.AddScoped<CategoryQueries>();
             return service;
         }
         // Swagger Documentation
