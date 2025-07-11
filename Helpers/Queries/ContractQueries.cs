@@ -21,7 +21,7 @@ namespace CSMapi.Helpers.Queries
                   .AsQueryable();
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {
-                query = query.Where(c => c.Lesseecompany == searchTerm);
+                query = query.Where(c => c.Lesseecompany.Contains(searchTerm));
             }
             return query;
         }

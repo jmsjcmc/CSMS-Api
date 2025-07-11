@@ -27,6 +27,8 @@
     public class OccupiedPalletResponse
     {
         public int Id { get; set; }
+        public string Taggingnumber { get; set; }
+        public string Pallettype { get; set; }
         public int? Palletno { get; set; }
         public ProductOnlyResponse Product { get; set; }
         public List<RepalletizeDetailResponse> ReceivingDetail { get; set; }
@@ -34,7 +36,7 @@
     public class ProductBasedOccupiedPalletResponse
     {
         public int Id { get; set; }
-        public int? Palletno { get; set; }
+        public string Taggingnumber { get; set; }
     }
     public class PalletOnlyResponse
     {

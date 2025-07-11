@@ -53,7 +53,9 @@ namespace CSMapi.Helpers.Queries
 
                 if (!string.IsNullOrWhiteSpace(searchTerm))
                 {
-                    query = query.Where(r => r.Document.Documentno == searchTerm);
+                    query = query.Where(r => r.Document.Documentno.Contains(searchTerm) || 
+                    r.Product.Customer.Companyname.Contains(searchTerm) ||
+                    r.Product.Productname.Contains(searchTerm));
                 }
                 if (!string.IsNullOrWhiteSpace(status))
                 {
@@ -89,7 +91,9 @@ namespace CSMapi.Helpers.Queries
 
                 if (!string.IsNullOrWhiteSpace(searchTerm))
                 {
-                    query = query.Where(r => r.Document.Documentno == searchTerm);
+                    query = query.Where(r => r.Document.Documentno.Contains(searchTerm) ||
+                    r.Product.Customer.Companyname.Contains(searchTerm) || 
+                    r.Product.Productname.Contains(searchTerm));
                 }
 
                 if (!string.IsNullOrWhiteSpace(status))

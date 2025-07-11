@@ -20,7 +20,7 @@ namespace CSMapi.Helpers.Queries
                    .AsQueryable();
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {
-                query = query.Where(c => c.Companyname == searchTerm);
+                query = query.Where(c => c.Companyname.Contains(searchTerm));
             }
             return query;
         }

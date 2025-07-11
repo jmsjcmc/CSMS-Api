@@ -101,7 +101,7 @@ namespace CSMapi.Helpers.Queries
 
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {
-                query = query.Where(p => p.Productcode == searchTerm);
+                query = query.Where(p => p.Productcode.Contains(searchTerm) || p.Productname.Contains(searchTerm));
             }
             return query;
         }

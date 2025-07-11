@@ -110,7 +110,7 @@ namespace CSMapi.Helpers
             CreateMap<Product, ProductCodeResponse>();
 
             CreateMap<Product, ProductWithReceivingAndDispatchingResponse>()
-                .ForMember(d => d.Category, o => o.MapFrom(s => s.Category))
+                .ForMember(d => d.Category, o => o.MapFrom(s => s.Category.Name))
                 .ForMember(d => d.Customer, o => o.MapFrom(s => s.Customer))
                 .ForMember(d => d.Receiving, o => o.MapFrom(s => s.Receiving))
                 .ForMember(d => d.Dispatching, o => o.MapFrom(s => s.Dispatching));
@@ -138,7 +138,7 @@ namespace CSMapi.Helpers
                 )));
 
             CreateMap<Product, ProductSummary>()
-                .ForMember(d => d.Category, o => o.MapFrom(s => s.Category))
+                .ForMember(d => d.Category, o => o.MapFrom(s => s.Category.Name))
                 .ForMember(d => d.Companyname, o => o.MapFrom(s => s.Customer.Companyname));
             // Repalletizations Mapping
             CreateMap<RepalletizationRequest, Repalletization>()

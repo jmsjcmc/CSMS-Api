@@ -132,7 +132,7 @@ namespace CSMapi.Helpers.Queries
                    .AsQueryable();
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {
-                query = query.Where(p => p.Palletno.ToString().Contains(searchTerm));
+                query = query.Where(p => p.Pallettype.Contains(searchTerm) || p.Taggingnumber.Contains(searchTerm));
             }
             return query;
         }
