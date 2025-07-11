@@ -4,7 +4,7 @@ using CSMapi.Helpers.Queries;
 using CSMapi.Interfaces;
 using CSMapi.Models;
 using CSMapi.Validators;
-using Microsoft.EntityFrameworkCore;
+
 
 namespace CSMapi.Services
 {
@@ -48,7 +48,7 @@ namespace CSMapi.Services
             var customer = _mapper.Map<Customer>(request);
             customer.Active = true;
 
-            _context.Customers.Add(customer);
+            await _context.Customers.AddAsync(customer);
             await _context.SaveChangesAsync();
 
             return await customerResponse(customer.Id);
@@ -80,7 +80,7 @@ namespace CSMapi.Services
         {
             var customer = await getcustomerid(id);
 
-            customer.Removed = true;
+            customer.Removed = !customer.Removed;
 
             _context.Customers.Update(customer);
             await _context.SaveChangesAsync();

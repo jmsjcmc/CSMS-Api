@@ -59,6 +59,8 @@ namespace CSMapi.Models
         public int Positionid { get; set; }
         public DateTime Productiondate { get; set; }
         public int Quantityinapallet { get; set; }
+        public int Duquantity { get; set; }
+        public double Duweight { get; set; }
         public double Totalweight { get; set; }
     }
 
@@ -68,6 +70,8 @@ namespace CSMapi.Models
         public int Receivingid { get; set; }
         public DateTime Productiondate { get; set; }
         public int Quantityinapallet { get; set; }
+        public int Duquantity { get; set; }
+        public double Duweight { get; set; }
         public double Totalweight { get; set; }
         public bool Received { get; set; }
         public bool Partialdispatched { get; set; }
@@ -85,6 +89,8 @@ namespace CSMapi.Models
         public int Id { get; set; }
         public DateTime Productiondate { get; set; }
         public int Quantityinapallet { get; set; }
+        public int Duquantity { get; set; }
+        public double Duweight { get; set; }
         public double Totalweight { get; set; }
         public PalletResponse Pallet { get; set; }
         public PalletPositionResponse Position { get; set; }

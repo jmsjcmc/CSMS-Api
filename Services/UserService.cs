@@ -108,7 +108,7 @@ namespace CSMapi.Services
             user.Role = roleNames;
             user.Createdon = TimeHelper.GetPhilippineStandardTime();
 
-            _context.Users.Add(user);
+            await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
 
             return _mapper.Map<UserResponse>(user);
@@ -117,7 +117,7 @@ namespace CSMapi.Services
         public async Task<RoleResponse> addrole(RoleRequest request)
         {
             var role = _mapper.Map<Role>(request);
-            _context.Roles.Add(role);
+            await _context.Roles.AddAsync(role);
             await _context.SaveChangesAsync();
 
             return _mapper.Map<RoleResponse>(role);
@@ -171,7 +171,7 @@ namespace CSMapi.Services
         {
             var user = await getuserid(id);
 
-            user.Removed = true;
+            user.Removed = !user.Removed;
 
             _context.Users.Update(user);
             await _context.SaveChangesAsync();
@@ -183,7 +183,7 @@ namespace CSMapi.Services
         {
             var role = await getroleid(id);
 
-            role.Removed = true;
+            role.Removed = !role.Removed;
 
             _context.Roles.Update(role);
             await _context.SaveChangesAsync();

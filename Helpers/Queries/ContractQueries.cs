@@ -25,6 +25,27 @@ namespace CSMapi.Helpers.Queries
             }
             return query;
         }
+        // Query for fetching all contracts with optional filter for lessee company (List)
+        public async Task<List<Contract>> contracstlist(string? searchTerm = null)
+        {
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                return await _context.Contracts
+                  .AsNoTracking()
+                  .Include(c => c.Leasedpremises)
+                  .Where(c => !c.Removed && c.Lesseecompany == searchTerm)
+                  .OrderByDescending(c => c.Createdon)
+                  .ToListAsync();
+            } else
+            {
+                return await _context.Contracts
+                 .AsNoTracking()
+                 .Include(c => c.Leasedpremises)
+                 .Where(c => !c.Removed)
+                 .OrderByDescending(c => c.Createdon)
+                 .ToListAsync();
+            }
+        }
         // Query for fetching specific contract for GET method
         public async Task<Contract?> getmethodcontractid(int id)
         {

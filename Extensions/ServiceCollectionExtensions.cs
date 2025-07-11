@@ -50,6 +50,7 @@ namespace CSMapi.Extensions
             service.AddScoped<ReceivingQueries>();
             service.AddScoped<UserQueries>();
             service.AddScoped<CategoryQueries>();
+       
             return service;
         }
         // Swagger Documentation

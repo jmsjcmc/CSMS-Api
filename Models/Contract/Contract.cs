@@ -1,4 +1,6 @@
-﻿namespace CSMapi.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace CSMapi.Models
 {
     public class Contract
     {
@@ -12,8 +14,10 @@
         public string Lesseerepresentative { get; set; }
         public string Lesseerepresentativeposition { get; set; }
         public string Lesseecompanylocation { get; set; }
-        public string Startlease { get; set; }
-        public string Endlease { get; set; }
+        [Required]
+        public DateTime Startlease { get; set; }
+        [Required]
+        public DateTime Endlease { get; set; }
         public string Notarylocation { get; set; }
         public string Lessoridtype { get; set; }
         public string Lessoriddetail { get; set; }

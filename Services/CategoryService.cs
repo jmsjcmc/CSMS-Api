@@ -30,7 +30,7 @@ namespace CSMapi.Services
         {
             var category = _mapper.Map<Category>(request);
 
-            _context.Categories.Add(category);
+            await _context.Categories.AddAsync(category);
             await _context.SaveChangesAsync();
 
             return await categoryResponse(category.Id);
@@ -51,7 +51,7 @@ namespace CSMapi.Services
         {
             var category = await patchcategoryid(id);
 
-            category.Removed = true;
+            category.Removed = !category.Removed;
 
             _context.Categories.Update(category);
             await _context.SaveChangesAsync();

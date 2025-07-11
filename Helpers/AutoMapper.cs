@@ -93,6 +93,8 @@ namespace CSMapi.Helpers
                 .ForMember(d => d.ReceivingDetail, o => o.MapFrom(s => s.ReceivingDetail.Where(r => !r.Fulldispatched && r.Received)));
 
             CreateMap<Pallet, ProductBasedOccupiedPalletResponse>();
+
+            CreateMap<Pallet, PalletTypeBasedResponse>();
             // Pallet Positions Mapping
             CreateMap<PalletPositionRequest, PalletPosition>()
                 .ForMember(d => d.Hidden, o => o.Ignore())

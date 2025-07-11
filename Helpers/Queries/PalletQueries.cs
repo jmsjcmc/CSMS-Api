@@ -19,6 +19,12 @@ namespace CSMapi.Helpers.Queries
                 .Include(p => p.ReceivingDetail)
                 .ThenInclude(r => r.Receiving)
                 .ThenInclude(r => r.Product)
+                .ThenInclude(p => p.Customer)
+                .Include(p => p.ReceivingDetail)
+                .ThenInclude(r => r.Receiving)
+                .ThenInclude(r => r.Product)
+                .ThenInclude(r => r.Category)
+                .Include(p => p.Creator)
                 .Where(p => p.Occupied && p.ReceivingDetail.Any(r => r.Receiving.Product.Id == id))
                 .OrderByDescending(p => p.Id)
                 .ToListAsync();
@@ -32,6 +38,12 @@ namespace CSMapi.Helpers.Queries
                 .Include(p => p.ReceivingDetail)
                 .ThenInclude(r => r.Receiving)
                 .ThenInclude(r => r.Product)
+                .ThenInclude(p => p.Customer)
+                .Include(p => p.ReceivingDetail)
+                .ThenInclude(r => r.Receiving)
+                .ThenInclude(r => r.Product)
+                .ThenInclude(r => r.Category)
+                .Include(p => p.Creator)
                 .OrderByDescending(p => p.Id)
                 .Where(p => p.Active && p.Occupied && !p.Removed)
                 .AsQueryable();
@@ -48,18 +60,54 @@ namespace CSMapi.Helpers.Queries
         {
             return await _context.Pallets
                 .AsNoTracking()
+                .Include(p => p.DispatchDetail)
                 .Include(p => p.ReceivingDetail)
                 .ThenInclude(r => r.Receiving)
                 .ThenInclude(r => r.Product)
+                .ThenInclude(p => p.Customer)
+                .Include(p => p.ReceivingDetail)
+                .ThenInclude(r => r.Receiving)
+                .ThenInclude(r => r.Product)
+                .ThenInclude(r => r.Category)
+                .Include(p => p.Creator)
                 .OrderByDescending(p => p.Id)
                 .Where(p => p.Active && p.Occupied && !p.Removed)
                 .ToListAsync();
+        }
+        // Query for fetching active pallets with optional filter for pallet type
+        public async Task<List<Pallet>> pallettypepalletslist(string searchTerm)
+        {
+            return await _context.Pallets
+                  .AsNoTracking()
+                  .Include(p => p.DispatchDetail)
+                  .Include(p => p.ReceivingDetail)
+                  .ThenInclude(r => r.Receiving)
+                  .ThenInclude(r => r.Product)
+                  .ThenInclude(p => p.Customer)
+                  .Include(p => p.ReceivingDetail)
+                  .ThenInclude(r => r.Receiving)
+                  .ThenInclude(r => r.Product)
+                  .ThenInclude(r => r.Category)
+                  .Include(p => p.Creator)
+                  .OrderByDescending(p => p.Id)
+                  .Where(p => p.Active && !p.Occupied && !p.Removed && p.Pallettype == searchTerm)
+                  .ToListAsync();
         }
         // Query for fetching all active pallets
         public async Task<List<Pallet>> activepallets()
         {
             return await _context.Pallets
                    .AsNoTracking()
+                  .Include(p => p.DispatchDetail)
+                  .Include(p => p.ReceivingDetail)
+                  .ThenInclude(r => r.Receiving)
+                  .ThenInclude(r => r.Product)
+                  .ThenInclude(p => p.Customer)
+                  .Include(p => p.ReceivingDetail)
+                  .ThenInclude(r => r.Receiving)
+                  .ThenInclude(r => r.Product)
+                  .ThenInclude(r => r.Category)
+                  .Include(p => p.Creator)
                    .OrderByDescending(p => p.Createdon)
                    .Where(p => p.Active && !p.Occupied && !p.Removed)
                    .ToListAsync();
@@ -69,7 +117,16 @@ namespace CSMapi.Helpers.Queries
         {
             var query = _context.Pallets
                    .AsNoTracking()
-                   .Include(p => p.Creator)
+                  .Include(p => p.DispatchDetail)
+                  .Include(p => p.ReceivingDetail)
+                  .ThenInclude(r => r.Receiving)
+                  .ThenInclude(r => r.Product)
+                  .ThenInclude(p => p.Customer)
+                  .Include(p => p.ReceivingDetail)
+                  .ThenInclude(r => r.Receiving)
+                  .ThenInclude(r => r.Product)
+                  .ThenInclude(r => r.Category)
+                  .Include(p => p.Creator)
                    .Where(p => !p.Removed)
                    .OrderByDescending(p => p.Createdon)
                    .AsQueryable();
@@ -92,6 +149,16 @@ namespace CSMapi.Helpers.Queries
         {
             return await _context.Pallets
                  .AsNoTracking()
+                 .Include(p => p.DispatchDetail)
+                 .Include(p => p.ReceivingDetail)
+                 .ThenInclude(r => r.Receiving)
+                 .ThenInclude(r => r.Product)
+                 .ThenInclude(p => p.Customer)
+                 .Include(p => p.ReceivingDetail)
+                 .ThenInclude(r => r.Receiving)
+                 .ThenInclude(r => r.Product)
+                 .ThenInclude(r => r.Category)
+                 .Include(p => p.Creator)
                  .Include(p => p.Creator)
                  .FirstOrDefaultAsync(p => p.Id == id);
         }

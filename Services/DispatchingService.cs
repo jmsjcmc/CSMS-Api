@@ -87,7 +87,7 @@ namespace CSMapi.Services
             };
 
             var requestDocument = _mapper.Map<Document>(document);
-            _context.Documents.Add(requestDocument);
+            await _context.Documents.AddAsync(requestDocument);
             await _context.SaveChangesAsync();
 
             var dispatch = _mapper.Map<Dispatching>(request);
@@ -95,7 +95,7 @@ namespace CSMapi.Services
             dispatch.Pending = true;
             dispatch.Requestorid = AuthUserHelper.GetUserId(user);
             dispatch.Createdon = TimeHelper.GetPhilippineStandardTime();
-            _context.Dispatchings.Add(dispatch);
+            await _context.Dispatchings.AddAsync(dispatch);
             await _context.SaveChangesAsync();
 
             foreach (var detail in request.DispatchingDetail)
@@ -160,7 +160,7 @@ namespace CSMapi.Services
             dispatch.Requestorid = AuthUserHelper.GetUserId(user);
             dispatch.Createdon = TimeHelper.GetPhilippineStandardTime();
 
-            _context.Dispatchings.Add(dispatch);
+            await _context.Dispatchings.AddAsync(dispatch);
             await _context.SaveChangesAsync();
 
             var groupedDetails = request.DispatchingDetail
@@ -198,7 +198,7 @@ namespace CSMapi.Services
                     detail.Partialdispatched = !isFullDispatch;
                     detail.Fulldispatched = isFullDispatch;
 
-                    _context.Dispatchingdetails.Add(detail);
+                    await _context.Dispatchingdetails.AddAsync(detail);
                 }
                 receivingDetail.Fulldispatched = isFullDispatch;
                 receivingDetail.Partialdispatched = !isFullDispatch;
@@ -268,7 +268,7 @@ namespace CSMapi.Services
         {
             var dispatching = await getdispatchingid(id);
 
-            dispatching.Removed = true;
+            dispatching.Removed = !dispatching.Removed;
 
             _context.Dispatchings.Update(dispatching);
             await _context.SaveChangesAsync();

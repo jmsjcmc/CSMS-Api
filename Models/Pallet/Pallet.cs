@@ -3,8 +3,9 @@
     public class Pallet
     {
         public int Id { get; set; }
+        public string Taggingnumber { get; set; }
         public string Pallettype { get; set; }
-        public int Palletno { get; set; }
+        public int? Palletno { get; set; }
         public int Creatorid { get; set; }
         public User Creator { get; set; }
         public DateTime Createdon { get; set; }

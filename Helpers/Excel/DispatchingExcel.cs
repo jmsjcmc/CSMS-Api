@@ -10,17 +10,16 @@ namespace CSMapi.Helpers.Excel
             "Category", "Document Number", "Product Name",
             "Dispatch Time Start", "Dispatch Time End", "NMIS Certificate",
             "Dispatch Plate Number", "Seal Number", "Overall Weight",
-            "Temperature", "Production Date", "Note",
-            "Dispatched", "Declined", "Pending",
-            "Requestor", "Approver"
+            "Note", "Dispatched", "Declined", 
+            "Pending", "Requestor", "Approver"
         };
 
         private readonly string[] detailheader =
         {
             "Product Name", "Pallet Number", "Wing",
             "Floor", "Column", "Side",
-            "Quantity", "Total Weight", "Full Dispatched",
-            "Partial Dispatched"
+            "Quantity", "Production Date", "Total Weight", 
+            "Full Dispatched", "Partial Dispatched"
         };
         public DispatchingExcel(AppDbContext context) : base(context)
         {
@@ -55,8 +54,6 @@ namespace CSMapi.Helpers.Excel
                     dispatching.Dispatchplateno,
                     dispatching.Sealno,
                     dispatching.Overallweight,
-                    dispatching.Temperature,
-                    dispatching.Productiondate,
                     dispatching.Note,
                     dispatching.Dispatched,
                     dispatching.Pending,
@@ -101,6 +98,7 @@ namespace CSMapi.Helpers.Excel
                         dispatchingdetail.PalletPosition.Column,
                         dispatchingdetail.PalletPosition.Side,
                         dispatchingdetail.Quantity,
+                        dispatchingdetail.Productiondate,
                         dispatchingdetail.Totalweight,
                         dispatchingdetail.Fulldispatched,
                         dispatchingdetail.Partialdispatched

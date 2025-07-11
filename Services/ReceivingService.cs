@@ -123,7 +123,7 @@ namespace CSMapi.Services
             pallets.ForEach(p => p.Occupied = true);
             positions.ForEach(p => p.Hidden = true);
 
-            _context.Receivings.Add(receiving);
+            await _context.Receivings.AddAsync(receiving);
             await _context.SaveChangesAsync();
             await transaction.CommitAsync();
 
@@ -170,7 +170,7 @@ namespace CSMapi.Services
         {
             var receiving = await getreceivingid(id);
 
-            receiving.Removed = true;
+            receiving.Removed = !receiving.Removed;
             _context.Receivings.Update(receiving);
             await _context.SaveChangesAsync();
 

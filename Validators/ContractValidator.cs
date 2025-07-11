@@ -57,16 +57,6 @@ namespace CSMapi.Validators
                 throw new ArgumentException("Lessee Company Location required.");
             }
 
-            if (string.IsNullOrWhiteSpace(request.Startlease))
-            {
-                throw new ArgumentException("Start Lease required.");
-            }
-
-            if (string.IsNullOrWhiteSpace(request.Endlease))
-            {
-                throw new ArgumentException("End Lease required.");
-            }
-
             if (string.IsNullOrWhiteSpace(request.Notarylocation))
             {
                 throw new ArgumentException("Notary Location required.");

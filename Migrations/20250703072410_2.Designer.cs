@@ -4,6 +4,7 @@ using CSMapi;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CSMapi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250703072410_2")]
+    partial class _2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -136,8 +139,9 @@ namespace CSMapi.Migrations
                     b.Property<int>("Creatorid")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("Endlease")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("Endlease")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Lesseecompany")
                         .IsRequired()
@@ -198,8 +202,9 @@ namespace CSMapi.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("Startlease")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("Startlease")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("Updatedon")
                         .HasColumnType("datetime2");
@@ -324,6 +329,9 @@ namespace CSMapi.Migrations
                     b.Property<int>("Productid")
                         .HasColumnType("int");
 
+                    b.Property<DateTime?>("Productiondate")
+                        .HasColumnType("datetime2");
+
                     b.Property<bool>("Removed")
                         .HasColumnType("bit");
 
@@ -332,6 +340,9 @@ namespace CSMapi.Migrations
 
                     b.Property<string>("Sealno")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Temperature")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("Updatedon")
@@ -372,9 +383,6 @@ namespace CSMapi.Migrations
 
                     b.Property<int>("Positionid")
                         .HasColumnType("int");
-
-                    b.Property<DateTime?>("Productiondate")
-                        .HasColumnType("datetime2");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
@@ -461,7 +469,7 @@ namespace CSMapi.Migrations
                     b.Property<bool>("Occupied")
                         .HasColumnType("bit");
 
-                    b.Property<int?>("Palletno")
+                    b.Property<int>("Palletno")
                         .HasColumnType("int");
 
                     b.Property<string>("Pallettype")
@@ -470,10 +478,6 @@ namespace CSMapi.Migrations
 
                     b.Property<bool>("Removed")
                         .HasColumnType("bit");
-
-                    b.Property<string>("Taggingnumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("Updatedon")
                         .HasColumnType("datetime2");
@@ -689,9 +693,6 @@ namespace CSMapi.Migrations
                     b.Property<int>("Duquantity")
                         .HasColumnType("int");
 
-                    b.Property<double>("Duweight")
-                        .HasColumnType("float");
-
                     b.Property<bool>("Fulldispatched")
                         .HasColumnType("bit");
 
@@ -893,11 +894,11 @@ namespace CSMapi.Migrations
                             Id = 1,
                             Businessunit = "ABFI Central Office",
                             Businessunitlocation = "Binugao, Toril, Davao City",
-                            Createdon = new DateTime(2025, 7, 9, 16, 1, 23, 654, DateTimeKind.Unspecified).AddTicks(5843),
+                            Createdon = new DateTime(2025, 7, 3, 15, 24, 10, 166, DateTimeKind.Unspecified).AddTicks(193),
                             Department = "Cisdevo",
                             Firstname = "James Jecemeco",
                             Lastname = "Tabilog",
-                            Password = "$2a$11$jvvS2fALjNxwzlcjCWI1lezuMKG/nfv.NSKzEYOFBicXxU3.AVo12",
+                            Password = "$2a$11$qoP46X5nAPROzOSyqEAyJuesM5ZP.xYtkPcnrjbDMFU14KYsE/oXK",
                             Position = "Software Developer",
                             Removed = false,
                             Role = "Admin, User, Approver",
@@ -908,11 +909,11 @@ namespace CSMapi.Migrations
                             Id = 2,
                             Businessunit = "SubZero Ice and Cold Storage Inc",
                             Businessunitlocation = "Binugao, Toril, Davao City",
-                            Createdon = new DateTime(2025, 7, 9, 16, 1, 23, 895, DateTimeKind.Unspecified).AddTicks(8416),
+                            Createdon = new DateTime(2025, 7, 3, 15, 24, 10, 334, DateTimeKind.Unspecified).AddTicks(4532),
                             Department = "Executive",
                             Firstname = "Shiela",
                             Lastname = "Hernando",
-                            Password = "$2a$11$ZALJWiG4MLpjgjdXv9YAq.g1AqHKnBGpj2DXMwB2FQ3qe1NsUTplq",
+                            Password = "$2a$11$RZVPulnNT77vU8FYmMyHpubXgw2OvKDnifYSVYDxu7Lw3PirtwlXa",
                             Position = "Senior Operations Manager",
                             Removed = false,
                             Role = "Approver",
@@ -923,11 +924,11 @@ namespace CSMapi.Migrations
                             Id = 3,
                             Businessunit = "ABFI Central Office",
                             Businessunitlocation = "Binugao, Toril, Davao City",
-                            Createdon = new DateTime(2025, 7, 9, 16, 1, 24, 108, DateTimeKind.Unspecified).AddTicks(5112),
+                            Createdon = new DateTime(2025, 7, 3, 15, 24, 10, 505, DateTimeKind.Unspecified).AddTicks(8984),
                             Department = "Cisdevo",
                             Firstname = "Jerecho",
                             Lastname = "Asilum",
-                            Password = "$2a$11$RlnJnAo7rhr9RUpPFe02TeTkV1mWuNuJFcP60GUmqF5abotuLbMJm",
+                            Password = "$2a$11$Ug2JcGux0fCcFVInw7kqdOwfwJPjS3cpW.5pzSsgwXsV9t/IVNXA6",
                             Position = "Software Developer",
                             Removed = false,
                             Role = "Admin, User, Approver",

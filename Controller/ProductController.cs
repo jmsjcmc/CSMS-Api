@@ -3,6 +3,7 @@ using CSMapi.Helpers;
 using CSMapi.Helpers.Excel;
 using CSMapi.Models;
 using CSMapi.Services;
+using EFCore.BulkExtensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -199,8 +200,7 @@ namespace CSMapi.Controller
             try
             {
                 var products = await _productExcel.importproducts(file);
-                await _context.Products.AddRangeAsync(products);
-                await _context.SaveChangesAsync();
+                await _context.BulkInsertAsync(products);
 
                 var response = _mapper.Map<List<ProductOnlyResponse>>(products);
                 return response;

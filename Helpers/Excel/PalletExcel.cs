@@ -8,7 +8,7 @@ namespace CSMapi.Helpers.Excel
     {
         private readonly string[] palletheader =
         {
-            "Pallet Type", "Pallet Number"
+            "Tagging Number", "Pallet Type", "Pallet Number"
         };
 
         private readonly string[] positionHeader =
@@ -34,8 +34,9 @@ namespace CSMapi.Helpers.Excel
 
             for (int i = 2; i <= 100; i++)
             {
-                workSheet.Cell(i, 1).Value = "Plastic";
-                workSheet.Cell(i, 2).Value = 123123 + i;
+                workSheet.Cell(i, 1).Value = 123756 + i;
+                workSheet.Cell(i, 2).Value = "Plastic";
+                workSheet.Cell(i, 3).Value = 123123 + i;
             }
 
             save();
@@ -78,7 +79,7 @@ namespace CSMapi.Helpers.Excel
             {
                 var values = new object[]
                 {
-             pallet.Pallettype, pallet.Palletno
+                    pallet.Taggingnumber, pallet.Pallettype, pallet.Palletno
                 };
                 for (int col = 0; col < values.Length; col++)
                     workSheet.Cell(row, col + 1).Value = values[col]?.ToString();
@@ -109,8 +110,8 @@ namespace CSMapi.Helpers.Excel
 
                 var values = new object[]
                 {
-             cs, position.Wing, position.Floor, position.Column,
-             position.Side
+                     cs, position.Wing, position.Floor, position.Column,
+                     position.Side
                 };
                 for (int col = 0; col < values.Length; col++)
                     workSheet.Cell(row, col + 1).Value = values[col]?.ToString();
@@ -130,8 +131,9 @@ namespace CSMapi.Helpers.Excel
             {
                 pallets.Add(new Pallet
                 {
-                    Pallettype = row.Cell(1).GetValue<string>(),
-                    Palletno = row.Cell(2).GetValue<int>(),
+                    Taggingnumber = row.Cell(1).GetValue<string>(),
+                    Pallettype = row.Cell(2).GetValue<string>(),
+                    Palletno = row.Cell(3).GetValue<int?>(),
                     Createdon = TimeHelper.GetPhilippineStandardTime(),
                     Creatorid = AuthUserHelper.GetUserId(user),
                     Occupied = false,

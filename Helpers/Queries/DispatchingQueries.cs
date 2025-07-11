@@ -108,6 +108,8 @@ namespace CSMapi.Helpers.Queries
                   .ThenInclude(d => d.PalletPosition)
                   .ThenInclude(p => p.Coldstorage)
                   .Include(d => d.Product)
+                  .ThenInclude(p => p.Category)
+                  .Include(d => d.Product)
                   .ThenInclude(p => p.Customer)
                   .Include(d => d.Requestor)
                   .Include(d => d.Approver)

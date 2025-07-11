@@ -18,6 +18,8 @@ namespace CSMapi.Helpers.Queries
             return await _context.Receivings
                 .Include(r => r.Document)
                 .Include(r => r.Product)
+                .ThenInclude(p => p.Category)
+                .Include(r => r.Product)
                 .ThenInclude(p => p.Customer)
                 .Include(r => r.Requestor)
                 .Include(r => r.Approver)
@@ -40,6 +42,8 @@ namespace CSMapi.Helpers.Queries
                 var query = _context.Receivings
                     .AsNoTracking()
                    .Include(r => r.Document)
+                   .Include(r => r.Product)
+                   .ThenInclude(p => p.Category)
                    .Include(r => r.Product)
                    .ThenInclude(p => p.Customer)
                    .Include(r => r.Receivingdetails)
@@ -74,6 +78,8 @@ namespace CSMapi.Helpers.Queries
                 var query = _context.Receivings
                        .AsNoTracking()
                        .Include(r => r.Document)
+                       .Include(r => r.Product)
+                       .ThenInclude(p => p.Category)
                        .Include(r => r.Product)
                        .ThenInclude(p => p.Customer)
                        .Include(r => r.Receivingdetails)
@@ -114,6 +120,8 @@ namespace CSMapi.Helpers.Queries
                     .AsNoTracking()
                     .Include(r => r.Document)
                     .Include(r => r.Product)
+                    .ThenInclude(p => p.Category) 
+                    .Include(r => r.Product)
                     .ThenInclude(p => p.Customer)
                     .Include(r => r.Receivingdetails)
                     .Where(r => r.Pending && !r.Removed && r.Product.Category.Id == id)
@@ -127,6 +135,8 @@ namespace CSMapi.Helpers.Queries
                 var query = _context.Receivings
                         .AsNoTracking()
                         .Include(r => r.Document)
+                        .Include(r => r.Product)
+                        .ThenInclude(p => p.Category)
                         .Include(r => r.Product)
                         .ThenInclude(p => p.Customer)
                         .Include(r => r.Receivingdetails)
@@ -144,6 +154,8 @@ namespace CSMapi.Helpers.Queries
                     .AsNoTracking()
                     .Include(r => r.Document)
                     .Include(r => r.Product)
+                    .ThenInclude(p => p.Category)
+                    .Include(r => r.Product)
                     .ThenInclude(p => p.Customer)
                     .Include(r => r.Receivingdetails)
                     .ThenInclude(r => r.Pallet)
@@ -160,7 +172,16 @@ namespace CSMapi.Helpers.Queries
             return await _context.Receivings
                    .Include(r => r.Document)
                    .Include(r => r.Product)
+                   .ThenInclude(p => p.Category)
+                   .Include(r => r.Product)
+                   .ThenInclude(p => p.Customer)
                    .Include(r => r.Receivingdetails)
+                   .ThenInclude(r => r.Pallet)
+                   .Include(r => r.Receivingdetails)
+                   .ThenInclude(r => r.PalletPosition)
+                   .ThenInclude(p => p.Coldstorage)
+                   .Include(r => r.Requestor)
+                   .Include(r => r.Approver)
                    .FirstOrDefaultAsync(r => r.Id == id);
         }
     }

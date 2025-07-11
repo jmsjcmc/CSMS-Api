@@ -70,7 +70,7 @@ namespace CSMapi.Validators
 
             foreach (var detail in request.ReceivingDetail)
             {
-
+                
                 if (detail.Palletid <= 0)
                 {
                     throw new ArgumentException("Pallet Id required and must be valid identifier.");

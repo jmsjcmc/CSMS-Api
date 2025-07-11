@@ -42,6 +42,8 @@
         public PalletPosition PalletPosition { get; set; }
         public DateTime Productiondate { get; set; }
         public int Quantityinapallet { get; set; }
+        public int Duquantity { get; set; }
+        public double Duweight { get; set; }
         public double Totalweight { get; set; }
         public bool Received { get; set; }
         public bool Partialdispatched { get; set; }

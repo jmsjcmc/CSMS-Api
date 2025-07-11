@@ -11,8 +11,8 @@
         public string Lesseerepresentative { get; set; }
         public string Lesseerepresentativeposition { get; set; }
         public string Lesseecompanylocation { get; set; }
-        public string Startlease { get; set; }
-        public string Endlease { get; set; }
+        public DateTime Startlease { get; set; }
+        public DateTime Endlease { get; set; }
         public string Notarylocation { get; set; }
         public string Lessoridtype { get; set; }
         public string Lessoriddetail { get; set; }
@@ -34,8 +34,8 @@
         public string Lesseerepresentative { get; set; }
         public string Lesseerepresentativeposition { get; set; }
         public string Lesseecompanylocation { get; set; }
-        public string Startlease { get; set; }
-        public string Endlease { get; set; }
+        public DateTime Startlease { get; set; }
+        public DateTime Endlease { get; set; }
         public string Notarylocation { get; set; }
         public string Lessoridtype { get; set; }
         public string Lessoriddetail { get; set; }

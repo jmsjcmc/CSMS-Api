@@ -11,6 +11,7 @@ namespace CSMapi.Interfaces
             int pageNumber = 1,
             int pageSize = 10,
             string? searchTerm = null);
+        Task<List<PalletTypeBasedResponse>> pallettypepalletslist(string searchTerm);
         Task<List<ActivePalletResponse>> activepallets();
         Task<List<ColdStorageResponse>> allcoldstorages();
         Task<List<PalletPositionResponse>> getfilteredpositions(int id);

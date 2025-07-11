@@ -184,7 +184,7 @@ namespace CSMapi.Services
             var product = _mapper.Map<Product>(request);
             product.Active = true;
 
-            _context.Products.Add(product);
+            await _context.Products.AddAsync(product);
             await _context.SaveChangesAsync();
 
             return _mapper.Map<ProductResponse>(product);
@@ -217,7 +217,7 @@ namespace CSMapi.Services
         {
             var product = await getproductid(id);
 
-            product.Removed = true;
+            product.Removed = !product.Removed;
 
             _context.Products.Update(product);
             await _context.SaveChangesAsync();

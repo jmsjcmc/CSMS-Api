@@ -9,8 +9,6 @@
         public string Dispatchplateno { get; set; }
         public string Sealno { get; set; }
         public double Overallweight { get; set; }
-        public string? Temperature { get; set; }
-        public DateTime? Productiondate { get; set; }
         public List<DispatchingDetailRequest> DispatchingDetail { get; set; }
     }
 
@@ -24,8 +22,6 @@
         public string Dispatchplateno { get; set; }
         public string Sealno { get; set; }
         public double Overallweight { get; set; }
-        public string? Temperature { get; set; }
-        public DateTime? Productiondate { get; set; }
         public DateTime? Createdon { get; set; }
         public DateTime? Approvedon { get; set; }
         public DateTime? Updatedon { get; set; }
@@ -43,6 +39,7 @@
         public int Receivingdetailid { get; set; }
         public int Positionid { get; set; }
         public int Palletid { get; set; }
+        public DateTime? Productiondate { get; set; }
         public int Quantity { get; set; }
         public double? Totalweight { get; set; }
     }
@@ -52,6 +49,7 @@
         public int Id { get; set; }
         public int Receivingdetailid { get; set; }
         public int Quantity { get; set; }
+        public DateTime? Productiondate { get; set; }
         public double Totalweight { get; set; }
         public PalletResponse Pallet { get; set; }
         public PalletPositionResponse Position { get; set; }
@@ -73,8 +71,6 @@
         public string Dispatchplateno { get; set; }
         public string Sealno { get; set; }
         public double Overallweight { get; set; }
-        public string Temperature { get; set; }
-        public DateTime Productiondate { get; set; }
         public DateTime Createdon { get; set; }
         public string Createdby { get; set; }
         public string Approvedby { get; set; }

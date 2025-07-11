@@ -64,6 +64,12 @@ namespace CSMapi.Services
             }
             return PaginationHelper.paginatedresponse(pallets, totalCount, pageNumber, pageSize);
         }
+        // [HttpGet("pallets/active/pallet-type")]
+        public async Task<List<PalletTypeBasedResponse>> pallettypepalletslist(string searchTerm)
+        {
+            var pallets = await _palletQueries.pallettypepalletslist(searchTerm);
+            return _mapper.Map<List<PalletTypeBasedResponse>>(pallets);
+        }
         // [HttpGet("pallets/active")]
         public async Task<List<ActivePalletResponse>> activepallets()
         {
@@ -138,7 +144,7 @@ namespace CSMapi.Services
             repalletize.Creatorid = AuthUserHelper.GetUserId(user);
             repalletize.Createdon = TimeHelper.GetPhilippineStandardTime();
 
-            _context.Repalletizations.Add(repalletize);
+            await _context.Repalletizations.AddAsync(repalletize);
             await _context.SaveChangesAsync();
 
             foreach (var detail in request.RepalletizationDetail)
@@ -212,7 +218,7 @@ namespace CSMapi.Services
         {
             var cs = _mapper.Map<ColdStorage>(request);
 
-            _context.Coldstorages.Add(cs);
+            await _context.Coldstorages.AddAsync(cs);
             await _context.SaveChangesAsync();
 
             return _mapper.Map<ColdStorageResponse>(cs);
@@ -230,7 +236,7 @@ namespace CSMapi.Services
             pallet.Createdon = TimeHelper.GetPhilippineStandardTime();
             pallet.Creatorid = AuthUserHelper.GetUserId(user);
 
-            _context.Pallets.Add(pallet);
+            await _context.Pallets.AddAsync(pallet);
             await _context.SaveChangesAsync();
 
             var savedPallet = await getpalletdata(pallet.Id);
@@ -244,7 +250,7 @@ namespace CSMapi.Services
 
             var position = _mapper.Map<PalletPosition>(request);
 
-            _context.Palletpositions.Add(position);
+            await _context.Palletpositions.AddAsync(position);
             await _context.SaveChangesAsync();
 
             var savedPosition = await getpalletpositiondata(position.Id);
@@ -331,7 +337,7 @@ namespace CSMapi.Services
         {
             var pallet = await getpalletid(id);
 
-            pallet.Removed = true;
+            pallet.Removed = !pallet.Removed;
 
             _context.Pallets.Update(pallet);
             await _context.SaveChangesAsync();
@@ -343,7 +349,7 @@ namespace CSMapi.Services
         {
             var position = await getpalletpositionid(id);
 
-            position.Removed = true;
+            position.Removed = !position.Removed;
 
             _context.Palletpositions.Update(position);
             await _context.SaveChangesAsync();

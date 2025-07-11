@@ -47,7 +47,7 @@ namespace CSMapi.Services
             contract.Creatorid = AuthUserHelper.GetUserId(user);
             contract.Createdon = TimeHelper.GetPhilippineStandardTime();
 
-            _context.Contracts.Add(contract);
+            await _context.Contracts.AddAsync(contract);
             await _context.SaveChangesAsync();
 
             return await contractResponse(contract.Id);
@@ -70,7 +70,7 @@ namespace CSMapi.Services
         {
             var contract = await getcontractid(id);
 
-            contract.Removed = true;
+            contract.Removed = !contract.Removed;
 
             _context.Contracts.Update(contract);
             await _context.SaveChangesAsync();

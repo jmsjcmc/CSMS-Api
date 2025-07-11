@@ -17,11 +17,6 @@ namespace CSMapi.Validators
                 throw new ArgumentException("Pallet Number taken.");
             }
 
-            if (request.Positionid < 0)
-            {
-                throw new ArgumentException("Position Id required and must be valid identifier.");
-            }
-
             if (string.IsNullOrWhiteSpace(request.Pallettype))
             {
                 throw new ArgumentException("Pallet Type required.");
@@ -32,6 +27,7 @@ namespace CSMapi.Validators
                 throw new ArgumentException("Pallet Number required and must be greater than zero.");
             }
         }
+
         public async Task ValidatePalletUpdateRequest(PalletRequest request, int id)
         {
             var pallet = await _context.Pallets
@@ -40,11 +36,6 @@ namespace CSMapi.Validators
             if (pallet == null)
             {
                 throw new ArgumentException($"Pallet id {id} not found.");
-            }
-
-            if (await _context.Pallets.AnyAsync(p => p.Palletno == request.Palletno))
-            {
-                throw new ArgumentException("Pallet Number taken.");
             }
         }
 

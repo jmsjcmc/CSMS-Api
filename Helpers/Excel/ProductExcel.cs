@@ -71,10 +71,10 @@ namespace CSMapi.Helpers.Excel
             {
                 var values = new object[]
                 {
-             product.Customer.Companyname, product.Productcode, product.Productname,
-             product.Variant, product.Sku, product.Category,
-             product.Productpackaging, product.Deliveryunit,  product.Quantity, 
-             product.Uom, product.Weight, product.Unit
+                     product.Customer.Companyname, product.Productcode, product.Productname,
+                     product.Variant, product.Sku, product.Category,
+                     product.Productpackaging, product.Deliveryunit,  product.Quantity, 
+                     product.Uom, product.Weight, product.Unit
                 };
                 for (int col = 0; col < values.Length; col++)
                     workSheet.Cell(row, col + 1).Value = values[col]?.ToString();

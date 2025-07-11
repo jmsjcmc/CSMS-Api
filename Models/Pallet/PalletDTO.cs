@@ -2,15 +2,16 @@
 {
     public class PalletRequest
     {
-        public int Positionid { get; set; }
+        public string Taggingnumber { get; set; }
         public string Pallettype { get; set; }
         public int Palletno { get; set; }
     }
     public class PalletResponse
     {
         public int Id { get; set; }
+        public string Taggingnumber { get; set; }
         public string Pallettype { get; set; }
-        public int Palletno { get; set; }
+        public int? Palletno { get; set; }
         public bool Occupied { get; set; }
         public bool Active { get; set; }
         public bool Deleted { get; set; }
@@ -26,20 +27,21 @@
     public class OccupiedPalletResponse
     {
         public int Id { get; set; }
-        public int Palletno { get; set; }
+        public int? Palletno { get; set; }
         public ProductOnlyResponse Product { get; set; }
         public List<RepalletizeDetailResponse> ReceivingDetail { get; set; }
     }
     public class ProductBasedOccupiedPalletResponse
     {
         public int Id { get; set; }
-        public int Palletno { get; set; }
+        public int? Palletno { get; set; }
     }
     public class PalletOnlyResponse
     {
         public int Id { get; set; }
+        public string Taggingnumber { get; set; }
         public string Pallettype { get; set; }
-        public int Palletno { get; set; }
+        public int? Palletno { get; set; }
         public bool Occupied { get; set; }
         public bool Active { get; set; }
         public bool Deleted { get; set; }
@@ -93,5 +95,12 @@
     {
         public int Receivingdetailid { get; set; }
         public int Quantitymoved { get; set; }
+    }
+    public class PalletTypeBasedResponse
+    {
+        public int Id { get; set; }
+        public string Pallettype { get; set; }
+        public string Taggingnumber { get; set; }
+        public int? Palletno { get; set; }
     }
 }
