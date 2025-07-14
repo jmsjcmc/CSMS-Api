@@ -83,7 +83,6 @@ namespace CSMapi.Validators
                 throw new ArgumentException($"Invalid roles: {string.Join(", ", invalidRoles)}");
             }
         }
-
         public async Task ValidateUserUpdateRequest(UserRequest request, int id)
         {
             var user = await _context.Users
@@ -92,11 +91,6 @@ namespace CSMapi.Validators
             if (user == null)
             {
                 throw new ArgumentException($"User id {id} not found.");
-            }
-
-            if (await _context.Users.AnyAsync(u => u.Username == request.Username))
-            {
-                throw new ArgumentException("Username taken.");
             }
         }
 
@@ -111,7 +105,7 @@ namespace CSMapi.Validators
             }
         }
 
-        public async Task ValidateUserESignature(IFormFile file)
+        public Task ValidateUserESignature(IFormFile file)
         {
             var allowedTypes = new[]
             {
@@ -127,6 +121,8 @@ namespace CSMapi.Validators
             {
                 throw new ArgumentException("JPEG, PNG, or PDF files allowed only.");
             }
+
+            return Task.CompletedTask;
         }
 
         public static int ValidateUserClaim(ClaimsPrincipal user)

@@ -56,7 +56,7 @@ namespace CSMapi.Services
         // [HttpPatch("customer/update/{id}")]
         public async Task<CustomerResponse> updatecustomer(CustomerRequest request, int id)
         {
-            var customer = await getcustomerid(id);
+            var customer = await ValidateCustomer(id);
 
             _mapper.Map(request, customer);
             await _context.SaveChangesAsync();
@@ -66,7 +66,7 @@ namespace CSMapi.Services
         // [HttpPatch("customer/toggle-active")]
         public async Task<CustomerResponse> toggleactive(int id)
         {
-            var customer = await getcustomerid(id);
+            var customer = await ValidateCustomer(id);
 
             customer.Active = !customer.Active;
 
@@ -78,7 +78,7 @@ namespace CSMapi.Services
         // [HttpPatch("customer/hide/{id}")]
         public async Task<CustomerResponse> hidecustomer(int id)
         {
-            var customer = await getcustomerid(id);
+            var customer = await ValidateCustomer(id);
 
             customer.Removed = !customer.Removed;
 
@@ -90,7 +90,7 @@ namespace CSMapi.Services
         // [HttpDelete("customer/delete/{id}")]
         public async Task<CustomerResponse> deletecustomer(int id)
         {
-            var customer = await getcustomerid(id);
+            var customer = await ValidateCustomer(id);
 
             _context.Customers.Remove(customer);
             await _context.SaveChangesAsync();
@@ -110,6 +110,13 @@ namespace CSMapi.Services
         {
             var response = await getcustomerdata(id);
             return _mapper.Map<CustomerResponse>(response);
+        }
+        // Validators
+        private async Task<Customer> ValidateCustomer(int id)
+        {
+            var customer = await getcustomerid(id);
+            return customer ??
+                throw new ArgumentException($"Customer with id {id} not found.");
         }
     }
 }

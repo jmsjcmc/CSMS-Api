@@ -3,11 +3,8 @@ using CSMapi.Helpers;
 using CSMapi.Helpers.Excel;
 using CSMapi.Models;
 using CSMapi.Services;
-using EFCore.BulkExtensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
-
 
 namespace CSMapi.Controller
 {
@@ -43,19 +40,6 @@ namespace CSMapi.Controller
             try
             {
                 var response = await _palletService.occupiedpallets(pageNumber, pageSize, searchTerm);
-                return response;
-            } catch (Exception e)
-            {
-                return HandleException(e);
-            }
-        }
-        // Fetch all active pallets based on pallet type
-        [HttpGet("pallets/active/pallet-type")]
-        public async Task<ActionResult<List<PalletTypeBasedResponse>>> palletbasedpalletslist(string searchTerm)
-        {
-            try
-            {
-                var response = await _palletService.pallettypepalletslist(searchTerm);
                 return response;
             } catch (Exception e)
             {
@@ -234,12 +218,13 @@ namespace CSMapi.Controller
         }
         // Repalletize product
         [HttpPost("pallet/repalletization")]
-        public async Task<ActionResult<RepalletizationResponse>> repalletization([FromBody] RepalletizationRequest request)
+        public async Task<ActionResult> repalletization([FromBody] RepalletizationRequest request)
         {
             try
             {
-                var response = await _palletService.repalletize(request, User);
-                return response;
+                await _palletService.repalletize(request, User);
+                return Ok("Success.");
+
             } catch (Exception e)
             {
                 return HandleException(e);
@@ -291,12 +276,12 @@ namespace CSMapi.Controller
             try
             {
                 var pallets = _palletExcel.importpallets(file, User);
-                await _context.BulkInsertAsync(pallets);
+                await _context.Pallets.AddRangeAsync(pallets);
+                await _context.SaveChangesAsync();
 
                 var response = _mapper.Map<List<PalletOnlyResponse>>(pallets);
                 return response;
-            }
-            catch (Exception e)
+            } catch (Exception e)
             {
                 return HandleException(e);
             }
@@ -308,7 +293,8 @@ namespace CSMapi.Controller
             try
             {
                 var positions = await _palletExcel.importpositions(file);
-                await _context.BulkInsertAsync(positions);
+                await _context.Palletpositions.AddRangeAsync(positions);
+                await _context.SaveChangesAsync();
 
                 var response = _mapper.Map<List<PalletPositionResponse>>(positions);
                 return response;

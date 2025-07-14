@@ -110,7 +110,7 @@ namespace CSMapi.Services
                     .SumAsync(d => (int?)d.Quantity) ?? 0;
 
                 var totalDispatched = dispatchedQuantity + detail.Quantity;
-                var isFullDispatched = totalDispatched == receivingDetail.Quantityinapallet;
+                var isFullDispatched = totalDispatched == receivingDetail?.Quantityinapallet;
 
                 var requestDispatchDetail = _mapper.Map<DispatchingDetail>(detail);
                 requestDispatchDetail.Dispatchingid = dispatch.Id;
@@ -225,7 +225,7 @@ namespace CSMapi.Services
         // [HttpPatch("dispatching/update/{id}")]
         public async Task<DispatchingResponse> updatedispatch(ClaimsPrincipal user, DispatchingRequest request, int id)
         {
-            var dispatching = await getdispatchingid(id);
+            var dispatching = await ValidateDispatch(id);
 
             _mapper.Map(request, dispatching);
 
@@ -238,7 +238,7 @@ namespace CSMapi.Services
         // [HttpPatch("dispatching/time-start-end")]
         public async Task<DispatchingTimeStartEndResponse> addtimestartend (string timeStart, string timeEnd, int id, ClaimsPrincipal user)
         {
-            var dispatching = await getdispatchingid(id);
+            var dispatching = await ValidateDispatch(id);
 
             dispatching.Dispatchtimestart = timeStart;
             dispatching.Dispatchtimeend = timeEnd;
@@ -266,7 +266,7 @@ namespace CSMapi.Services
         // [HttpPatch("dispatching/hide/{id}")]
         public async Task<DispatchingResponse> hidedispatch(int id)
         {
-            var dispatching = await getdispatchingid(id);
+            var dispatching = await ValidateDispatch(id);
 
             dispatching.Removed = !dispatching.Removed;
 
@@ -278,7 +278,7 @@ namespace CSMapi.Services
         // [HttpDelete("dispatching/delete/{id}")]
         public async Task<DispatchingResponse> deletedispatch(int id)
         {
-            var dispatching = await getdispatchingid(id);
+            var dispatching = await ValidateDispatch(id);
 
             _context.Dispatchings.Remove(dispatching);
             await _context.SaveChangesAsync();
@@ -315,6 +315,13 @@ namespace CSMapi.Services
         {
             var response = await getdispatchingdata(id);
             return _mapper.Map<DispatchingResponse>(response);
+        }
+        // Validators
+        private async Task<Dispatching> ValidateDispatch(int id)
+        {
+            var dispatch = await getdispatchingid(id);
+            return dispatch ??
+                throw new ArgumentException($"Dispatching data with id {id} not found.");
         }
     }
 }

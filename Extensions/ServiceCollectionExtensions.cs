@@ -1,6 +1,7 @@
 ﻿using CSMapi.Helpers;
 using CSMapi.Helpers.Excel;
 using CSMapi.Helpers.Queries;
+using CSMapi.Models;
 using CSMapi.Services;
 using CSMapi.Validators;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -90,6 +91,7 @@ namespace CSMapi.Extensions
         // JWT Authentication
         public static IServiceCollection AddJwtAuthentication(this IServiceCollection service, IConfiguration configuration)
         {
+            var JWTSettings = GetValidatedJWTSettings(configuration);
             service.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
             {
@@ -100,7 +102,7 @@ namespace CSMapi.Extensions
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = configuration["Jwt:Issuer"],
                     ValidAudience = configuration["Jwt:Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"])),
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JWTSettings.Key)),
                     ClockSkew = TimeSpan.Zero
                 };
 
@@ -157,6 +159,24 @@ namespace CSMapi.Extensions
             //    FileProvider = new PhysicalFileProvider(@"D:\CISDEVO Repo\images"),
             //    RequestPath = "/uploads/receivingform"
             //});
+        }
+
+        // Validations
+        private static JwtSetting GetValidatedJWTSettings(IConfiguration configuration)
+        {
+            var key = configuration["Jwt:Key"] ??
+                throw new InvalidOperationException("JWT key is not configured.");
+            var issuer = configuration["Jwt:Issuer"] ??
+                throw new InvalidOperationException("JWT issuer id not configured.");
+            var audience = configuration["Jwt:Audience"] ??
+                throw new InvalidOperationException("JWT audience is not configured.");
+
+            return new JwtSetting
+            {
+                Key = key,
+                Issuer = issuer,
+                Audience = audience
+            };
         }
     }
 }

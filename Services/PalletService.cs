@@ -387,33 +387,40 @@ namespace CSMapi.Services
             return await positionResponse(position.Id);
         }
         // Helpers
-        private async Task<Pallet?> getpalletid(int id)
+        private async Task<Pallet> getpalletid(int id)
         {
-            return await _palletQueries.patchmethodpalletid(id);
+            return await _palletQueries.patchmethodpalletid(id) ??
+                throw new ArgumentException($"Pallet with id {id} not found.");
         }
-        private async Task<PalletPosition?> getpalletpositionid(int id)
+        private async Task<PalletPosition> getpalletpositionid(int id)
         {
-            return await _palletQueries.patchmethodpositionid(id);
+            return await _palletQueries.patchmethodpositionid(id) ?? 
+                throw new ArgumentException($"Pallet position with id {id} not found.");
         }
-        private async Task<ColdStorage?> getcoldstorageid(int id)
+        private async Task<ColdStorage> getcoldstorageid(int id)
         {
-            return await _palletQueries.patchmethodcoldstorageid(id);
+            return await _palletQueries.patchmethodcoldstorageid(id) ?? 
+                throw new ArgumentException($"Cold Storage with id {id} not found.");
         }
-        private async Task<Pallet?> getpalletdata(int id)
+        private async Task<Pallet> getpalletdata(int id)
         {
-            return await _palletQueries.getmethodpalletid(id);
+            return await _palletQueries.getmethodpalletid(id) ??
+                throw new ArgumentException($"Pallet with id {id} not found.");
         }
-        private async Task<PalletPosition?> getpalletpositiondata(int id)
+        private async Task<PalletPosition> getpalletpositiondata(int id)
         {
-            return await _palletQueries.getmethodpositionid(id);
+            return await _palletQueries.getmethodpositionid(id) ?? 
+                throw new ArgumentException($"Pallet position with id {id} not found.");
         }
-        private async Task<ColdStorage?> getcoldstoragedata(int id)
+        private async Task<ColdStorage> getcoldstoragedata(int id)
         {
-            return await _palletQueries.getmethodcoldstorageid(id);
+            return await _palletQueries.getmethodcoldstorageid(id) ?? 
+                throw new ArgumentException($"Cold storage with id {id} not found.");
         }
-        private async Task<Repalletization?> getrepalletizationdata(int id)
+        private async Task<Repalletization> getrepalletizationdata(int id)
         {
-            return await _palletQueries.getmethodrepalletizationid(id);
+            return await _palletQueries.getmethodrepalletizationid(id) ??
+                throw new ArgumentException($"Repalletized with id {id} not found.");
         }
         private async Task<PalletResponse> palletResponse(int id)
         {

@@ -13,11 +13,8 @@ namespace CSMapi.Helpers.Queries
         // Query for fetching customers with optional filter for company name
         public IQueryable<Customer> customeronlyquery(string? searchTerm = null)
         {
-            var query = _context.Customers
-                   .AsNoTracking()
-                   .Where(c => !c.Removed)
-                   .OrderByDescending(c => c.Id)
-                   .AsQueryable();
+            var query = batchgetquery();
+
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {
                 query = query.Where(c => c.Companyname.Contains(searchTerm));
@@ -25,26 +22,36 @@ namespace CSMapi.Helpers.Queries
             return query;
         }
         // Query for fetcing all active customers
-        public async Task<List<Customer>> activecustomersquery()
+        public async Task<List<Customer>> activecustomersquery(string? searchTerm = null)
         {
-            return await _context.Customers
-                    .AsNoTracking()
-                    .Where(c => c.Active && !c.Removed)
-                    .OrderByDescending(c => c.Id)
-                    .ToListAsync();
+            return await customeronlyquery(searchTerm).ToListAsync();
         }
         // Query for fetching specific customer for GET method
         public async Task<Customer?> getmethodcustomerid(int id)
         {
-            return await _context.Customers
-                    .AsNoTracking()
+            return await batchgetquery()
                     .FirstOrDefaultAsync(c => c.Id == id);
         }
         // Query for fetching specific customer for PATCH/PUT/DELETE methods
         public async Task<Customer?> patchmethodcustomerid(int id)
         {
-            return await _context.Customers
+            return await patchquery()
                     .FirstOrDefaultAsync(c => c.Id == id);
+        }
+        // Helpers
+        private IQueryable<Customer> batchgetquery()
+        {
+            return _context.Customers
+                .AsNoTracking()
+                .Include(c => c.Product)
+                .Where(c => !c.Removed)
+                .OrderByDescending(c => c.Id);
+        }
+        private IQueryable<Customer> patchquery()
+        {
+            return _context.Customers
+                .Include(c => c.Product)
+                .Where(c => !c.Removed);
         }
     }
 }

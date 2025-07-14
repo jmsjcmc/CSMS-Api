@@ -125,7 +125,7 @@ namespace CSMapi.Helpers
                 .ForMember(d => d.Category, o => o.MapFrom(s => s.Category));
 
             CreateMap<Product, ProductWithReceivingResponse>()
-                .ForMember(d => d.Category, o => o.MapFrom(s => s.Category))
+                .ForMember(d => d.Category, o => o.MapFrom(s => s.Category.Name))
                 .ForMember(d => d.Overallweight, o => o.Ignore())
                 .ForMember(d => d.Customer, o => o.MapFrom(s => s.Customer))
                 .ForMember(d => d.ReceivingDetail, o => o.MapFrom((s, d, dm, c) =>

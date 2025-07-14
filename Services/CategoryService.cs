@@ -69,18 +69,21 @@ namespace CSMapi.Services
             return await categoryResponse(category.Id);
         }
         // Helpers
-        private async Task<Category?> getcategoryid(int id)
+        private async Task<Category> getcategoryid(int id)
         {
-            return await _query.getcategoryid(id);
+            return await _query.getcategoryid(id) ??
+                throw new ArgumentException($"Category with id {id} not found.");
         }
-        private async Task<Category?> patchcategoryid(int id)
+        private async Task<Category> patchcategoryid(int id)
         {
-            return await _query.patchcategoryid(id);
+            return await _query.patchcategoryid(id) ??
+                throw new ArgumentException($"Category with id {id} not found.");
         }
         private async Task<CategoryResponse> categoryResponse(int id)
         {
             var response = await getcategoryid(id);
             return _mapper.Map<CategoryResponse>(response);
         }
+        
     }
 }

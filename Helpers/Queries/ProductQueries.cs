@@ -16,49 +16,21 @@ namespace CSMapi.Helpers.Queries
         // Query for fetching all products with optional filter for company, using present date
         public IQueryable<Product> productwithcompany_asof(string? company = null)
         {
-            var query = _context.Products
-                .AsNoTracking()
-                .Include(p => p.Category)
-                .Include(p => p.Customer)
-                .Include(p => p.Receiving)
-                .ThenInclude(r => r.Document)
-                .Include(p => p.Receiving)
-                .ThenInclude(r => r.Receivingdetails)
-                .Include(p => p.Dispatching)
-                .ThenInclude(d => d.Document)
-                .Include(p => p.Dispatching)
-                .ThenInclude(d => d.Dispatchingdetails)
-                .Where(p => p.Receiving.Any()
-                && p.Receiving.Any(r => r.Expirationdate >= TimeHelper.GetPhilippineStandardTime().Date) &&
-                !p.Dispatching.Any(d => !d.Dispatched))
-                .OrderByDescending(p => p.Id)
-                .AsQueryable();
+            var query = batchgetquery();
 
             if (!string.IsNullOrWhiteSpace(company))
             {
-                query = query.Where(p => p.Customer.Companyname == company);
+                query = query.Where(p => p.Receiving.Any()
+                && p.Receiving.Any(r => r.Expirationdate >= TimeHelper.GetPhilippineStandardTime().Date) &&
+                !p.Dispatching.Any(d => !d.Dispatched));
             }
-
             return query;
         }
         // Query for fetching products with optional filter for company, as of, from date received, and to date received 
         public IQueryable<Product> productwithcompanyquery(string? company = null, DateTime? from = null, DateTime? to = null)
         {
-            var query = _context.Products
-                .AsNoTracking()
-                .Include(p => p.Category)
-                .Include(p => p.Customer)
-                .Include(p => p.Receiving)
-                .ThenInclude(r => r.Document)
-                .Include(p => p.Receiving)
-                .ThenInclude(r => r.Receivingdetails)
-                .Include(p => p.Dispatching)
-                .ThenInclude(d => d.Document)
-                .Include(p => p.Dispatching)
-                .ThenInclude(d => d.Dispatchingdetails)
-                .Where(p => p.Receiving.Any())
-                .OrderByDescending(p => p.Id)
-                .AsQueryable();
+            var query = batchgetquery();
+
             if (!string.IsNullOrWhiteSpace(company))
             {
                 query = query.Where(p => p.Customer.Companyname == company);
@@ -92,17 +64,13 @@ namespace CSMapi.Helpers.Queries
         // Query for fetching all products with optional filter for product code
         public IQueryable<Product> productsquery(string? searchTerm = null)
         {
-            var query = _context.Products
-                  .AsNoTracking()
-                  .Include(p => p.Category)
-                  .Include(p => p.Customer)
-                  .OrderByDescending(p => p.Id)
-                  .AsQueryable();
+            var query = batchgetquery();
 
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {
                 query = query.Where(p => p.Productcode.Contains(searchTerm) || p.Productname.Contains(searchTerm));
             }
+
             return query;
         }
         // Query for fetching specific product by product code
@@ -122,7 +90,8 @@ namespace CSMapi.Helpers.Queries
                    .Include(p => p.Category)
                    .Include(p => p.Receiving)
                    .ThenInclude(r => r.Receivingdetails)
-                   .Where(p => p.Receiving.Any(r => r.Received))
+                   .Where(p => p.Receiving.Any(r => r.Received) && 
+                   p.Receiving.Any(r => r.Receivingdetails.Any(r => !r.Fulldispatched)))
                    .ToListAsync();
         }
         // Query for fetching all receiving details based on product code
@@ -154,9 +123,63 @@ namespace CSMapi.Helpers.Queries
         // Query for fetching specific product for PATCH/PUT/DELETE methods
         public async Task<Product?> patchmethodproductid(int id)
         {
-            return await _context.Products
-                .Include(p => p.Category)
+            return await patchquery()
                 .FirstOrDefaultAsync(p => p.Id == id);
+        }
+        // Helpers
+        private IQueryable<Product> batchgetquery()
+        {
+            return _context.Products
+                .AsNoTracking()
+                .Include(p => p.Category)
+                .Include(p => p.Customer)
+                .Include(p => p.Receiving)
+                .ThenInclude(r => r.Document)
+                .Include(p => p.Receiving)
+                .ThenInclude(r => r.Requestor)
+                .Include(p => p.Receiving)
+                .ThenInclude(r => r.Approver)
+                .Include(p => p.Receiving)
+                .ThenInclude(r => r.Receivingdetails)
+                .ThenInclude(r => r.Pallet)
+                .Include(p => p.Receiving)
+                .ThenInclude(r => r.Receivingdetails)
+                .ThenInclude(r => r.PalletPosition)
+                .Include(p => p.Receiving)
+                .ThenInclude(r => r.Receivingdetails)
+                .ThenInclude(r => r.DispatchingDetail)
+                .Include(p => p.Receiving)
+                .ThenInclude(r => r.Receivingdetails)
+                .ThenInclude(r => r.RepalletizationDetail)
+                .Include(p => p.Dispatching)
+                .Where(p => !p.Removed)
+                .OrderByDescending(p => p.Id);
+        }
+        private IQueryable<Product> patchquery()
+        {
+            return _context.Products
+                .Include(p => p.Category)
+                .Include(p => p.Customer)
+                .Include(p => p.Receiving)
+                .ThenInclude(r => r.Document)
+                .Include(p => p.Receiving)
+                .ThenInclude(r => r.Requestor)
+                .Include(p => p.Receiving)
+                .ThenInclude(r => r.Approver)
+                .Include(p => p.Receiving)
+                .ThenInclude(r => r.Receivingdetails)
+                .ThenInclude(r => r.Pallet)
+                .Include(p => p.Receiving)
+                .ThenInclude(r => r.Receivingdetails)
+                .ThenInclude(r => r.PalletPosition)
+                .Include(p => p.Receiving)
+                .ThenInclude(r => r.Receivingdetails)
+                .ThenInclude(r => r.DispatchingDetail)
+                .Include(p => p.Receiving)
+                .ThenInclude(r => r.Receivingdetails)
+                .ThenInclude(r => r.RepalletizationDetail)
+                .Include(p => p.Dispatching)
+                .Where(p => !p.Removed);
         }
     }
 }

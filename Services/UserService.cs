@@ -71,7 +71,8 @@ namespace CSMapi.Services
             await _userValidator.ValidateUserLoginRequest(request);
 
             var user = await _context.Users
-                .SingleOrDefaultAsync(u => u.Username == request.Username);
+                .SingleOrDefaultAsync(u => u.Username == request.Username) ??
+                throw new ArgumentException("User not found.");
 
             var accessToken = _authHelper.GenerateAccessToken(user);
 
@@ -82,8 +83,6 @@ namespace CSMapi.Services
                 AccessToken = accessToken,
                 User = new
                 {
-                    user.Id,
-                    user.Username,
                     user.Role
                 }
             };
@@ -125,7 +124,8 @@ namespace CSMapi.Services
         // [HttpPatch("role/update/{id}")]
         public async Task<RoleResponse> updaterole(RoleRequest request, int id)
         {
-            var role = await getroleid(id);
+            var role = await getroleid(id) ?? 
+                throw new ArgumentException("Role not found.");
 
             _mapper.Map(request, role);
             await _context.SaveChangesAsync();
@@ -138,7 +138,8 @@ namespace CSMapi.Services
             await _userValidator.ValidateUserUpdateRequest(request, id);
             var roleNames = await GetValidRoleNames(request.Roles);
 
-            var user = await getuserid(id);
+            var user = await getuserid(id) ??
+                throw new ArgumentException("User not found.");
 
             _mapper.Map(request, user);
             user.Role = roleNames;
@@ -153,8 +154,9 @@ namespace CSMapi.Services
         public async Task<UserEsignResponse> addesign(IFormFile file, int id, ClaimsPrincipal requestor)
         {
             await _userValidator.ValidateUserESignature(file);
-            var user = await _context.Users.FindAsync(id);
-
+            var user = await _context.Users.FindAsync(id) ??
+                throw new ArgumentException("User not found.");
+           
             string fullName = AuthUserHelper.GetFullName(requestor);
             string savedPath = await FileHelper.SaveEsignAsync(file, fullName);
 
@@ -169,7 +171,8 @@ namespace CSMapi.Services
         // [HttpPatch("user/hide/{id}")]
         public async Task<UserResponse> hideuser(int id)
         {
-            var user = await getuserid(id);
+            var user = await getuserid(id) ??
+                throw new ArgumentException("User not found.");
 
             user.Removed = !user.Removed;
 
@@ -181,7 +184,8 @@ namespace CSMapi.Services
         // [HttpPatch("role/hide/{id}")]
         public async Task<RoleResponse> hiderole(int id)
         {
-            var role = await getroleid(id);
+            var role = await getroleid(id) ?? 
+                throw new ArgumentException("Role not found.");
 
             role.Removed = !role.Removed;
 
@@ -193,7 +197,8 @@ namespace CSMapi.Services
         // [HttpDelete("user/delete/{id}")]
         public async Task<UserResponse> deleteuser(int id)
         {
-            var user = await getuserid(id);
+            var user = await getuserid(id) ??
+                throw new ArgumentException("User not found");
 
             _context.Users.Remove(user);
             await _context.SaveChangesAsync();
@@ -203,7 +208,8 @@ namespace CSMapi.Services
         // [HttpDelete("role/delete/{id}")]
         public async Task<RoleResponse> deleterole(int id)
         {
-            var role = await getroleid(id);
+            var role = await getroleid(id) ??
+                throw new ArgumentException("Role not found");
 
             _context.Roles.Remove(role);
             await _context.SaveChangesAsync();

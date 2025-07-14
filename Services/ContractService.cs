@@ -4,7 +4,6 @@ using CSMapi.Helpers.Queries;
 using CSMapi.Interfaces;
 using CSMapi.Models;
 using CSMapi.Validators;
-using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace CSMapi.Services
@@ -88,13 +87,15 @@ namespace CSMapi.Services
             return await contractResponse(contract.Id);
         }
         // Helpers
-        private async Task<Contract?> getcontractid(int id)
+        private async Task<Contract> getcontractid(int id)
         {
-            return await _contractQueries.patchmethodcontractid(id);
+            return await _contractQueries.patchmethodcontractid(id) ?? 
+                throw new ArgumentException($"Contract with id {id} not found.");
         }
-        private async Task<Contract?> getcontractdata(int id)
+        private async Task<Contract> getcontractdata(int id)
         {
-            return await _contractQueries.getmethodcontractid(id);
+            return await _contractQueries.getmethodcontractid(id) ??
+                throw new ArgumentException($"Contract with id {id} not found.");
         }
         private async Task<ContractResponse> contractResponse(int id)
         {
