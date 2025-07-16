@@ -107,6 +107,19 @@
         public List<ProductDispatchingResponse> Dispatching { get; set; }
     }
 
+    public class ProductBasedReceivingDispatchingResponse
+    {
+        public List<ProductReceivingResponse> Receiving { get; set; }
+        public List<ProductDispatchingResponse> Dispatching { get; set; }
+    }
+
+    public class BasicProductResponse
+    {
+        public int Id { get; set; }
+        public string Productcode { get; set; }
+        public string Productname { get; set; }
+    }
+
     public class ProductSummary
     {
         public int Id { get; set; }

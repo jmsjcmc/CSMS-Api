@@ -49,7 +49,7 @@
         public bool Partialdispatched { get; set; }
         public bool Fulldispatched { get; set; }
         public ICollection<DispatchingDetail> DispatchingDetail { get; set; }
-        public RepalletizationDetail RepalletizationDetail { get; set; }
+        public ICollection<RepalletizationDetail> RepalletizationDetail { get; set; }
     }
 
     public class Document

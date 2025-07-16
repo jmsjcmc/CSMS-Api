@@ -65,6 +65,14 @@ namespace CSMapi.Services
 
             return _mapper.Map<UserResponse>(user);
         }
+        // [HttpGet("users/count-all")]
+        public async Task<int> totalcount()
+        {
+            return await _context.Users
+                .AsNoTracking()
+                .Where(u => !u.Removed)
+                .CountAsync();
+        }
         // [HttpPost("login")]
         public async Task<object> login(Login request)
         {
@@ -106,6 +114,7 @@ namespace CSMapi.Services
             user.Password = BCrypt.Net.BCrypt.HashPassword(request.Password);
             user.Role = roleNames;
             user.Createdon = TimeHelper.GetPhilippineStandardTime();
+            user.Active = true;
 
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
@@ -167,6 +176,18 @@ namespace CSMapi.Services
             await _context.SaveChangesAsync();
 
             return _mapper.Map<UserEsignResponse>(user);
+        }
+        // [HttpPatch("user/toggle-active")]
+        public async Task<UserResponse> toggleactive(int id)
+        {
+            var user = await getuserid(id);
+
+            user.Active = !user.Active;
+
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+
+            return await userResponse(user.Id);
         }
         // [HttpPatch("user/hide/{id}")]
         public async Task<UserResponse> hideuser(int id)
@@ -233,9 +254,10 @@ namespace CSMapi.Services
 
             return roleNames;
         }
-        private async Task<User?> getuserid(int id)
+        private async Task<User> getuserid(int id)
         {
-            return await _userQueries.patchmethoduserid(id);
+            return await _userQueries.patchmethoduserid(id) ??
+                throw new ArgumentException($"User with id {id} not found.");
         }
 
         private async Task<Role?> getroleid(int id)

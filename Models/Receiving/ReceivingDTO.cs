@@ -139,4 +139,12 @@ namespace CSMapi.Models
         public UserEsignResponse Approver { get; set; }
         public List<ReceivingDetailResponse> ReceivingDetail { get; set; }
     }
+
+    public class ReceivingsCount
+    {
+        public int Total { get; set; }
+        public int Pending { get; set; }
+        public int Received { get; set; }
+        public int Declined { get; set; }
+    }
 }

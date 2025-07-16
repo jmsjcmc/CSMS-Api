@@ -27,9 +27,14 @@ namespace CSMapi.Helpers.Queries
             return query;
         }
         // Query for fetching products with optional filter for company, as of, from date received, and to date received 
-        public IQueryable<Product> productwithcompanyquery(string? company = null, DateTime? from = null, DateTime? to = null)
+        public IQueryable<Product> productwithcompanyquery( string? company = null, DateTime? from = null, DateTime? to = null, int? productId = null)
         {
             var query = batchgetquery();
+
+            if (productId.HasValue)
+            {
+                query = query.Where(p => p.Id == productId);
+            }
 
             if (!string.IsNullOrWhiteSpace(company))
             {
@@ -49,6 +54,36 @@ namespace CSMapi.Helpers.Queries
             }
 
             return query;
+        }
+
+        public async Task<List<Product>> companybasesproductslist(int id)
+        {
+            return await _context.Products
+                .AsNoTracking()
+                .Include(p => p.Category)
+                .Include(p => p.Customer)
+                .Include(p => p.Receiving)
+                .ThenInclude(r => r.Document)
+                .Include(p => p.Receiving)
+                .ThenInclude(r => r.Requestor)
+                .Include(p => p.Receiving)
+                .ThenInclude(r => r.Approver)
+                .Include(p => p.Receiving)
+                .ThenInclude(r => r.Receivingdetails)
+                .ThenInclude(r => r.Pallet)
+                .Include(p => p.Receiving)
+                .ThenInclude(r => r.Receivingdetails)
+                .ThenInclude(r => r.PalletPosition)
+                .Include(p => p.Receiving)
+                .ThenInclude(r => r.Receivingdetails)
+                .ThenInclude(r => r.DispatchingDetail)
+                .Include(p => p.Receiving)
+                .ThenInclude(r => r.Receivingdetails)
+                .ThenInclude(r => r.RepalletizationDetail)
+                .Include(p => p.Dispatching)
+                .Where(p => !p.Removed && p.Customer.Id == id)
+                .OrderByDescending(p => p.Id)
+                .ToListAsync();
         }
         // Query for fetching all products with related customers
         public async Task<List<Product>?> productlistquery(int id)

@@ -27,7 +27,8 @@
         public string Esignature { get; set; }
         public DateTime Createdon { get; set; }
         public DateTime Updatedon { get; set; }
-        public bool Removed { get; set; }
+        public Boolean Active { get; set; }
+        public Boolean Removed { get; set; }
     }
 
     public class UserEsignResponse
@@ -53,6 +54,11 @@
     {
         public int Id { get; set; }
         public string Rolename { get; set; }
-        public bool Removed { get; set; }
+        public Boolean Removed { get; set; }
+    }
+
+    public class UsersCount
+    {
+        public int Total { get; set; }
     }
 }

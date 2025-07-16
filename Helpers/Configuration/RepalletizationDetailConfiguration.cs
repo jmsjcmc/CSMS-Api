@@ -14,8 +14,8 @@ namespace CSMapi.Helpers.Configuration
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(r => r.Receivingdetail)
-                .WithOne(r => r.RepalletizationDetail)
-                .HasForeignKey<RepalletizationDetail>(r => r.Receivingdetailid);
+                .WithMany(r => r.RepalletizationDetail)
+                .HasForeignKey(r => r.Receivingdetailid);
         }
     }
 }

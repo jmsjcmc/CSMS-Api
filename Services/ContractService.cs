@@ -43,6 +43,7 @@ namespace CSMapi.Services
             await _contractValidator.ValidateContractRequest(request);
 
             var contract = _mapper.Map<Contract>(request);
+            contract.Active = true;
             contract.Creatorid = AuthUserHelper.GetUserId(user);
             contract.Createdon = TimeHelper.GetPhilippineStandardTime();
 
@@ -60,6 +61,18 @@ namespace CSMapi.Services
             contract.Creatorid = AuthUserHelper.GetUserId(user);
             contract.Updatedon = TimeHelper.GetPhilippineStandardTime();
 
+            await _context.SaveChangesAsync();
+
+            return await contractResponse(contract.Id);
+        }
+        // [HttpPatch("contract/toggle-active")]
+        public async Task<ContractResponse> toggleactive(int id)
+        {
+            var contract = await getcontractid(id);
+
+            contract.Active = !contract.Active;
+
+            _context.Contracts.Update(contract);
             await _context.SaveChangesAsync();
 
             return await contractResponse(contract.Id);

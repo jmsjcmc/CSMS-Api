@@ -126,5 +126,4 @@ namespace CSMapi.Helpers.Configuration
                 });
         }
     }
-    }
 }

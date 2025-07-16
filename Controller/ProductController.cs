@@ -63,6 +63,35 @@ namespace CSMapi.Controller
                 return HandleException(e);
             }
         }
+        // Fetch all receivings and dispatching based on product
+        [HttpGet("product/receivings-dispatchings")]
+        public async Task<ActionResult<Pagination<ProductBasedReceivingDispatchingResponse>>> customerbasedreceivingdispatching_summary(
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10,
+            [FromQuery] int? productId = null)
+        {
+            try
+            {
+                var response = await _productService.productbasedreceivingdispatching_summary(pageNumber, pageSize, productId);
+                return response;
+            } catch(Exception e)
+            {
+                return HandleException(e);
+            }
+        }
+        // Fetch all product based on company id
+        [HttpGet("products/company-based")]
+        public async Task<ActionResult<List<BasicProductResponse>>> customerbasedproductsbasic(int id)
+        {
+            try
+            {
+                var response = await _productService.customerbasedproductsbasic(id);
+                return response;
+            } catch (Exception e)
+            {
+                return HandleException(e);
+            }
+        }
         // Fetch all products based on customer with optional filter from and to
         [HttpGet("products/company-inventory/from-to")]
         public async Task<ActionResult<Pagination<ProductWithReceivingAndDispatchingResponse>>> companybasedproducts(

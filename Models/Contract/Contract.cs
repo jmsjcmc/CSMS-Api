@@ -28,7 +28,8 @@ namespace CSMapi.Models
         public int Creatorid { get; set; }
         public User Creator { get; set; }
         public DateTime? Updatedon { get; set; }
-        public bool Removed { get; set; }
+        public Boolean Active { get; set; }
+        public Boolean Removed { get; set; }
         public List<LeasedPresmises> Leasedpremises { get; set; } = new List<LeasedPresmises>();
     }
 

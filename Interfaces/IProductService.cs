@@ -20,6 +20,11 @@ namespace CSMapi.Interfaces
             string? company = null,
             DateTime? from = null,
             DateTime? to = null);
+        Task<Pagination<ProductBasedReceivingDispatchingResponse>> productbasedreceivingdispatching_summary(
+            int pageNumber = 1,
+            int pageSize = 10,
+            int? productId = null);
+        Task<List<BasicProductResponse>> customerbasedproductsbasic(int id);
         Task<Pagination<ProductSummary>> customerbasedproducts_summary(
             int pageNumber = 1,
             int pageSize = 10,

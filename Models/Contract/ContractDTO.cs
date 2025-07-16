@@ -44,7 +44,8 @@
         public string Sealdate { get; set; }
         public DateTime Createdon { get; set; }
         public DateTime Updatedon { get; set; }
-        public bool Removed { get; set; }
+        public Boolean Active { get; set; }
+        public Boolean Removed { get; set; }
         public UserEsignResponse User { get; set; }
         public List<LeasedPremisesResponse> LeasedPremise { get; set; }
     }

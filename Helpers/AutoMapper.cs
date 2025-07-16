@@ -54,6 +54,7 @@ namespace CSMapi.Helpers
                 .ForMember(d => d.Createdon, o => o.Ignore())
                 .ForMember(d => d.Creatorid, o => o.Ignore())
                 .ForMember(d => d.Updatedon, o => o.Ignore())
+                .ForMember(d => d.Active, o => o.Ignore())
                 .ForMember(d => d.Removed, o => o.Ignore());
 
             CreateMap<Contract, ContractResponse>()
@@ -140,6 +141,12 @@ namespace CSMapi.Helpers
             CreateMap<Product, ProductSummary>()
                 .ForMember(d => d.Category, o => o.MapFrom(s => s.Category.Name))
                 .ForMember(d => d.Companyname, o => o.MapFrom(s => s.Customer.Companyname));
+
+            CreateMap<Product, ProductBasedReceivingDispatchingResponse>()
+                .ForMember(d => d.Receiving, o => o.MapFrom(s => s.Receiving))
+                .ForMember(d => d.Dispatching, o => o.MapFrom(s => s.Dispatching));
+
+            CreateMap<Product, BasicProductResponse>();
             // Repalletizations Mapping
             CreateMap<RepalletizationRequest, Repalletization>()
                 .ForMember(d => d.Createdon, o => o.Ignore())
@@ -195,6 +202,7 @@ namespace CSMapi.Helpers
             CreateMap<Role, RoleResponse>();
             // Users Mapping
             CreateMap<UserRequest, User>()
+                .ForMember(d => d.Active, o => o.Ignore())
                 .ForMember(d => d.Createdon, o => o.Ignore())
                 .ForMember(d => d.Updatedon, o => o.Ignore())
                 .ForMember(d => d.Removed, o => o.Ignore());

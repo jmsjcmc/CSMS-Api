@@ -63,6 +63,26 @@ namespace CSMapi.Services
 
             return PaginationHelper.paginatedresponse(products, totalCount, pageNumber, pageSize);
         }
+        // [HttpGet("product/receivings-dispatchings")]
+        public async Task<Pagination<ProductBasedReceivingDispatchingResponse>> productbasedreceivingdispatching_summary(
+            int pageNumber = 1,
+            int pageSize = 10,
+            int? productId = null)
+        {
+            var query = _productQueries.productwithcompanyquery( productId : productId);
+            var totalCount = await query.CountAsync();
+
+            var products = await PaginationHelper.paginateandproject<Product, ProductBasedReceivingDispatchingResponse>(
+                query, pageNumber, pageSize, _mapper);
+
+            return PaginationHelper.paginatedresponse(products, totalCount, pageNumber, pageSize);
+        }
+        // [HttpGet("products/company-based")]
+        public async Task<List<BasicProductResponse>> customerbasedproductsbasic(int id)
+        {
+            var products = await _productQueries.companybasesproductslist(id);
+            return _mapper.Map<List<BasicProductResponse>>(products);
+        }
         // [HttpGet("products/company-inventory/summary")]
         public async Task<Pagination<ProductSummary>> customerbasedproducts_summary(
             int pageNumber = 1,

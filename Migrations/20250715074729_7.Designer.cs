@@ -4,6 +4,7 @@ using CSMapi;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CSMapi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250715074729_7")]
+    partial class _7
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -125,9 +128,6 @@ namespace CSMapi.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("Active")
-                        .HasColumnType("bit");
 
                     b.Property<string>("Agreementdate")
                         .IsRequired()
@@ -899,11 +899,11 @@ namespace CSMapi.Migrations
                             Active = false,
                             Businessunit = "ABFI Central Office",
                             Businessunitlocation = "Binugao, Toril, Davao City",
-                            Createdon = new DateTime(2025, 7, 15, 16, 43, 13, 132, DateTimeKind.Unspecified).AddTicks(4990),
+                            Createdon = new DateTime(2025, 7, 15, 15, 47, 29, 222, DateTimeKind.Unspecified).AddTicks(2645),
                             Department = "Cisdevo",
                             Firstname = "James Jecemeco",
                             Lastname = "Tabilog",
-                            Password = "$2a$11$0VoOryZ/NmmmkjDKaes6M.tiYhpS3I8gSmBswwhCOkryFVypWG/g2",
+                            Password = "$2a$11$7Wl072m8PyGCqdX6GUPBROu0O0hjka1F7y28yWf8Dhhzo.Exfx28.",
                             Position = "Software Developer",
                             Removed = false,
                             Role = "Admin, User, Approver",
@@ -915,11 +915,11 @@ namespace CSMapi.Migrations
                             Active = false,
                             Businessunit = "SubZero Ice and Cold Storage Inc",
                             Businessunitlocation = "Binugao, Toril, Davao City",
-                            Createdon = new DateTime(2025, 7, 15, 16, 43, 13, 298, DateTimeKind.Unspecified).AddTicks(7193),
+                            Createdon = new DateTime(2025, 7, 15, 15, 47, 29, 414, DateTimeKind.Unspecified).AddTicks(5837),
                             Department = "Executive",
                             Firstname = "Shiela",
                             Lastname = "Hernando",
-                            Password = "$2a$11$KyrpStxp0TcuHEtDiECGkO18yYDHa9mc0IoXJAnVnJUHNalJ5gaTO",
+                            Password = "$2a$11$UXvCrgZH2e0XlZPoC6XtL.0eTKNUXBWQlQLvLMG9WnaS7VU/YARMy",
                             Position = "Senior Operations Manager",
                             Removed = false,
                             Role = "Approver",
@@ -931,11 +931,11 @@ namespace CSMapi.Migrations
                             Active = false,
                             Businessunit = "ABFI Central Office",
                             Businessunitlocation = "Binugao, Toril, Davao City",
-                            Createdon = new DateTime(2025, 7, 15, 16, 43, 13, 462, DateTimeKind.Unspecified).AddTicks(6115),
+                            Createdon = new DateTime(2025, 7, 15, 15, 47, 29, 595, DateTimeKind.Unspecified).AddTicks(8722),
                             Department = "Cisdevo",
                             Firstname = "Jerecho",
                             Lastname = "Asilum",
-                            Password = "$2a$11$MkU1qvh/7fFxCFX5EV9nfuFH46dn/GoTcZHN3fTnKKI9Z1Ztcog9G",
+                            Password = "$2a$11$tzak.Yc5EAZlUkGrN7n7SOxxHDO1KaSGb4II0VyOxjdU65UDW.M/K",
                             Position = "Software Developer",
                             Removed = false,
                             Role = "Admin, User, Approver",

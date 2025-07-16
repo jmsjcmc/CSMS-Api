@@ -15,6 +15,24 @@ namespace CSMapi.Controller
         {
             _userService = userService;
         }
+        // Count all users
+        [HttpGet("users/count-all")]
+        public async Task<ActionResult<UsersCount>> countall()
+        {
+            try
+            {
+                var count = new UsersCount
+                {
+                    Total = await _userService.totalcount()
+                };
+
+                return count;
+            }
+            catch (Exception e)
+            {
+                return HandleException(e);
+            }
+        }
         // Fetch all users 
         [HttpGet("users")]
         public async Task<ActionResult<Pagination<UserResponse>>> allusers(
@@ -174,6 +192,19 @@ namespace CSMapi.Controller
                 return response;
             }
             catch (Exception e)
+            {
+                return HandleException(e);
+            }
+        }
+        // Toggle specific user active status
+        [HttpPatch("user/toggle-active")]
+        public async Task<ActionResult<UserResponse>> toggleactive(int id)
+        {
+            try
+            {
+                var response = await _userService.toggleactive(id);
+                return response;
+            } catch (Exception e)
             {
                 return HandleException(e);
             }

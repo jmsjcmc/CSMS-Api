@@ -199,14 +199,14 @@ namespace CSMapi.Helpers.Queries
         // Query for fetching specific pallet for PATCH/PUT/DELETE methods
         public async Task<Pallet?> patchmethodpalletid(int id)
         {
-            return await _context.Pallets.
-                FirstOrDefaultAsync(p => p.Id == id);
+            return await patchpalletquery()
+                .FirstOrDefaultAsync(p => p.Id == id);
         }
         // Query for fetching specific pallet position for PATCH/PUT/DELETE methods
         public async Task<PalletPosition?> patchmethodpositionid(int id)
         {
-            return await _context.Palletpositions.
-                FirstOrDefaultAsync(p => p.Id == id);
+            return await patchpositionquery()
+                .FirstOrDefaultAsync(p => p.Id == id);
         }
         // Query for fetching specific cold storage for PATCH/PUT/DELETE methods
         public async Task<ColdStorage?> patchmethodcoldstorageid(int id)

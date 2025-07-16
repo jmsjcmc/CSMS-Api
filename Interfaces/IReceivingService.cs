@@ -18,6 +18,10 @@ namespace CSMapi.Interfaces
             int? id = null);
         Task<ReceivingResponse> getreceiving(int id);
         Task<DocumentNumberResponse> generatedocumentnumber(string category);
+        Task<int> totalcount();
+        Task<int> pendingcount();
+        Task<int> receivedcount();
+        Task<int> declinedcount();
         Task<ReceivingResponse> addreceiving(ReceivingRequest request, IFormFile file, ClaimsPrincipal user);
         Task<ReceivingResponse> request(ClaimsPrincipal user, string status, int documentId, string? note = null);
         Task<ReceivingResponse> updatereceiving(ReceivingRequest request, IFormFile? file, int id, ClaimsPrincipal user);

@@ -6,6 +6,7 @@ using CSMapi.Models;
 using CSMapi.Validators;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace CSMapi.Services
 {
@@ -63,6 +64,38 @@ namespace CSMapi.Services
             {
                 Documentno = generateDocNo
             };
+        }
+        // [HttpGet("receivings/count-all")] "Total"
+        public async Task<int> totalcount()
+        {
+            return await _context.Receivings
+                .AsNoTracking()
+                .Where(r => !r.Removed)
+                .CountAsync();
+        }
+        // [HttpGet("receivings/count-all")] "Pending"
+        public async Task<int> pendingcount()
+        {
+            return await _context.Receivings
+                .AsNoTracking()
+                .Where(r => !r.Removed && r.Pending)
+                .CountAsync();
+        }
+        // [HttpGet("receivings/count-all")] "Received"
+        public async Task<int> receivedcount()
+        {
+            return await _context.Receivings
+                .AsNoTracking()
+                .Where(r => !r.Removed && r.Received)
+                .CountAsync();
+        }
+        // [HttpGet("receivings/count-all")] "Declined"
+        public async Task<int> declinedcount()
+        {
+            return await _context.Receivings
+                .AsNoTracking()
+                .Where(r => r.Removed && r.Declined)
+                .CountAsync();
         }
         // [HttpPost("receiving")]
         public async Task<ReceivingResponse> addreceiving(ReceivingRequest request, IFormFile? file, ClaimsPrincipal user)

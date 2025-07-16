@@ -15,12 +15,14 @@ namespace CSMapi.Interfaces
         Task<UserResponse> getuser(int id);
         Task<RoleResponse> getrole(int id);
         Task<UserResponse> getuserdetail(ClaimsPrincipal detail);
+        Task<int> totalcount();
         Task<object> login(Login request);
         Task<UserResponse> createuser(UserRequest request);
         Task<RoleResponse> addrole(RoleRequest request);
         Task<RoleResponse> updaterole(RoleRequest request, int id);
         Task<UserResponse> updateuser(UserRequest request, int id);
         Task <UserEsignResponse> addesign(IFormFile file, int id, ClaimsPrincipal requestor);
+        Task<UserResponse> toggleactive(int id);
         Task<UserResponse> hideuser(int id);
         Task<RoleResponse> hiderole(int id);
         Task<UserResponse> deleteuser(int id);

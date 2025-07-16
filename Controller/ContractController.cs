@@ -70,6 +70,19 @@ namespace CSMapi.Controller
                 return HandleException(e);
             }
         }
+        // Toggle specific contract active status
+        [HttpPatch("contract/toggle-active")]
+        public async Task<ActionResult<ContractResponse>> toggleactive(int id)
+        {
+            try
+            {
+                var response = await _contractService.toggleactive(id);
+                return response;
+            } catch (Exception e)
+            {
+                return HandleException(e);
+            }
+        }
         // Remove specific contract without removing in Database (Soft Delete)
         [HttpPatch("contract/hide/{id}")]
         public async Task<ActionResult<ContractResponse>> hidecontract(int id)

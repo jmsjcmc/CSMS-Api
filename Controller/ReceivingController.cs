@@ -20,6 +20,26 @@ namespace CSMapi.Controller
             _receivingExcel = receivingExcel;
             _receivingQueries = receivingQueries;
         }
+        // Count all receivings
+        [HttpGet("receivings/count-all")]
+        public async Task<ActionResult<ReceivingsCount>> countall()
+        {
+            try
+            {
+                var count = new ReceivingsCount
+                {
+                    Total = await _receivingService.totalcount(),
+                    Pending = await _receivingService.pendingcount(),
+                    Received = await _receivingService.receivedcount(),
+                    Declined = await _receivingService.declinedcount(),
+                };
+
+                return count;
+            } catch (Exception e)
+            {
+                return HandleException(e);
+            }
+        }
         // Fetch all receiving request
         [HttpGet("receivings")]
         public async Task<ActionResult<Pagination<ReceivingResponse>>> allreceivings(
