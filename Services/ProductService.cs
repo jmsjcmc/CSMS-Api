@@ -199,7 +199,7 @@ namespace CSMapi.Services
         // [HttpPost("product")]
         public async Task<ProductResponse> addproduct(ProductRequest request)
         {
-            await _productValidator.ValidateProductRequest(request);
+            _productValidator.ValidateProductRequest(request);
 
             var product = _mapper.Map<Product>(request);
             product.Active = true;

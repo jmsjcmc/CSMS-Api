@@ -25,7 +25,7 @@ namespace CSMapi.Helpers.Excel
         {
 
         }
-        public async Task<byte[]> exportdispatching(IEnumerable<Dispatching> dispatchings)
+        public Task<byte[]> exportdispatching(IEnumerable<Dispatching> dispatchings)
         {
             var worksheet = createworksheet("Dispatchings");
             int row = 2;
@@ -48,13 +48,13 @@ namespace CSMapi.Helpers.Excel
                     dispatching.Product.Category,
                     dispatching.Document.Documentno,
                     productname,
-                    dispatching.Dispatchtimestart,
-                    dispatching.Dispatchtimeend,
+                    dispatching.Dispatchtimestart ?? "",
+                    dispatching.Dispatchtimeend ?? "",
                     dispatching.Nmiscertificate,
                     dispatching.Dispatchplateno,
                     dispatching.Sealno,
                     dispatching.Overallweight,
-                    dispatching.Note,
+                    dispatching.Note ?? "",
                     dispatching.Dispatched,
                     dispatching.Pending,
                     dispatching.Declined,
@@ -92,13 +92,13 @@ namespace CSMapi.Helpers.Excel
                     var values = new object[]
                     {
                         productname,
-                        dispatchingdetail.Pallet.Palletno,
+                        dispatchingdetail.Pallet.Palletno ?? 0,
                         dispatchingdetail.PalletPosition.Wing,
                         dispatchingdetail.PalletPosition.Floor,
-                        dispatchingdetail.PalletPosition.Column,
-                        dispatchingdetail.PalletPosition.Side,
+                        dispatchingdetail.PalletPosition.Column ?? "",
+                        dispatchingdetail.PalletPosition.Side ?? "",
                         dispatchingdetail.Quantity,
-                        dispatchingdetail.Productiondate,
+                        dispatchingdetail.Productiondate?.ToString("MM-dd-yyyy") ?? "",
                         dispatchingdetail.Totalweight,
                         dispatchingdetail.Fulldispatched,
                         dispatchingdetail.Partialdispatched
@@ -120,7 +120,7 @@ namespace CSMapi.Helpers.Excel
             }
             detail.Columns().AdjustToContents();
             save();
-            return getbytes();
+            return Task.FromResult(getbytes());
         }
     }
 }

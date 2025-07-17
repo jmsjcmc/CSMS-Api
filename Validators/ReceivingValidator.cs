@@ -88,7 +88,7 @@ namespace CSMapi.Validators
             }
         }
 
-        public async Task ValidateCategoryRequest(string category)
+        public void ValidateCategoryRequest(string category)
         {
             if (string.IsNullOrWhiteSpace(category))
             {
@@ -108,12 +108,19 @@ namespace CSMapi.Validators
                 .Max() + 1;
         }
 
-        public string? GetPrefixByCategory(string category) =>
-            category.Trim().ToLower() switch
+        public string? GetPrefixByCategory(string? category)
+        {
+            if (string.IsNullOrWhiteSpace(category))
+                return null;
+
+            return category.Trim().ToLower() switch
             {
                 "raw mats" => "R2",
                 "fresh goods" => "R3",
                 _ => null
             };
+
+        } 
+           
     }
 }

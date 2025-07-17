@@ -52,6 +52,10 @@ namespace CSMapi.Services
         public async Task<DocumentNumberResponse> generatedocumentnumber(string category)
         {
             var prefix = _receivingValidator.GetPrefixByCategory(category);
+
+            if (string.IsNullOrWhiteSpace(prefix))
+                throw new ArgumentException("Invalid category. Cannot generate document number.");
+
             var documentNos = await _context.Receivings
                 .AsNoTracking()
                 .Include(r => r.Document)

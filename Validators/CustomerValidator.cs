@@ -4,7 +4,7 @@ namespace CSMapi.Validators
 {
     public class CustomerValidator
     {
-        public async Task ValidateCustomerRequest(CustomerRequest request)
+        public void ValidateCustomerRequest(CustomerRequest request)
         {
             if (string.IsNullOrWhiteSpace(request.Firstname))
             {

@@ -39,7 +39,7 @@ namespace CSMapi.Validators
             }
         }
 
-        public async Task ValidatePalletPosition(PalletPositionRequest request)
+        public void ValidatePalletPosition(PalletPositionRequest request)
         {
             if (request.Csid < 0)
             {

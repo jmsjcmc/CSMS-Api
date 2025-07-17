@@ -193,7 +193,13 @@ namespace CSMapi.Services
             {
                 var pallet = await _context.Pallets
                     .FirstOrDefaultAsync(p => p.Id == request.Frompalletid);
+
+                if (pallet == null)
+                    throw new ArgumentException("Source pallet not found.");
+
                 pallet.Occupied = false;
+
+                
 
                 var positionId = await _context.Receivingdetails
                     .Where(r => r.Palletid == request.Frompalletid)
@@ -246,7 +252,7 @@ namespace CSMapi.Services
         // [HttpPost("pallet-position")]
         public async Task<PalletPositionResponse> addposition(PalletPositionRequest request)
         {
-            await _palletValidator.ValidatePalletPosition(request);
+            _palletValidator.ValidatePalletPosition(request);
 
             var position = _mapper.Map<PalletPosition>(request);
 

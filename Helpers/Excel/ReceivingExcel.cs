@@ -41,7 +41,7 @@ namespace CSMapi.Helpers.Excel
             return getbytes();
         }
         // Export receivings method
-        public async Task<byte[]> exportreceivings(IEnumerable<Receiving> receivings)
+        public Task<byte[]> exportreceivings(IEnumerable<Receiving> receivings)
         {
             var worksheet = createworksheet("Receivings");
             int row = 2;
@@ -71,9 +71,9 @@ namespace CSMapi.Helpers.Excel
                     receiving.Unloadingstart, 
                     receiving.Unloadingend,
                     receiving.Overallweight, 
-                    receiving.Note, 
-                    receiving.Datereceived,
-                    receiving.Datedeclined,
+                    receiving.Note ?? "", 
+                    receiving.Datereceived?.ToString("MM-dd-yyyy") ?? "",
+                    receiving.Datedeclined?.ToString("MM-dd-yyyy") ?? "",
                     receiving.Pending, 
                     receiving.Received, 
                     receiving.Declined,
@@ -112,11 +112,11 @@ namespace CSMapi.Helpers.Excel
                     var values = new object[]
                     {
                         productName, 
-                        receivingDetail.Pallet.Palletno, 
+                        receivingDetail.Pallet.Palletno ?? 0, 
                         receivingDetail.PalletPosition.Wing,
                         receivingDetail.PalletPosition.Floor, 
-                        receivingDetail.PalletPosition.Column, 
-                        receivingDetail.PalletPosition.Side,
+                        receivingDetail.PalletPosition.Column ?? "", 
+                        receivingDetail.PalletPosition.Side ?? "",
                         receivingDetail.Productiondate.ToString("MM-dd-yyyy"),
                         receivingDetail.Quantityinapallet, 
                         receivingDetail.Totalweight,
@@ -141,7 +141,7 @@ namespace CSMapi.Helpers.Excel
             }
             detail.Columns().AdjustToContents();
             save();
-            return getbytes();
+            return Task.FromResult(getbytes());
         }
     }
 }

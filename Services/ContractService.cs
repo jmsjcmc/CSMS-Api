@@ -40,7 +40,7 @@ namespace CSMapi.Services
         // [HttpPost("contract")]
         public async Task<ContractResponse> addcontract(ContractRequest request, ClaimsPrincipal user)
         {
-            await _contractValidator.ValidateContractRequest(request);
+            _contractValidator.ValidateContractRequest(request);
 
             var contract = _mapper.Map<Contract>(request);
             contract.Active = true;

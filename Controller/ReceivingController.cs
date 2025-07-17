@@ -106,7 +106,7 @@ namespace CSMapi.Controller
         {
             try
             {
-                var file = _receivingExcel.generatereceivingtemplate();
+                var file = await Task.Run(() => _receivingExcel.generatereceivingtemplate());
                 return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "ReceivingTemplate.xlsx");
             } catch (Exception e)
             {

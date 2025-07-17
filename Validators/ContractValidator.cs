@@ -10,7 +10,7 @@ namespace CSMapi.Validators
         {
             _context = context;
         }
-        public async Task ValidateContractRequest(ContractRequest request)
+        public void ValidateContractRequest(ContractRequest request)
         {
             if (string.IsNullOrWhiteSpace(request.Agreementdate))
             {

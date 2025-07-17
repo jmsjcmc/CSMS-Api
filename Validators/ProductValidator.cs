@@ -4,7 +4,7 @@ namespace CSMapi.Validators
 {
     public class ProductValidator
     {
-        public async Task ValidateProductRequest(ProductRequest request)
+        public void ValidateProductRequest(ProductRequest request)
         {
             if (request.Categoryid <= 0)
             {

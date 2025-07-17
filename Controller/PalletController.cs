@@ -108,7 +108,7 @@ namespace CSMapi.Controller
         {
             try
             {
-                var file = _palletExcel.generatepallettemplate();
+                var file = await Task.Run(() => _palletExcel.generatepallettemplate());
                 return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "PalletTemplate.xlsx");
             }
             catch (Exception e)
@@ -138,7 +138,7 @@ namespace CSMapi.Controller
         {
             try
             {
-                var file = _palletExcel.generatepalletposition();
+                var file = await Task.Run(() => _palletExcel.generatepalletposition());
                 return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "PalletPositionTemplate");
             } catch (Exception e)
             {

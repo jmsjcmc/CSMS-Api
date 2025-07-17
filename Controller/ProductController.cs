@@ -134,7 +134,7 @@ namespace CSMapi.Controller
         {
             try
             {
-                var file = _productExcel.generateproducttemplate();
+                var file = await Task.Run(() => _productExcel.generateproducttemplate());
                 return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "ProductTemplate.xlsx");
             } catch (Exception e)
             {

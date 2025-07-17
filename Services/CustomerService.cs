@@ -43,7 +43,7 @@ namespace CSMapi.Services
         // [HttpPost("customer")]
         public async Task<CustomerResponse> addcustomer(CustomerRequest request)
         {
-            await _customerValidator.ValidateCustomerRequest(request);
+            _customerValidator.ValidateCustomerRequest(request);
 
             var customer = _mapper.Map<Customer>(request);
             customer.Active = true;
