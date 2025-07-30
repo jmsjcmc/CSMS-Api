@@ -1,5 +1,4 @@
 ﻿using CSMapi.Models;
-using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
 namespace CSMapi.Interfaces
@@ -23,6 +22,10 @@ namespace CSMapi.Interfaces
         Task<ColdStorageResponse> getcoldstorage(int id);
         Task<PalletPositionResponse> getposition(int id);
         Task<PalletResponse> getpallet(int id);
+        Task<int> totalcount();
+        Task<int> activecount();
+        Task<int> occupiedcount();
+        Task<int> repalletizedcount();
         Task<RepalletizationResponse> repalletize(RepalletizationRequest request, ClaimsPrincipal user);
         Task<ColdStorageResponse> addcoldstorage(ColdStorageRequest request);
         Task<PalletResponse> addpallet(PalletRequest request, ClaimsPrincipal user);

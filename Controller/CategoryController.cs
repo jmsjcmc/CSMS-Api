@@ -2,7 +2,6 @@
 using CSMapi.Helpers;
 using CSMapi.Models;
 using CSMapi.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CSMapi.Controller

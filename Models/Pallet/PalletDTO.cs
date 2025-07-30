@@ -105,4 +105,12 @@
         public string Taggingnumber { get; set; }
         public int? Palletno { get; set; }
     }
+
+    public class PalletsCount
+    {
+        public int Total { get; set; }
+        public int Active { get; set; }
+        public int Occupied { get; set; }
+        public int Repalletized { get; set; }
+    }
 }

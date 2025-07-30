@@ -136,6 +136,37 @@ namespace CSMapi.Services
 
             return _mapper.Map<PalletResponse>(pallet);
         }
+        // [HttpGet("pallets/count-all")] "Total"
+        public async Task<int> totalcount()
+        {
+            return await _context.Pallets
+                .AsNoTracking()
+                .Where(p => !p.Removed)
+                .CountAsync();
+        }
+        // [HttpGet("pallets/count-all")] "Active"
+        public async Task<int> activecount()
+        {
+            return await _context.Pallets
+                .AsNoTracking()
+                .Where(p => !p.Removed && p.Active)
+                .CountAsync();
+        }
+        // [HttpGet("pallets/count-all")] "Occupied"
+        public async Task<int> occupiedcount()
+        {
+            return await _context.Pallets
+                .AsNoTracking()
+                .Where(p => !p.Removed && p.Occupied)
+                .CountAsync();
+        }
+        // [HttpGet("pallets/count-all")] "Repalletized"
+        public async Task<int> repalletizedcount()
+        {
+            return await _context.Repalletizations
+                .AsNoTracking()
+                .CountAsync();
+        }
         // [HttpPost("pallet/repalletization")]
         public async Task<RepalletizationResponse> repalletize(RepalletizationRequest request, ClaimsPrincipal user)
         {

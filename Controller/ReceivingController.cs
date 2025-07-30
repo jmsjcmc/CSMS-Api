@@ -74,6 +74,19 @@ namespace CSMapi.Controller
                 return HandleException(e);
             }
         }
+        // Fetch all pallets connected to specific product through receiving details
+        [HttpGet("receiving-details/product-id")]
+        public async Task<ActionResult<List<ProductBasesPallet>>> productbasedpallets(int productId)
+        {
+            try
+            {
+                var response = await _receivingService.productbasedpallets(productId);
+                return response;
+            } catch (Exception e)
+            {
+                return HandleException(e);
+            }
+        }
         // Fetch specific receiving request
         [HttpGet("receiving/{id}")]
         public async Task<ActionResult<ReceivingResponse>> getreceiving(int id)

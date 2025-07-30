@@ -26,6 +26,13 @@ namespace CSMapi.Services
             var query = _customerQueries.customeronlyquery(searchTerm);
             return await PaginationHelper.paginateandmap<Customer, CustomerResponse>(query, pageNumber, pageSize, _mapper);
         }
+        // [HttpGet("customers/active-companies")]
+        public async Task<List<CompanyNameOnlyResponse>> allactivecompanynames()
+        {
+            var companies = await _customerQueries.activecustomersquery();
+
+            return _mapper.Map<List<CompanyNameOnlyResponse>>(companies);
+        }
         // [HttpGet("customers/active")]
         public async Task<List<CustomerResponse>> allactivecustomers()
         {

@@ -34,6 +34,19 @@ namespace CSMapi.Controller
                 return HandleException(e);
             }
         }
+        // Fetch all active customers (name and id only)
+        [HttpGet("customers/active-companies")]
+        public async Task<ActionResult<List<CompanyNameOnlyResponse>>> allactivecompanies()
+        {
+            try
+            {
+                var response = await _customerService.allactivecompanynames();
+                return response;
+            } catch (Exception e)
+            {
+                return HandleException(e);
+            }
+        }
         // Fetch all active customers
         [HttpGet("customers/active")]
         public async Task<ActionResult<List<CustomerResponse>>> allactivecustomers()

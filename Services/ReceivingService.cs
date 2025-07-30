@@ -6,7 +6,6 @@ using CSMapi.Models;
 using CSMapi.Validators;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace CSMapi.Services
 {
@@ -29,7 +28,7 @@ namespace CSMapi.Services
             int? categoryId = null,
             string? status = null)
         {
-            var query = await _receivingQueries.receivingsquery(searchTerm, categoryId, status);
+            var query = _receivingQueries.receivingdisplayquery(searchTerm, categoryId, status);
             return await PaginationHelper.paginateandmap<Receiving, ReceivingResponse>(query, pageNumber, pageSize, _mapper);
         }
         // [HttpGet("receivings/pending")]
@@ -40,6 +39,12 @@ namespace CSMapi.Services
         {
             var query = _receivingQueries.pendingreceivingsquery(id);
             return await PaginationHelper.paginateandmap<Receiving, ReceivingResponse>(query, pageNumber, pageSize, _mapper);
+        }
+        // [HttpGet("receiving-details/{product-id}")]
+        public async Task<List<ProductBasesPallet>> productbasedpallets(int productId)
+        {
+            var receivings = await _receivingQueries.receivingdetaillist(productId);
+            return _mapper.Map<List<ProductBasesPallet>>(receivings);
         }
         // [HttpGet("receiving/{id}")]
         public async Task<ReceivingResponse> getreceiving(int id)

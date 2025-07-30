@@ -1,5 +1,4 @@
 ﻿using CSMapi.Models;
-using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
 namespace CSMapi.Interfaces
@@ -15,6 +14,10 @@ namespace CSMapi.Interfaces
             int pageSize = 10,
             int? id = null);
         Task<DocumentNumberResponse> generatedocumentnumber();
+        Task<int> totalcount();
+        Task<int> pendingcount();
+        Task<int> dispatchedcount();
+        Task<int> declinedcount();
         Task<DispatchingResponse> getdispatch(int id);
         Task<DispatchingResponse> addmultipledispatch(DispatchingRequest request, ClaimsPrincipal user);
         Task<DispatchingResponse> addsingledispatch(DispatchingRequest request, ClaimsPrincipal user);

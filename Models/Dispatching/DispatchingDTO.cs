@@ -54,13 +54,21 @@
         public PalletResponse Pallet { get; set; }
         public PalletPositionResponse Position { get; set; }
     }
-
+    public class ProductBasedDispatchingDetailResponse
+    {
+        public int Id { get; set; }
+        public int Receivingdetailid { get; set; }
+        public int Quantity { get; set; }
+        public DateTime? Productiondate { get; set; }
+        public double Totalweight { get; set; }
+        public PalletResponse Pallet { get; set; }
+        public PalletPositionResponse Position { get; set; }
+    }
     public class DispatchingTimeStartEndResponse
     {
         public string Dispatchtimestart { get; set; }
         public string Dispatchtimeend { get; set; }
     }
-
     public class ProductDispatchingResponse
     {
         public int Id { get; set; }
@@ -81,5 +89,13 @@
         public bool Pending { get; set; }
         public DocumentResponse Document { get; set; }
         public List<DispatchingDetailResponse> DispatchignDetail { get; set; }
+    }
+
+    public class DispatchingsCount
+    {
+        public int Total { get; set; }
+        public int Pending { get; set; }
+        public int Dispatched { get; set; }
+        public int Declined { get; set; }
     }
 }

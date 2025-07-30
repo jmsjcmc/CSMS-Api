@@ -31,8 +31,8 @@ namespace CSMapi.Helpers.Queries
                 .OrderByDescending(r => r.Id)
                 .ToListAsync();
         }
-        // Query for fetching all receivings with optional filter for document number, category, and status
-        public async Task<IQueryable<Receiving>> receivingsquery(
+        // Query for fetching receivings for receiving management display
+        public IQueryable<Receiving> receivingdisplayquery(
             string? searchTerm = null,
             int? categoryId = null,
             string? status = null)
@@ -41,15 +41,92 @@ namespace CSMapi.Helpers.Queries
             {
                 var query = _context.Receivings
                     .AsNoTracking()
-                   .Include(r => r.Document)
-                   .Include(r => r.Product)
-                   .ThenInclude(p => p.Category)
-                   .Include(r => r.Product)
-                   .ThenInclude(p => p.Customer)
-                   .Include(r => r.Receivingdetails)
-                   .Where(r => !r.Removed && r.Product.Category.Id == categoryId)
-                   .OrderByDescending(r => r.Createdon)
-                   .AsQueryable();
+                    .Where(r => !r.Removed && r.Product.Category.Id == categoryId)
+                    .Include(r => r.Document)
+                    .Include(r => r.Product.Customer)
+                    .Include(r => r.Requestor)
+                    .OrderByDescending(r => r.Id)
+                    .AsQueryable();
+
+                if (!string.IsNullOrWhiteSpace(searchTerm))
+                {
+                    query = query.Where(r => r.Document.Documentno.Contains(searchTerm) ||
+                    r.Product.Customer.Companyname.Contains(searchTerm) ||
+                    r.Product.Productname.Contains(searchTerm));
+                }
+                if (!string.IsNullOrWhiteSpace(status))
+                {
+                    switch (status.ToLower())
+                    {
+                        case "pending":
+                            query = query.Where(r => r.Pending);
+                            break;
+                        case "received":
+                            query = query.Where(r => r.Received);
+                            break;
+                        case "declined":
+                            query = query.Where(r => r.Declined);
+                            break;
+                    }
+                }
+
+                return query;
+            }
+            else
+            {
+                var query = _context.Receivings
+                    .AsNoTracking()
+                    .Where(r => !r.Removed)
+                    .Include(r => r.Document)
+                    .Include(r => r.Product.Customer)
+                    .Include(r => r.Requestor)
+                    .OrderByDescending(r => r.Id)
+                    .AsQueryable();
+
+                if (!string.IsNullOrWhiteSpace(searchTerm))
+                {
+                    query = query.Where(r => r.Document.Documentno.Contains(searchTerm) ||
+                    r.Product.Customer.Companyname.Contains(searchTerm) ||
+                    r.Product.Productname.Contains(searchTerm));
+                }
+
+                if (!string.IsNullOrWhiteSpace(status))
+                {
+                    switch (status.ToLower())
+                    {
+                        case "pending":
+                            query = query.Where(r => r.Pending);
+                            break;
+                        case "received":
+                            query = query.Where(r => r.Received);
+                            break;
+                        case "declined":
+                            query = query.Where(r => r.Declined);
+                            break;
+                    }
+                }
+
+                return query;
+            }
+        }
+
+        // Query for fetching all receivings with optional filter for document number, category, and status
+        public IQueryable<Receiving> receivingsquery(
+            string? searchTerm = null,
+            int? categoryId = null,
+            string? status = null)
+        {
+            if (categoryId.HasValue)
+            {
+                var query = _context.Receivings
+                    .AsNoTracking()
+                    .Where(r => !r.Removed && r.Product.Category.Id == categoryId)
+                    .Include(r => r.Document)
+                    .Include(r => r.Product.Category)
+                    .Include(r => r.Product.Customer)
+                    .Include(r => r.Receivingdetails)
+                    .OrderByDescending(r => r.Id)
+                    .AsQueryable();
 
                 if (!string.IsNullOrWhiteSpace(searchTerm))
                 {
@@ -79,13 +156,11 @@ namespace CSMapi.Helpers.Queries
             {
                 var query = _context.Receivings
                        .AsNoTracking()
-                       .Include(r => r.Document)
-                       .Include(r => r.Product)
-                       .ThenInclude(p => p.Category)
-                       .Include(r => r.Product)
-                       .ThenInclude(p => p.Customer)
-                       .Include(r => r.Receivingdetails)
                        .Where(r => !r.Removed)
+                       .Include(r => r.Document)
+                       .Include(r => r.Product.Category)
+                       .Include(r => r.Product.Customer)
+                       .Include(r => r.Receivingdetails)
                        .OrderByDescending(r => r.Createdon)
                        .AsQueryable();
 
@@ -122,13 +197,11 @@ namespace CSMapi.Helpers.Queries
             {
                 var query = _context.Receivings
                     .AsNoTracking()
-                    .Include(r => r.Document)
-                    .Include(r => r.Product)
-                    .ThenInclude(p => p.Category) 
-                    .Include(r => r.Product)
-                    .ThenInclude(p => p.Customer)
-                    .Include(r => r.Receivingdetails)
                     .Where(r => r.Pending && !r.Removed && r.Product.Category.Id == id)
+                    .Include(r => r.Document)
+                    .Include(r => r.Product.Category)
+                    .Include(r => r.Product.Customer)
+                    .Include(r => r.Receivingdetails)
                     .OrderByDescending(r => r.Createdon)
                     .AsQueryable();
 
@@ -138,13 +211,11 @@ namespace CSMapi.Helpers.Queries
             {
                 var query = _context.Receivings
                         .AsNoTracking()
-                        .Include(r => r.Document)
-                        .Include(r => r.Product)
-                        .ThenInclude(p => p.Category)
-                        .Include(r => r.Product)
-                        .ThenInclude(p => p.Customer)
-                        .Include(r => r.Receivingdetails)
                         .Where(r => r.Pending && !r.Removed)
+                        .Include(r => r.Document)
+                        .Include(r => r.Product.Category)
+                        .Include(r => r.Product.Customer)
+                        .Include(r => r.Receivingdetails)
                         .OrderByDescending(r => r.Createdon)
                         .AsQueryable();
 
@@ -157,10 +228,8 @@ namespace CSMapi.Helpers.Queries
             return await _context.Receivings
                     .AsNoTracking()
                     .Include(r => r.Document)
-                    .Include(r => r.Product)
-                    .ThenInclude(p => p.Category)
-                    .Include(r => r.Product)
-                    .ThenInclude(p => p.Customer)
+                    .Include(r => r.Product.Category)
+                    .Include(r => r.Product.Customer)
                     .Include(r => r.Receivingdetails)
                     .ThenInclude(r => r.Pallet)
                     .Include(r => r.Receivingdetails)
@@ -175,10 +244,8 @@ namespace CSMapi.Helpers.Queries
         {
             return await _context.Receivings
                    .Include(r => r.Document)
-                   .Include(r => r.Product)
-                   .ThenInclude(p => p.Category)
-                   .Include(r => r.Product)
-                   .ThenInclude(p => p.Customer)
+                   .Include(r => r.Product.Category)
+                   .Include(r => r.Product.Customer)
                    .Include(r => r.Receivingdetails)
                    .ThenInclude(r => r.Pallet)
                    .Include(r => r.Receivingdetails)
@@ -187,6 +254,28 @@ namespace CSMapi.Helpers.Queries
                    .Include(r => r.Requestor)
                    .Include(r => r.Approver)
                    .FirstOrDefaultAsync(r => r.Id == id);
+        }
+        // Query for fetching all receiving details 
+        public async Task<List<ReceivingDetail>> receivingdetaillist(int? productId)
+        {
+            if (productId.HasValue)
+            {
+                return await _context.Receivingdetails
+                    .AsNoTracking()
+                    .Where(r => r.Receiving.Productid == productId)
+                    .Include(r => r.PalletPosition.Coldstorage)
+                    .Include(r => r.Pallet)
+                    .OrderByDescending(r => r.Id)
+                    .ToListAsync();
+            }
+            else
+            {
+                return await _context.Receivingdetails
+                   .AsNoTracking()
+                   .Include(r => r.PalletPosition.Coldstorage)
+                   .OrderByDescending(r => r.Id)
+                   .ToListAsync();
+            }
         }
     }
 }

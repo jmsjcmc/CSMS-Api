@@ -199,7 +199,10 @@ namespace CSMapi.Helpers.Queries
         // Query for fetching specific pallet for PATCH/PUT/DELETE methods
         public async Task<Pallet?> patchmethodpalletid(int id)
         {
-            return await patchpalletquery()
+            return await _context.Pallets
+                .Include(p => p.Creator)
+                .Include(p => p.ReceivingDetail)
+                .Include(p => p.DispatchDetail)
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
         // Query for fetching specific pallet position for PATCH/PUT/DELETE methods
@@ -237,32 +240,6 @@ namespace CSMapi.Helpers.Queries
                 .Include(p => p.ReceivingDetail)
                 .ThenInclude(r => r.RepalletizationDetail)
                 .Include(p => p.DispatchDetail)
-                .Where(p => !p.Removed)
-                .OrderByDescending(p => p.Id);
-        }
-        private IQueryable<Pallet> patchpalletquery()
-        {
-            return _context.Pallets
-                .Include(p => p.Creator)
-                .Include(p => p.ReceivingDetail)
-                .ThenInclude(r => r.Receiving)
-                .Include(p => p.ReceivingDetail)
-                .ThenInclude(p => p.Pallet)
-                .Include(p => p.ReceivingDetail)
-                .ThenInclude(r => r.PalletPosition)
-                .ThenInclude(p => p.Coldstorage)
-                .Include(p => p.ReceivingDetail)
-                .ThenInclude(r => r.DispatchingDetail)
-                .Include(p => p.ReceivingDetail)
-                .ThenInclude(r => r.RepalletizationDetail)
-                .Include(p => p.DispatchDetail)
-                .Where(p => !p.Removed);
-        }
-        private IQueryable<PalletPosition> batchpositiongetquery()
-        {
-            return _context.Palletpositions
-                .AsNoTracking()
-                .Include(p => p.Coldstorage)
                 .Where(p => !p.Removed)
                 .OrderByDescending(p => p.Id);
         }

@@ -28,4 +28,10 @@
         public bool Active { get; set; }
         public bool Removed { get; set; }
     }
+
+    public class CompanyNameOnlyResponse
+    {
+        public int Id { get; set; }
+        public string Companyname { get; set; }
+    }
 }

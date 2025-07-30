@@ -68,6 +68,38 @@ namespace CSMapi.Services
                 Documentno = generatedDocNo
             };
         }
+        // [HttpGet("dispatchings/count-all")] "Total"
+        public async Task<int> totalcount()
+        {
+            return await _context.Dispatchings
+                .AsNoTracking()
+                .Where(d => !d.Removed)
+                .CountAsync();
+        }
+        // [HttpGet("dispatchings/count-all")] "Pending"
+        public async Task<int> pendingcount()
+        {
+            return await _context.Dispatchings
+                .AsNoTracking()
+                .Where(d => !d.Removed && d.Pending)
+                .CountAsync();
+        }
+        // [HttpGet("dispatchings/count-all")] "Dispatched"
+        public async Task<int> dispatchedcount()
+        {
+            return await _context.Dispatchings
+                .AsNoTracking()
+                .Where(d => !d.Removed && d.Dispatched)
+                .CountAsync();
+        }
+        // [HttpGet("dispatchings/count-all")] "Declined"
+        public async Task<int> declinedcount()
+        {
+            return await _context.Dispatchings
+                .AsNoTracking()
+                .Where(d => !d.Removed && d.Declined)
+                .CountAsync();
+        }
         // [HttpGet("dispatching/{id}")]
         public async Task<DispatchingResponse> getdispatch(int id)
         {

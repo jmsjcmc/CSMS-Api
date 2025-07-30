@@ -19,6 +19,25 @@ namespace CSMapi.Controller
             _dispatchingQueries = dispatchingQueries;
             _dispatchingExcel = dispatchingExcel;
         }
+        // Count all dispatchings
+        [HttpGet("dispatchings/count-all")]
+        public async Task<ActionResult<DispatchingsCount>> countall()
+        {
+            try
+            {
+                var count = new DispatchingsCount
+                {
+                    Total = await _dispatchingService.totalcount(),
+                    Pending = await _dispatchingService.pendingcount(),
+                    Dispatched = await _dispatchingService.dispatchedcount(),
+                    Declined = await _dispatchingService.declinedcount()
+                };
+                return count;
+            } catch (Exception e)
+            {
+                return HandleException(e);
+            }
+        }
         // Fetch all pending dispatching request
         [HttpGet("dispatchings/pending")]
         public async Task<ActionResult<Pagination<DispatchingResponse>>> allpendings(

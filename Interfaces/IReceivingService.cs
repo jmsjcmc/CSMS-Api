@@ -1,5 +1,4 @@
 ﻿using CSMapi.Models;
-using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
 namespace CSMapi.Interfaces
@@ -16,6 +15,7 @@ namespace CSMapi.Interfaces
             int pageNumber = 1,
             int pageSize = 10,
             int? id = null);
+        Task<List<ProductBasesPallet>> productbasedpallets(int productId);
         Task<ReceivingResponse> getreceiving(int id);
         Task<DocumentNumberResponse> generatedocumentnumber(string category);
         Task<int> totalcount();

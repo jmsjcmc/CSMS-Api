@@ -49,32 +49,55 @@ namespace CSMapi.Controller
         }
         // Fetch all products based on customer with optional filter as of
         [HttpGet("products/company-inventory/as-of")]
-        public async Task<ActionResult<Pagination<ProductWithReceivingAndDispatchingResponse>>> companybasedproducts_asof(
+        public async Task<ActionResult<Pagination<ProductCompanyInventoryAsOfResponse>>> companybasedproducts_asof(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 10,
-            [FromQuery] string? company = null)
+            [FromQuery] int? companyId = null,
+            [FromQuery] DateTime? asOf = null)
         {
             try
             {
-                var response = await _productService.customerbasedproducts_asof(pageNumber, pageSize, company);
+                var response = await _productService.customerbasedproducts_asof(pageNumber, pageSize, companyId, asOf);
                 return response;
             } catch (Exception e)
             {
                 return HandleException(e);
             }
         }
-        // Fetch all receivings and dispatching based on product
-        [HttpGet("product/receivings-dispatchings")]
-        public async Task<ActionResult<Pagination<ProductBasedReceivingDispatchingResponse>>> customerbasedreceivingdispatching_summary(
+        // Fetch specific product receivings data
+        [HttpGet("product/receivings")]
+        public async Task<ActionResult<Pagination<ProductBasedReceiving>>> productbasedreceivings(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 10,
-            [FromQuery] int? productId = null)
+            [FromQuery] int? productId = null,
+            [FromQuery] DateTime? from = null,
+            [FromQuery] DateTime? to = null)
         {
             try
             {
-                var response = await _productService.productbasedreceivingdispatching_summary(pageNumber, pageSize, productId);
+                var response = await _productService.productbasedreceivings(pageNumber, pageSize, productId, from, to);
                 return response;
-            } catch(Exception e)
+            }
+            catch (Exception e)
+            {
+                return HandleException(e);
+            }
+        }
+        // Fetch specific product dispatching data
+        [HttpGet("product/dispatchings")]
+        public async Task<ActionResult<Pagination<ProductBasedDispatching>>> productbaseddispatchings(
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10,
+            [FromQuery] int? productId = null,
+            [FromQuery] DateTime? from = null,
+            [FromQuery] DateTime? to = null)
+        {
+            try
+            {
+                var response = await _productService.productbaseddispatchings(pageNumber, pageSize, productId, from, to);
+                return response;
+            }
+            catch (Exception e)
             {
                 return HandleException(e);
             }
@@ -104,24 +127,6 @@ namespace CSMapi.Controller
             try
             {
                 var response = await _productService.customerbasedproducts_fromto(pageNumber, pageSize, company, from, to);
-                return response;
-            } catch (Exception e)
-            {
-                return HandleException(e);
-            }
-        }
-        // Fetch all products based on customer (summary)
-        [HttpGet("products/company-inventory/summary")]
-        public async Task<ActionResult<Pagination<ProductSummary>>> companybasedproducts_summary(
-            [FromQuery] int pageNumber = 1,
-            [FromQuery] int pageSize = 10,
-            [FromQuery] string? company = null,
-            [FromQuery] DateTime? from = null,
-            [FromQuery] DateTime? to = null)
-        {
-            try
-            {
-                var response = await _productService.customerbasedproducts_summary(pageNumber, pageSize, company, from, to);
                 return response;
             } catch (Exception e)
             {

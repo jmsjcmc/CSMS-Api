@@ -17,6 +17,25 @@ namespace CSMapi.Controller
             _palletExcel = palletExcel;
             _palletService = palletService;
         }
+        // Count all pallets
+        [HttpGet("pallets/count-all")]
+        public async Task<ActionResult<PalletsCount>> countall()
+        {
+            try
+            {
+                var count = new PalletsCount
+                {
+                    Total = await _palletService.totalcount(),
+                    Active = await _palletService.activecount(),
+                    Occupied = await _palletService.occupiedcount(),
+                    Repalletized = await _palletService.repalletizedcount()
+                };
+                return count;
+            } catch (Exception e)
+            {
+                return HandleException(e);
+            }
+        }
         // Fetch all occupied pallets based on product id
         [HttpGet("pallets/occupied/product-id")]
         public async Task<ActionResult<List<ProductBasedOccupiedPalletResponse>>> productbasedoccupiedpallets(int id)
@@ -40,6 +59,19 @@ namespace CSMapi.Controller
             try
             {
                 var response = await _palletService.occupiedpallets(pageNumber, pageSize, searchTerm);
+                return response;
+            } catch (Exception e)
+            {
+                return HandleException(e);
+            }
+        }
+        // Fetch all active pallets based on pallet type
+        [HttpGet("pallets/active/pallet-type")]
+        public async Task<ActionResult<List<PalletTypeBasedResponse>>> pallettypepalletslist(string searchTerm)
+        {
+            try
+            {
+                var response = await _palletService.pallettypepalletslist(searchTerm);
                 return response;
             } catch (Exception e)
             {

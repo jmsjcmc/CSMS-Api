@@ -9,6 +9,7 @@ namespace CSMapi.Interfaces
             int pageNumber = 1,
             int pageSize = 10,
             string? searchTerm = null);
+        Task<List<CompanyNameOnlyResponse>> allactivecompanynames();
         Task<List<CustomerResponse>> allactivecustomers();
         Task<CustomerResponse> getcustomer(int id);
         Task<CustomerResponse> addcustomer(CustomerRequest request);

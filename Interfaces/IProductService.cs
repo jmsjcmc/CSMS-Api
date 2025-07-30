@@ -1,5 +1,4 @@
 ﻿using CSMapi.Models;
-using Microsoft.AspNetCore.Mvc;
 
 namespace CSMapi.Interfaces
 {
@@ -10,27 +9,36 @@ namespace CSMapi.Interfaces
             int pageNumber = 1,
             int pageSize = 10,
             string? searchTerm = null);
-        Task<Pagination<ProductWithReceivingAndDispatchingResponse>> customerbasedproducts_asof(
+        Task<Pagination<ProductCompanyInventoryAsOfResponse>> customerbasedproducts_asof(
             int pageNumber = 1,
             int pageSize = 10,
-            string? company = null);
+            int? companyId = null,
+            DateTime? asOf = null);
         Task<Pagination<ProductWithReceivingAndDispatchingResponse>> customerbasedproducts_fromto(
             int pageNumber = 1,
             int pageSize = 10,
             string? company = null,
             DateTime? from = null,
             DateTime? to = null);
-        Task<Pagination<ProductBasedReceivingDispatchingResponse>> productbasedreceivingdispatching_summary(
+        Task<Pagination<ProductBasedReceiving>> productbasedreceivings(
+           int pageNumber = 1,
+           int pageSize = 10,
+           int? productId = null,
+           DateTime? from = null,
+           DateTime? to = null);
+        Task<Pagination<ProductBasedDispatching>> productbaseddispatchings(
             int pageNumber = 1,
             int pageSize = 10,
-            int? productId = null);
-        Task<List<BasicProductResponse>> customerbasedproductsbasic(int id);
-        Task<Pagination<ProductSummary>> customerbasedproducts_summary(
-            int pageNumber = 1,
-            int pageSize = 10,
-            string? company = null,
+            int? productId = null,
             DateTime? from = null,
             DateTime? to = null);
+        Task<List<BasicProductResponse>> customerbasedproductsbasic(int id);
+        //Task<Pagination<ProductSummary>> customerbasedproducts_summary(
+        //    int pageNumber = 1,
+        //    int pageSize = 10,
+        //    string? company = null,
+        //    DateTime? from = null,
+        //    DateTime? to = null);
         Task<ProductResponse> getproduct(int id);
         Task<ProductResponse> getproductbycode(string productCode);
         Task<List<ProductCodeResponse>> getproductcodefordispatch();
