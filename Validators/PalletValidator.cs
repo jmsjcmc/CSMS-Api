@@ -66,37 +66,23 @@ namespace CSMapi.Validators
                 throw new ArgumentException("Side required");
             }
         }
-
-        public async Task ValidateFetchPallet(int id)
+        public async Task ValidateSpecificId(int id)
         {
-            var pallet = await _context.Pallets
-                .FirstOrDefaultAsync(p => p.Id == id);
-
-            if (pallet == null)
+            if (!await _context.Pallets.AnyAsync(p => p.Id == id))
             {
-                throw new ArgumentException($"Pallet id {id} not found.");
+                throw new ArgumentException($"Pallet ID {id} not found.");
             }
-        }
-
-        public async Task ValidateFetchPosition(int id)
-        {
-            var position = await _context.Palletpositions
-                .FirstOrDefaultAsync(p => p.Id == id);
-
-            if (position == null)
+            if (!await _context.Palletpositions.AnyAsync(p => p.Id == id))
             {
-                throw new ArgumentException($"Position id {id} not found.");
+                throw new ArgumentException($"Pallet Position ID {id} not found.");
             }
-        }
-
-        public async Task ValidateFetchColdStorage(int id)
-        {
-            var cs = await _context.Coldstorages
-                .FirstOrDefaultAsync(c => c.Id == id);
-
-            if (cs == null)
+            if (!await _context.Coldstorages.AnyAsync(c => c.Id == id))
             {
-                throw new ArgumentException($"CS id {id} not found.");
+                throw new ArgumentException($"Cold Storage ID {id} not found.");
+            }
+            if (!await _context.Repalletizations.AnyAsync(r => r.Id == id))
+            {
+                throw new ArgumentException($"Repalletization ID {id} not found.");
             }
         }
     }

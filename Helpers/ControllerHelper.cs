@@ -23,6 +23,13 @@ namespace CSMapi.Helpers
                 StatusCode = 500
             };
         }
+        protected ActionResult HandleLoginException(Exception e)
+        {
+            return new ObjectResult(e.InnerException?.Message ?? e.Message)
+            {
+                StatusCode = 401
+            };
+        }
     }
 
     public abstract class BaseService

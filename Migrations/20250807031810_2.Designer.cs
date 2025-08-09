@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CSMapi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250715074729_7")]
-    partial class _7
+    [Migration("20250807031810_2")]
+    partial class _2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -128,6 +128,9 @@ namespace CSMapi.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Agreementdate")
                         .IsRequired()
@@ -750,6 +753,12 @@ namespace CSMapi.Migrations
                     b.Property<int>("Frompalletid")
                         .HasColumnType("int");
 
+                    b.Property<int>("Quantitymoved")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
                     b.Property<int>("Topalletid")
                         .HasColumnType("int");
 
@@ -757,36 +766,11 @@ namespace CSMapi.Migrations
 
                     b.HasIndex("Creatorid");
 
+                    b.HasIndex("Frompalletid");
+
+                    b.HasIndex("Topalletid");
+
                     b.ToTable("Repalletizations");
-                });
-
-            modelBuilder.Entity("CSMapi.Models.RepalletizationDetail", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Quantitymoved")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Receivingdetailid")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Repalletizationid")
-                        .HasColumnType("int");
-
-                    b.Property<double>("Weightmoved")
-                        .HasColumnType("float");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Receivingdetailid");
-
-                    b.HasIndex("Repalletizationid");
-
-                    b.ToTable("Repalletizationdetails");
                 });
 
             modelBuilder.Entity("CSMapi.Models.Role", b =>
@@ -899,11 +883,11 @@ namespace CSMapi.Migrations
                             Active = false,
                             Businessunit = "ABFI Central Office",
                             Businessunitlocation = "Binugao, Toril, Davao City",
-                            Createdon = new DateTime(2025, 7, 15, 15, 47, 29, 222, DateTimeKind.Unspecified).AddTicks(2645),
+                            Createdon = new DateTime(2025, 8, 7, 11, 18, 10, 2, DateTimeKind.Unspecified).AddTicks(9844),
                             Department = "Cisdevo",
                             Firstname = "James Jecemeco",
                             Lastname = "Tabilog",
-                            Password = "$2a$11$7Wl072m8PyGCqdX6GUPBROu0O0hjka1F7y28yWf8Dhhzo.Exfx28.",
+                            Password = "$2a$11$l9kk.7USQQWdbMczxSyPMOR.9H.MdLbeavKl6PdRAxTzFoMjZ6pAG",
                             Position = "Software Developer",
                             Removed = false,
                             Role = "Admin, User, Approver",
@@ -915,11 +899,11 @@ namespace CSMapi.Migrations
                             Active = false,
                             Businessunit = "SubZero Ice and Cold Storage Inc",
                             Businessunitlocation = "Binugao, Toril, Davao City",
-                            Createdon = new DateTime(2025, 7, 15, 15, 47, 29, 414, DateTimeKind.Unspecified).AddTicks(5837),
+                            Createdon = new DateTime(2025, 8, 7, 11, 18, 10, 185, DateTimeKind.Unspecified).AddTicks(1446),
                             Department = "Executive",
                             Firstname = "Shiela",
                             Lastname = "Hernando",
-                            Password = "$2a$11$UXvCrgZH2e0XlZPoC6XtL.0eTKNUXBWQlQLvLMG9WnaS7VU/YARMy",
+                            Password = "$2a$11$z41ww/Xm9wEaBrOh.YWK/udY740SFXJ46xPwrnGqD3LLVxAJ2cG.u",
                             Position = "Senior Operations Manager",
                             Removed = false,
                             Role = "Approver",
@@ -931,11 +915,11 @@ namespace CSMapi.Migrations
                             Active = false,
                             Businessunit = "ABFI Central Office",
                             Businessunitlocation = "Binugao, Toril, Davao City",
-                            Createdon = new DateTime(2025, 7, 15, 15, 47, 29, 595, DateTimeKind.Unspecified).AddTicks(8722),
+                            Createdon = new DateTime(2025, 8, 7, 11, 18, 10, 377, DateTimeKind.Unspecified).AddTicks(7701),
                             Department = "Cisdevo",
                             Firstname = "Jerecho",
                             Lastname = "Asilum",
-                            Password = "$2a$11$tzak.Yc5EAZlUkGrN7n7SOxxHDO1KaSGb4II0VyOxjdU65UDW.M/K",
+                            Password = "$2a$11$rbP3ruOwQ3Dl4XvYZYHM6OCEXD/PKa.JsXdoehrtKXQo.FZA0q5Xm",
                             Position = "Software Developer",
                             Removed = false,
                             Role = "Admin, User, Approver",
@@ -1142,26 +1126,23 @@ namespace CSMapi.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Creator");
-                });
-
-            modelBuilder.Entity("CSMapi.Models.RepalletizationDetail", b =>
-                {
-                    b.HasOne("CSMapi.Models.ReceivingDetail", "Receivingdetail")
-                        .WithMany("RepalletizationDetail")
-                        .HasForeignKey("Receivingdetailid")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CSMapi.Models.Repalletization", "Repalletization")
-                        .WithMany("RepalletizationDetail")
-                        .HasForeignKey("Repalletizationid")
+                    b.HasOne("CSMapi.Models.ReceivingDetail", "Fromreceivingdetail")
+                        .WithMany("Outgoingrepalletization")
+                        .HasForeignKey("Frompalletid")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Receivingdetail");
+                    b.HasOne("CSMapi.Models.ReceivingDetail", "Toreceivingdetail")
+                        .WithMany("Incomingrepalletization")
+                        .HasForeignKey("Topalletid")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
-                    b.Navigation("Repalletization");
+                    b.Navigation("Creator");
+
+                    b.Navigation("Fromreceivingdetail");
+
+                    b.Navigation("Toreceivingdetail");
                 });
 
             modelBuilder.Entity("CSMapi.Models.Category", b =>
@@ -1226,12 +1207,9 @@ namespace CSMapi.Migrations
                 {
                     b.Navigation("DispatchingDetail");
 
-                    b.Navigation("RepalletizationDetail");
-                });
+                    b.Navigation("Incomingrepalletization");
 
-            modelBuilder.Entity("CSMapi.Models.Repalletization", b =>
-                {
-                    b.Navigation("RepalletizationDetail");
+                    b.Navigation("Outgoingrepalletization");
                 });
 #pragma warning restore 612, 618
         }

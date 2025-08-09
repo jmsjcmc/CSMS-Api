@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using CSMapi.Models;
+using CSMapi.Validators;
 using Microsoft.EntityFrameworkCore;
 
 namespace CSMapi.Helpers.Queries
@@ -7,14 +8,14 @@ namespace CSMapi.Helpers.Queries
     public class ProductQueries
     {
         private readonly AppDbContext _context;
-        private readonly IMapper _mapper;
-        public ProductQueries(AppDbContext context, IMapper mapper)
+        private readonly ProductValidator _validator;
+        public ProductQueries(AppDbContext context, ProductValidator validator)
         {
             _context = context;
-            _mapper = mapper;
+            _validator = validator;
         }
         // Query for fetching all products with optional filter for company, using present date
-        public IQueryable<Product> productwithcompany_asof(int? companyId = null, DateTime? asOf = null)
+        public IQueryable<Product> ProductWithCompany_AsOf(int? companyId = null, DateTime? asOf = null)
         {
             var query = _context.Products
                 .AsNoTracking()
@@ -41,15 +42,15 @@ namespace CSMapi.Helpers.Queries
             return query;
         }
         // Query for fetching all products with dispatching with optional filter for company, as of, from date received, and to date received
-        public IQueryable<Product> productswithcompanydispatching(string? company = null, DateTime? from = null, DateTime? to = null, int? productId = null)
+        public IQueryable<Product> ProductsWithCompanyDispatching(string? company = null, DateTime? from = null, DateTime? to = null, int? productId = null)
         {
             var query = _context.Products
                 .AsNoTracking()
+                .Where(p => !p.Removed && p.Dispatching.Any(d => d.Dispatched))
                 .Include(p => p.Category)
                 .Include(p => p.Customer)
                 .Include(p => p.Dispatching)
                 .ThenInclude(d => d.Dispatchingdetails)
-                .Where(p => !p.Removed && p.Dispatching.Any(d => d.Dispatched))
                 .OrderByDescending(p => p.Id)
                 .AsQueryable();
 
@@ -80,10 +81,11 @@ namespace CSMapi.Helpers.Queries
             return query;
         }
         // Query for fetching products with optional filter for company, as of, from date received, and to date received 
-        public IQueryable<Product> productwithcompanyquery(string? company = null, DateTime? from = null, DateTime? to = null, int? productId = null)
+        public IQueryable<Product> ProductWithCompanyQuery(string? company = null, DateTime? from = null, DateTime? to = null, int? productId = null)
         {
             var query = _context.Products
                 .AsNoTracking()
+                .Where(p => !p.Removed)
                 .Include(p => p.Category)
                 .Include(p => p.Customer)
                 .Include(p => p.Receiving)
@@ -103,10 +105,8 @@ namespace CSMapi.Helpers.Queries
                 .ThenInclude(r => r.DispatchingDetail)
                 .Include(p => p.Receiving)
                 .ThenInclude(r => r.Receivingdetails)
-                .ThenInclude(r => r.RepalletizationDetail)
                 .Include(p => p.Dispatching)
                 .ThenInclude(d => d.Dispatchingdetails)
-                .Where(p => !p.Removed)
                 .OrderByDescending(p => p.Id)
                 .AsQueryable();
 
@@ -137,10 +137,11 @@ namespace CSMapi.Helpers.Queries
             return query;
         }
         // Query for fetching all list of products based on company id
-        public async Task<List<Product>> companybasesproductslist(int id)
+        public async Task<List<Product>> CompanyBasedProductsList(int id)
         {
             return await _context.Products
                 .AsNoTracking()
+                .Where(p => !p.Removed && p.Customer.Id == id)
                 .Include(p => p.Category)
                 .Include(p => p.Customer)
                 .Include(p => p.Receiving)
@@ -160,30 +161,29 @@ namespace CSMapi.Helpers.Queries
                 .ThenInclude(r => r.DispatchingDetail)
                 .Include(p => p.Receiving)
                 .ThenInclude(r => r.Receivingdetails)
-                .ThenInclude(r => r.RepalletizationDetail)
                 .Include(p => p.Dispatching)
                 .ThenInclude(d => d.Dispatchingdetails)
                 .Include(p => p.Dispatching)
-                .Where(p => !p.Removed && p.Customer.Id == id)
                 .OrderByDescending(p => p.Id)
                 .ToListAsync();
         }
         // Query for fetching all products with related customers
-        public async Task<List<Product>?> productlistquery(int id)
+        public async Task<List<Product>?> ProductListQuery(int id)
         {
             return await _context.Products
                   .AsNoTracking()
+                  .Where(p => p.Category.Id == id)
                   .Include(p => p.Category)
                   .Include(p => p.Customer)
-                  .Where(p => p.Category.Id == id)
                   .OrderByDescending(p => p.Id)
                   .ToListAsync();
         }
         // Query for fetching all products with optional filter for product code
-        public IQueryable<Product> productsquery(string? searchTerm = null)
+        public IQueryable<Product> ProductsQuery(string? searchTerm = null)
         {
             var query = _context.Products
                 .AsNoTracking()
+                .Where(p => !p.Removed)
                 .Include(p => p.Category)
                 .Include(p => p.Customer)
                 .Include(p => p.Receiving)
@@ -203,9 +203,7 @@ namespace CSMapi.Helpers.Queries
                 .ThenInclude(r => r.DispatchingDetail)
                 .Include(p => p.Receiving)
                 .ThenInclude(r => r.Receivingdetails)
-                .ThenInclude(r => r.RepalletizationDetail)
                 .Include(p => p.Dispatching)
-                .Where(p => !p.Removed)
                 .OrderByDescending(p => p.Id)
                 .AsQueryable();
 
@@ -217,7 +215,7 @@ namespace CSMapi.Helpers.Queries
             return query;
         }
         // Query for fetching specific product by product code
-        public async Task<Product?> productsbycode(string? productCode = null)
+        public async Task<Product?> ProductsByCode(string? productCode = null)
         {
             return await _context.Products
                    .AsNoTracking()
@@ -226,28 +224,39 @@ namespace CSMapi.Helpers.Queries
                    .FirstOrDefaultAsync(p => p.Productcode == productCode);
         }
         // Query for fetching all products with related receiving details
-        public async Task<List<Product>> productwithreceivings()
+        public async Task<List<Product>> ProductWithReceivings()
         {
             return await _context.Products
                    .AsNoTracking()
+                   .Where(p => p.Receiving.Any(r => r.Received) &&
+                   p.Receiving.Any(r => r.Receivingdetails.Any(r => !r.Fulldispatched)))
                    .Include(p => p.Category)
                    .Include(p => p.Receiving)
                    .ThenInclude(r => r.Receivingdetails)
-                   .Where(p => p.Receiving.Any(r => r.Received) && 
-                   p.Receiving.Any(r => r.Receivingdetails.Any(r => !r.Fulldispatched)))
                    .ToListAsync();
         }
         // Query for fetching all receiving details based on product code
-        public async Task<Product?> productwithreceivingdetail(string productCode)
+        public async Task<Product?> ProductWithReceivingDetail(string productCode)
         {
             return await _context.Products
                 .AsNoTracking()
                 .Include(p => p.Category)
                 .Include(p => p.Customer)
-                .Include(p => p.Receiving)
+                .Include(p => p.Receiving
+                .Where(r => r.Received))
                 .ThenInclude(r => r.Receivingdetails)
                 .ThenInclude(r => r.Pallet)
                 .ThenInclude(p => p.Creator)
+                .Include(p => p.Receiving)
+                .ThenInclude(r => r.Receivingdetails)
+                .ThenInclude(r => r.DispatchingDetail)
+                .ThenInclude(d => d.Dispatching)
+                .Include(r => r.Receiving)
+                .ThenInclude(r => r.Receivingdetails)
+                .ThenInclude(r => r.Outgoingrepalletization)
+                .Include(r => r.Receiving)
+                .ThenInclude(r => r.Receivingdetails)
+                .ThenInclude(r => r.Incomingrepalletization)
                 .Include(p => p.Receiving)
                 .ThenInclude(r => r.Receivingdetails)
                 .ThenInclude(r => r.PalletPosition)
@@ -255,8 +264,11 @@ namespace CSMapi.Helpers.Queries
                 .FirstOrDefaultAsync(p => p.Productcode == productCode);
         }
         // Query for fetching specific product for GET method
-        public async Task<Product?> getmethodproductid(int id)
+        public async Task<Product?> GetProductId(int id)
         {
+            // Validate id if it exist
+            await _validator.ValidateSpecificProduct(id);
+
             return await _context.Products
                   .AsNoTracking()
                   .Include(p => p.Category)
@@ -264,8 +276,11 @@ namespace CSMapi.Helpers.Queries
                   .FirstOrDefaultAsync(p => p.Id == id);
         }
         // Query for fetching specific product for PATCH/PUT/DELETE methods
-        public async Task<Product?> patchmethodproductid(int id)
+        public async Task<Product?> PatchProductId(int id)
         {
+            // Validate id if it exist
+            await _validator.ValidateSpecificProduct(id);
+
             return await _context.Products
                 .Include(p => p.Category)
                 .Include(p => p.Customer)
@@ -286,7 +301,6 @@ namespace CSMapi.Helpers.Queries
                 .ThenInclude(r => r.DispatchingDetail)
                 .Include(p => p.Receiving)
                 .ThenInclude(r => r.Receivingdetails)
-                .ThenInclude(r => r.RepalletizationDetail)
                 .Include(p => p.Dispatching)
                 .FirstOrDefaultAsync(p => p.Id == id);
         }

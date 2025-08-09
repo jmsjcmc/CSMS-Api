@@ -5,7 +5,7 @@ namespace CSMapi.Helpers
 {
     public class AutoMapper : Profile
     {
-       
+
         public AutoMapper()
         {
             // Dispatchings Mapping 
@@ -141,7 +141,7 @@ namespace CSMapi.Helpers
                     s.Receiving
                         .Where(r => r.Productid == s.Id)
                         .SelectMany(r => r.Receivingdetails
-                        .Where(r => r.Receiving.Received && !r.Fulldispatched)
+                        .Where(r => r.Received && !r.Fulldispatched)
                         .Select(detail => c.Mapper.Map<ProductReceivingDetailResponse>(detail))
                         .ToList()
                 )));
@@ -156,13 +156,6 @@ namespace CSMapi.Helpers
                 .ForMember(d => d.Category, o => o.MapFrom(s => s.Category.Name))
                 .ForMember(d => d.Receiving, o => o.MapFrom(s => s.Receiving));
 
-            // Repalletizations Mapping
-            CreateMap<RepalletizationRequest, Repalletization>()
-                .ForMember(d => d.Createdon, o => o.Ignore())
-                .ForMember(d => d.Creatorid, o => o.Ignore())
-                .ForMember(d => d.RepalletizationDetail, o => o.MapFrom(s => s.RepalletizationDetail));
-
-            CreateMap<RepalletizationDetailRequest, RepalletizationDetail>();
             // Receivings Mapping
             CreateMap<ReceivingRequest, Receiving>()
                 .ForMember(d => d.Receivingdetails, o => o.MapFrom(s => s.ReceivingDetail))
@@ -215,8 +208,8 @@ namespace CSMapi.Helpers
                 .ForMember(d => d.Position, o => o.MapFrom(s => s.PalletPosition));
 
             CreateMap<ReceivingDetail, ProductReceivingDetailResponse>()
-                .ForMember(d => d.Quantityinapallet, o => o.Ignore())
-                .ForMember(d => d.Totalweight, o => o.Ignore())
+                .ForMember(d => d.Remainingweight, o => o.Ignore())
+                .ForMember(d => d.Remainingquantity, o => o.Ignore())
                 .ForMember(d => d.Pallet, o => o.MapFrom(s => s.Pallet))
                 .ForMember(d => d.Position, o => o.MapFrom(s => s.PalletPosition));
 
@@ -232,18 +225,16 @@ namespace CSMapi.Helpers
                 .ForMember(d => d.Pallet, o => o.MapFrom(s => s.Pallet));
 
             CreateMap<ReceivingDetail, ProductBasesPallet>()
-                .ForMember(d => d.Palletno, o => o.MapFrom(s => s.Pallet != null ?
-                s.Pallet.Palletno : null))
-                .ForMember(d => d.Taggingnumber, o => o.MapFrom(s => s.Pallet != null ?
-                s.Pallet.Taggingnumber : null))
-                .ForMember(d => d.Csnumber, o => o.MapFrom(s => s.PalletPosition != null &&
-                s.PalletPosition.Coldstorage != null ?
-                s.PalletPosition.Coldstorage.Csnumber : null))
+                .ForMember(d => d.Palletid, o => o.MapFrom(s => s.Pallet.Id))
+                .ForMember(d => d.Taggingnumber, o => o.MapFrom(s => s.Pallet.Taggingnumber))
+                .ForMember(d => d.Palletno, o => o.MapFrom(s => s.Pallet.Palletno))
+                .ForMember(d => d.Remainingquantity, o => o.Ignore())
+                .ForMember(d => d.Remainingweight, o => o.Ignore())
+                .ForMember(d => d.Csnumber, o => o.MapFrom(s => s.PalletPosition.Coldstorage.Csnumber))
                 .ForMember(d => d.Wing, o => o.MapFrom(s => s.PalletPosition.Wing))
                 .ForMember(d => d.Floor, o => o.MapFrom(s => s.PalletPosition.Floor))
                 .ForMember(d => d.Column, o => o.MapFrom(s => s.PalletPosition.Column))
-                .ForMember(d => d.Side, o => o.MapFrom(s => s.PalletPosition.Side))
-                .ForMember(d => d.Totalweight, o => o.MapFrom(s => s.Totalweight));
+                .ForMember(d => d.Side, o => o.MapFrom(s => s.PalletPosition.Side));
             // Roles Mapping
             CreateMap<RoleRequest, Role>()
                 .ForMember(d => d.Removed, o => o.Ignore());
@@ -260,15 +251,18 @@ namespace CSMapi.Helpers
 
             CreateMap<User, UserEsignResponse>();
             // Repalletization Mapping
-            CreateMap<RepalletizationRequest, Repalletization>()
-                .ForMember(d => d.RepalletizationDetail, o => o.MapFrom(s => s.RepalletizationDetail));
+            CreateMap<RepalletizationRequest, Repalletization>();
+
+            CreateMap<Repalletization, RepalletizationDraftRequest>()
+                .ForMember(d => d.Fromreceivingdetail, o => o.MapFrom(s => s.Fromreceivingdetail))
+                .ForMember(d => d.Toreceivingdetail, o => o.MapFrom(s => s.Toreceivingdetail));
 
             CreateMap<Repalletization, RepalletizationResponse>()
-                .ForMember(d => d.RepalletizationDetail, o => o.MapFrom(s => s.RepalletizationDetail));
-            // Repalletization Detail Mapping
-            CreateMap<RepalletizationDetailRequest, RepalletizationDetail>();
+                .ForMember(d => d.Creator, o => o.MapFrom(s => s.Creator));
 
-            CreateMap<RepalletizationDetail, RepalletizationDetailResponse>();
+            CreateMap<Repalletization, RepalletizationDraftResponse>()
+                .ForMember(d => d.Fromreceivingdetail, o => o.MapFrom(s => s.Fromreceivingdetail))
+                .ForMember(d => d.Toreceivingdetail, o => o.MapFrom(s => s.Toreceivingdetail));
             // Category Mapping
             CreateMap<CategoryRequest, Category>();
 

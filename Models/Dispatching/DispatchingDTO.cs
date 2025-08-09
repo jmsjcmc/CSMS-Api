@@ -27,6 +27,8 @@
         public DateTime? Updatedon { get; set; }
         public bool Dispatched { get; set; }
         public bool Pending { get; set; }
+        public bool Declined { get; set; }
+        public bool Removed { get; set; }
         public DocumentResponse Document { get; set; }
         public ProductResponse Product { get; set; }
         public UserEsignResponse Requestor { get; set; }

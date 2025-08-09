@@ -20,11 +20,11 @@ namespace CSMapi.Controller
         }
         // Fetch all products without pagination
         [HttpGet("products/list")]
-        public async Task<ActionResult<List<ProductOnlyResponse>>> productslist(int id)
+        public async Task<ActionResult<List<ProductOnlyResponse>>> ProductsList(int id)
         {
             try
             {
-                var response = await _productService.productslist(id);
+                var response = await _productService.ProductsList(id);
                 return response;
             } catch (Exception e)
             {
@@ -33,14 +33,14 @@ namespace CSMapi.Controller
         }
         // Fetch all products with pagination
         [HttpGet("products")]
-        public async Task<ActionResult<Pagination<ProductResponse>>> allproducts(
+        public async Task<ActionResult<Pagination<ProductResponse>>> AllProducts(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 10,
             [FromQuery] string? searchTerm = null)
         {
             try
             {
-                var response = await _productService.allproducts(pageNumber, pageSize, searchTerm);
+                var response = await _productService.AllProducts(pageNumber, pageSize, searchTerm);
                 return response;
             } catch (Exception e)
             {
@@ -59,14 +59,15 @@ namespace CSMapi.Controller
             {
                 var response = await _productService.customerbasedproducts_asof(pageNumber, pageSize, companyId, asOf);
                 return response;
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 return HandleException(e);
             }
         }
         // Fetch specific product receivings data
         [HttpGet("product/receivings")]
-        public async Task<ActionResult<Pagination<ProductBasedReceiving>>> productbasedreceivings(
+        public async Task<ActionResult<Pagination<ProductBasedReceiving>>> ProductBasedReceivings(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 10,
             [FromQuery] int? productId = null,
@@ -75,7 +76,7 @@ namespace CSMapi.Controller
         {
             try
             {
-                var response = await _productService.productbasedreceivings(pageNumber, pageSize, productId, from, to);
+                var response = await _productService.ProductBasedReceivings(pageNumber, pageSize, productId, from, to);
                 return response;
             }
             catch (Exception e)
@@ -85,7 +86,7 @@ namespace CSMapi.Controller
         }
         // Fetch specific product dispatching data
         [HttpGet("product/dispatchings")]
-        public async Task<ActionResult<Pagination<ProductBasedDispatching>>> productbaseddispatchings(
+        public async Task<ActionResult<Pagination<ProductBasedDispatching>>> ProductBasedDispatchings(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 10,
             [FromQuery] int? productId = null,
@@ -94,7 +95,7 @@ namespace CSMapi.Controller
         {
             try
             {
-                var response = await _productService.productbaseddispatchings(pageNumber, pageSize, productId, from, to);
+                var response = await _productService.ProductBasedDispatchings(pageNumber, pageSize, productId, from, to);
                 return response;
             }
             catch (Exception e)
@@ -104,11 +105,11 @@ namespace CSMapi.Controller
         }
         // Fetch all product based on company id
         [HttpGet("products/company-based")]
-        public async Task<ActionResult<List<BasicProductResponse>>> customerbasedproductsbasic(int id)
+        public async Task<ActionResult<List<BasicProductResponse>>> CustomerBasedProductsBasic(int id)
         {
             try
             {
-                var response = await _productService.customerbasedproductsbasic(id);
+                var response = await _productService.CustomerBasedProductsBasic(id);
                 return response;
             } catch (Exception e)
             {
@@ -117,7 +118,7 @@ namespace CSMapi.Controller
         }
         // Fetch all products based on customer with optional filter from and to
         [HttpGet("products/company-inventory/from-to")]
-        public async Task<ActionResult<Pagination<ProductWithReceivingAndDispatchingResponse>>> companybasedproducts(
+        public async Task<ActionResult<Pagination<ProductWithReceivingAndDispatchingResponse>>> CompanyBasedProducts(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 10,
             [FromQuery] string? company = null,
@@ -126,7 +127,7 @@ namespace CSMapi.Controller
         {
             try
             {
-                var response = await _productService.customerbasedproducts_fromto(pageNumber, pageSize, company, from, to);
+                var response = await _productService.CustomerBasedProducts_FromTo(pageNumber, pageSize, company, from, to);
                 return response;
             } catch (Exception e)
             {
@@ -135,7 +136,7 @@ namespace CSMapi.Controller
         }
         // Products Template
         [HttpGet("products/template")]
-        public async Task<ActionResult> producttemplate()
+        public async Task<ActionResult> ProductTemplate()
         {
             try
             {
@@ -148,7 +149,7 @@ namespace CSMapi.Controller
         }
         // Export products
         [HttpGet("products/export")]
-        public async Task<ActionResult> exportproducts()
+        public async Task<ActionResult> ExportProducts()
         {
             try
             {
@@ -164,11 +165,11 @@ namespace CSMapi.Controller
         }
         // Fetch specific product
         [HttpGet("product/{id}")]
-        public async Task<ActionResult<ProductResponse>> getproduct(int id)
+        public async Task<ActionResult<ProductResponse>> GetProduct(int id)
         {
             try
             {
-                var response = await _productService.getproduct(id);
+                var response = await _productService.GetProduct(id);
                 return response;
             } catch (Exception e)
             {
@@ -177,11 +178,11 @@ namespace CSMapi.Controller
         }
         // Fetch all products for receiving request
         [HttpGet("product/product-code")]
-        public async Task<ActionResult<ProductResponse>> getproductbycode(string productCode)
+        public async Task<ActionResult<ProductResponse>> GetProductByCode(string productCode)
         {
             try
             {
-                var response = await _productService.getproductbycode(productCode);
+                var response = await _productService.GetProductByCode(productCode);
                 return response;
             } catch (Exception e)
             {
@@ -190,11 +191,11 @@ namespace CSMapi.Controller
         }
         // Fetch product code for dispatching 
         [HttpGet("product/product-code/dispatch")]
-        public async Task<ActionResult<List<ProductCodeResponse>>> getproductcodefordispatch()
+        public async Task<ActionResult<List<ProductCodeResponse>>> GetProductCodeForDispatch()
         {
             try
             {
-                var response = await _productService.getproductcodefordispatch();
+                var response = await _productService.GetProductCodeForDispatch();
                 return response;
             } catch (Exception e)
             {
@@ -203,24 +204,25 @@ namespace CSMapi.Controller
         }
         // Fetch receiving details through product code
         [HttpGet("product/receiving-detail/dispatch")]
-        public async Task<ActionResult<ProductWithReceivingResponse>> getproductwithreceivingdetail(string productCode)
+        public async Task<ActionResult<ProductWithReceivingResponse>> GetProductWithReceivingDetail(string productCode)
         {
             try
             {
-                var response = await _productService.getproductwithreceivingdetail(productCode);
+                var response = await _productService.GetProductWithReceivingDetail(productCode);
                 return response;
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 return HandleException(e);
             }
         }
         // Create product
         [HttpPost("product")]
-        public async Task<ActionResult<ProductResponse>> addproduct([FromBody] ProductRequest request)
+        public async Task<ActionResult<ProductResponse>> AddProduct([FromBody] ProductRequest request)
         {
             try
             {
-                var response = await _productService.addproduct(request);
+                var response = await _productService.AddProduct(request);
                 return response;
             } catch (Exception e)
             {
@@ -229,7 +231,7 @@ namespace CSMapi.Controller
         }
         // Import products
         [HttpPost("products/import")]
-        public async Task<ActionResult<List<ProductOnlyResponse>>> importproducts(IFormFile file)
+        public async Task<ActionResult<List<ProductOnlyResponse>>> ImportProducts(IFormFile file)
         {
             try
             {
@@ -245,11 +247,11 @@ namespace CSMapi.Controller
         }
         // Update specific product
         [HttpPatch("product/update/{id}")]
-        public async Task<ActionResult<ProductResponse>> updateproduct([FromBody] ProductRequest request, int id)
+        public async Task<ActionResult<ProductResponse>> UpdateProduct([FromBody] ProductRequest request, int id)
         {
             try
             {
-                var response = await _productService.updateproduct(request, id);
+                var response = await _productService.UpdateProduct(request, id);
                 return response;
             } catch (Exception e)
             {
@@ -258,11 +260,11 @@ namespace CSMapi.Controller
         }
         // Toggle specific product active status to true/false
         [HttpPatch("product/toggle-active")]
-        public async Task<ActionResult<ProductActiveResponse>> toggleactive(int id)
+        public async Task<ActionResult<ProductActiveResponse>> ToggleActive(int id)
         {
             try
             {
-                var response = await _productService.toggleactive(id);
+                var response = await _productService.ToggleActive(id);
                 return response;
             } catch (Exception e)
             {
@@ -271,11 +273,11 @@ namespace CSMapi.Controller
         }
         // Remove specific product without removing in Database (Soft Delete)
         [HttpPatch("product/hide/{id}")]
-        public async Task<ActionResult<ProductResponse>> hideproduct(int id)
+        public async Task<ActionResult<ProductResponse>> HideProduct(int id)
         {
             try
             {
-                var response = await _productService.hideproduct(id);
+                var response = await _productService.HideProduct(id);
                 return response;
             } catch (Exception e)
             {
@@ -284,11 +286,11 @@ namespace CSMapi.Controller
         }
         // Delete specific product in Database
         [HttpDelete("product/delete/{id}")]
-        public async Task<ActionResult<ProductResponse>> deleteproduct(int id)
+        public async Task<ActionResult<ProductResponse>> DeleteProduct(int id)
         {
             try
             {
-                var response = await _productService.deleteproduct(id);
+                var response = await _productService.DeleteProduct(id);
                 return response;
             } catch (Exception e)
             {

@@ -3,34 +3,35 @@ using CSMapi.Helpers;
 using CSMapi.Helpers.Queries;
 using CSMapi.Interfaces;
 using CSMapi.Models;
+using CSMapi.Validators;
 using Microsoft.EntityFrameworkCore;
 
 namespace CSMapi.Services
 {
-    public class ProductService : BaseService , IProductService
+    public class ProductService : BaseService, IProductService
     {
         private readonly ProductValidator _productValidator;
         private readonly ProductQueries _productQueries;
-        public ProductService(AppDbContext context, IMapper mapper, ProductValidator productValidator, ProductQueries productQueries) : base (context, mapper)
+        public ProductService(AppDbContext context, IMapper mapper, ProductValidator productValidator, ProductQueries productQueries) : base(context, mapper)
         {
             _productValidator = productValidator;
             _productQueries = productQueries;
         }
         // [HttpGet("products/list")]
-        public async Task<List<ProductOnlyResponse>> productslist(int id)
+        public async Task<List<ProductOnlyResponse>> ProductsList(int id)
         {
-            var products = await _productQueries.productlistquery(id);
+            var products = await _productQueries.ProductListQuery(id);
 
             return _mapper.Map<List<ProductOnlyResponse>>(products);
         }
         // [HttpGet("products")]
-        public async Task<Pagination<ProductResponse>> allproducts(
+        public async Task<Pagination<ProductResponse>> AllProducts(
             int pageNumber = 1,
             int pageSize = 10,
             string? searchTerm = null)
         {
-            var query = _productQueries.productsquery(searchTerm);
-            return await PaginationHelper.paginateandmap<Product, ProductResponse>(query, pageNumber, pageSize, _mapper);
+            var query = _productQueries.ProductsQuery(searchTerm);
+            return await PaginationHelper.PaginateAndMap<Product, ProductResponse>(query, pageNumber, pageSize, _mapper);
         }
         // [HttpGet("products/company-inventory/as-of")]
         public async Task<Pagination<ProductCompanyInventoryAsOfResponse>> customerbasedproducts_asof(
@@ -41,11 +42,8 @@ namespace CSMapi.Services
         {
             if (!companyId.HasValue)
             {
-                return PaginationHelper.paginatedresponse(new List<ProductCompanyInventoryAsOfResponse>(), 0, pageNumber, pageSize);
+                return PaginationHelper.PaginatedResponse(new List<ProductCompanyInventoryAsOfResponse>(), 0, pageNumber, pageSize);
             }
-
-            DateTime? startDate = asOf?.Date;
-            DateTime? endDate = asOf?.Date;
 
             // Pre-aggregate dispatched quantities
             var dispatched = await _context.Dispatchingdetails
@@ -59,52 +57,41 @@ namespace CSMapi.Services
                 })
                 .ToDictionaryAsync(x => x.ReceivingDetailId);
 
-            // Pre-aggregate repalletization movements
-            var repalletization = await _context.Repalletizationdetails
-                .Where(r => !asOf.HasValue || r.Repalletization.Createdon <= asOf)
-                .Select(r => new
+            // Pre-aggregate repalletization movements (OUT and IN separately)
+            var repalletizationOut = await _context.Repalletizations
+                .Where(r => !asOf.HasValue || r.Createdon <= asOf)
+                .GroupBy(r => r.Fromreceivingdetailid)
+                .Select(g => new
                 {
-                    r.Receivingdetailid,
-                    FromPalletId = (int?)r.Repalletization.Frompalletid,
-                    ToPalletId = (int?)r.Repalletization.Topalletid,
-                    r.Quantitymoved,
-                    r.Weightmoved
+                    ReceivingDetailId = g.Key,
+                    QuantityMoved = g.Sum(r => r.Quantitymoved),
+                    WeightMoved = g.Sum(r => r.Weightmoved)
                 })
-                .ToListAsync();
+                .ToDictionaryAsync(x => x.ReceivingDetailId);
 
-            // Separate repalletization movements
-            var repalletizedFrom = repalletization
-                .GroupBy(x => new { x.Receivingdetailid, x.FromPalletId })
-                .ToDictionary(
-                    g => g.Key,
-                    g => new {
-                        QuantityMoved = g.Sum(x => x.Quantitymoved),
-                        WeightMoved = g.Sum(x => x.Weightmoved)
-                    });
-
-            var repalletizedTo = repalletization
-                .GroupBy(x => new { x.Receivingdetailid, x.ToPalletId })
-                .ToDictionary(
-                    g => g.Key,
-                    g => new {
-                        QuantityMoved = g.Sum(x => x.Quantitymoved),
-                        WeightMoved = g.Sum(x => x.Weightmoved)
-                    });
+            var repalletizationIn = await _context.Repalletizations
+                .Where(r => !asOf.HasValue || r.Createdon <= asOf)
+                .GroupBy(r => r.Toreceivingdetailtid)
+                .Select(g => new
+                {
+                    ReceivingDetailId = g.Key,
+                    QuantityMoved = g.Sum(r => r.Quantitymoved),
+                    WeightMoved = g.Sum(r => r.Weightmoved)
+                })
+                .ToDictionaryAsync(x => x.ReceivingDetailId);
 
             // Query products
-            var query = _productQueries.productwithcompany_asof(companyId, asOf);
+            var query = _productQueries.ProductWithCompany_AsOf(companyId, asOf);
             var totalCount = await query.CountAsync();
 
-            // Early return if no products exist
             if (totalCount == 0)
             {
-                return PaginationHelper.paginatedresponse(new List<ProductCompanyInventoryAsOfResponse>(), 0, pageNumber, pageSize);
+                return PaginationHelper.PaginatedResponse(new List<ProductCompanyInventoryAsOfResponse>(), 0, pageNumber, pageSize);
             }
 
-            var products = await PaginationHelper.paginateandproject<Product, ProductCompanyInventoryAsOfResponse>(
+            var products = await PaginationHelper.PaginatedAndProject<Product, ProductCompanyInventoryAsOfResponse>(
                 query, pageNumber, pageSize, _mapper);
 
-            // Process each product's receiving details
             var productsWithInventory = new List<ProductCompanyInventoryAsOfResponse>();
 
             foreach (var product in products)
@@ -113,23 +100,24 @@ namespace CSMapi.Services
 
                 foreach (var rec in product.Receiving)
                 {
-                    var palletId = rec.ReceivingDetail.FirstOrDefault()?.Pallet?.Id;
-                    if (palletId == null) continue;
-
+                    // Get aggregated values
                     dispatched.TryGetValue(rec.Id, out var dispAgg);
+                    repalletizationOut.TryGetValue(rec.Id, out var repOutAgg);
+                    repalletizationIn.TryGetValue(rec.Id, out var repInAgg);
 
-                    var fromKey = new { Receivingdetailid = rec.Id, FromPalletId = palletId };
-                    repalletizedFrom.TryGetValue(fromKey, out var repFromAgg);
-
-                    var toKey = new { Receivingdetailid = rec.Id, ToPalletId = palletId };
-                    repalletizedTo.TryGetValue(toKey, out var repToAgg);
-
+                    // Calculate remaining inventory
                     var remainingQty = rec.Quantityinapallet
                         - (dispAgg?.TotalQuantity ?? 0)
-                        - (repFromAgg?.QuantityMoved ?? 0)
-                        + (repToAgg?.QuantityMoved ?? 0);
+                        - (repOutAgg?.QuantityMoved ?? 0)
+                        + (repInAgg?.QuantityMoved ?? 0);
 
+                    // Skip if no remaining inventory
                     if (remainingQty <= 0) continue;
+
+                    var remainingWeight = rec.Totalweight
+                        - (dispAgg?.TotalWeight ?? 0)
+                        - (repOutAgg?.WeightMoved ?? 0)
+                        + (repInAgg?.WeightMoved ?? 0);
 
                     adjustedReceiving.Add(new ProductCompanyInventoryReceivingResponse
                     {
@@ -137,56 +125,59 @@ namespace CSMapi.Services
                         Document = rec.Document,
                         Requestor = rec.Requestor,
                         Approver = rec.Approver,
+                        Datereceived = rec.Datereceived,
                         Quantityinapallet = remainingQty,
-                        Totalweight = Math.Round(rec.Totalweight
-                            - (dispAgg?.TotalWeight ?? 0)
-                            - (repFromAgg?.WeightMoved ?? 0)
-                            + (repToAgg?.WeightMoved ?? 0), 2),
+                        Totalweight = Math.Round(remainingWeight, 2),
                         ReceivingDetail = rec.ReceivingDetail
                     });
                 }
 
-                // Only include products with inventory
                 if (adjustedReceiving.Any())
                 {
-                    product.Receiving = adjustedReceiving;
-                    productsWithInventory.Add(product);
+                    productsWithInventory.Add(new ProductCompanyInventoryAsOfResponse
+                    {
+                        Id = product.Id,
+                        Category = product.Category,
+                        Productcode = product.Productcode,
+                        Productname = product.Productname,
+                        Receiving = adjustedReceiving
+                    });
                 }
             }
 
-            // Return empty if no inventory records exist
-            return PaginationHelper.paginatedresponse(
-                productsWithInventory,
-                productsWithInventory.Count,
-                pageNumber,
-                pageSize
-            );
+            return new Pagination<ProductCompanyInventoryAsOfResponse>
+            {
+                Items = productsWithInventory,
+                Totalcount = totalCount,
+                Pagenumber = pageNumber,
+                Pagesize = pageSize
+            };
         }
         // [HttpGet("products/company-inventory/from-to")]
-        public async Task<Pagination<ProductWithReceivingAndDispatchingResponse>> customerbasedproducts_fromto(
+        public async Task<Pagination<ProductWithReceivingAndDispatchingResponse>> CustomerBasedProducts_FromTo(
             int pageNumber = 1,
             int pageSize = 10,
             string? company = null,
             DateTime? from = null,
             DateTime? to = null)
         {
-            var query = _productQueries.productwithcompanyquery(company, from, to);
+            var query = _productQueries.ProductWithCompanyQuery(company, from, to);
             var totalCount = await query.CountAsync();
 
-            var products = await PaginationHelper.paginateandproject<Product, ProductWithReceivingAndDispatchingResponse>(
+            var products = await PaginationHelper.PaginatedAndProject<Product, ProductWithReceivingAndDispatchingResponse>(
                 query, pageNumber, pageSize, _mapper);
 
-            return PaginationHelper.paginatedresponse(products, totalCount, pageNumber, pageSize);
+            return PaginationHelper.PaginatedResponse(products, totalCount, pageNumber, pageSize);
         }
         // [HttpGet("product/receivings")]
-        public async Task<Pagination<ProductBasedReceiving>> productbasedreceivings(
+        public async Task<Pagination<ProductBasedReceiving>> ProductBasedReceivings(
             int pageNumber = 1,
             int pageSize = 10,
             int? productId = null,
             DateTime? from = null,
             DateTime? to = null)
         {
-            var query = _productQueries.productwithcompanyquery(from: from, to: to, productId: productId);
+            var query = _productQueries.ProductWithCompanyQuery(from: from, to: to, productId: productId);
             var totalCount = await query.CountAsync();
 
             var products = await query
@@ -206,17 +197,17 @@ namespace CSMapi.Services
                 Quantityinapallet = r?.Receivingdetails.Sum(r => r.Quantityinapallet) ?? 0
             }).ToList();
 
-            return PaginationHelper.paginatedresponse(mapped, totalCount, pageNumber, pageSize);
+            return PaginationHelper.PaginatedResponse(mapped, totalCount, pageNumber, pageSize);
         }
         // [HttpGet("product/dispatchings")]
-        public async Task<Pagination<ProductBasedDispatching>> productbaseddispatchings(
+        public async Task<Pagination<ProductBasedDispatching>> ProductBasedDispatchings(
             int pageNumber = 1,
             int pageSize = 10,
             int? productId = null,
             DateTime? from = null,
             DateTime? to = null)
         {
-            var query = _productQueries.productswithcompanydispatching(from: from, to: to, productId: productId);
+            var query = _productQueries.ProductsWithCompanyDispatching(from: from, to: to, productId: productId);
             var totalCount = await query.CountAsync();
 
             var products = await query
@@ -225,110 +216,78 @@ namespace CSMapi.Services
                 .ToListAsync();
 
             var mapped = products.SelectMany(p =>
-            p.Dispatching
-            .Where(d => d.Dispatched)
-            .Select(d => new ProductBasedDispatching
-            {
-                Id = p.Id,
-                Productname = p.Productname,
-                Productpackaging = p.Productpackaging,
-                Deliveryunit = p.Deliveryunit,
-                Dispatchdate = d.Dispatchdate,
-                Quantity = d.Dispatchingdetails.Sum(d => d.Quantity)
-            })).ToList();
+                p.Dispatching
+                .Where(d => d.Dispatched)
+                .Select(d => new ProductBasedDispatching
+                {
+                    Id = p.Id,
+                    Productname = p.Productname,
+                    Productpackaging = p.Productpackaging,
+                    Deliveryunit = p.Deliveryunit,
+                    Dispatchdate = d.Dispatchdate,
+                    Quantity = d.Dispatchingdetails.Sum(d => d.Quantity)
+                })).ToList();
 
-            return PaginationHelper.paginatedresponse(mapped, totalCount, pageNumber, pageSize);
+            return PaginationHelper.PaginatedResponse(mapped, totalCount, pageNumber, pageSize);
         }
         // [HttpGet("products/company-based")]
-        public async Task<List<BasicProductResponse>> customerbasedproductsbasic(int id)
+        public async Task<List<BasicProductResponse>> CustomerBasedProductsBasic(int id)
         {
-            var products = await _productQueries.companybasesproductslist(id);
+            var products = await _productQueries.CompanyBasedProductsList(id);
             return _mapper.Map<List<BasicProductResponse>>(products);
         }
         // [HttpGet("product/{id}")]
-        public async Task<ProductResponse> getproduct(int id)
+        public async Task<ProductResponse> GetProduct(int id)
         {
-            var product = await getproductdata(id);
+            var product = await GetProductData(id);
 
             return _mapper.Map<ProductResponse>(product);
         }
         // [HttpGet("product/product-code")]
-        public async Task<ProductResponse> getproductbycode(string productCode)
+        public async Task<ProductResponse> GetProductByCode(string productCode)
         {
-            var product = await _productQueries.productsbycode(productCode);
+            var product = await _productQueries.ProductsByCode(productCode);
 
             return _mapper.Map<ProductResponse>(product);
         }
         // [HttpGet("product/product-code/dispatch")]
-        public async Task<List<ProductCodeResponse>> getproductcodefordispatch()
+        public async Task<List<ProductCodeResponse>> GetProductCodeForDispatch()
         {
-            var products = await _productQueries.productwithreceivings();
+            var products = await _productQueries.ProductWithReceivings();
 
             return _mapper.Map<List<ProductCodeResponse>>(products);
         }
         //[HttpGet("product/receiving-detail/dispatch")]
-        public async Task<ProductWithReceivingResponse> getproductwithreceivingdetail(string productCode)
+        public async Task<ProductWithReceivingResponse> GetProductWithReceivingDetail(string productCode)
         {
-            if (string.IsNullOrWhiteSpace(productCode))
-                throw new ArgumentException("Product code cannot be empty", nameof(productCode));
-
-            var product = await _productQueries.productwithreceivingdetail(productCode);
-            if (product == null)
-                throw new KeyNotFoundException($"Product not found: {productCode}");
-
-            var receivedReceivings = product.Receiving?
-                .Where(r => r.Received)
-                .ToList() ?? new List<Receiving>();
-            // Extract valid details
-            var validDetails = receivedReceivings
-                .SelectMany(r => r.Receivingdetails ?? Enumerable.Empty<ReceivingDetail>())
-                .Where(r => !r.Fulldispatched &&
-                r.Pallet?.Occupied == true)
-                .ToList();
-
-            if (!validDetails.Any())
-            {
-                return new ProductWithReceivingResponse
-                {
-                    ReceivingDetail = new List<ProductReceivingDetailResponse>(),
-                    Overallweight = Math.Round(receivedReceivings.Sum(r => r.Overallweight), 2)
-                };
-            }
-            // Bulk preload data
-            var (dispatchedSums, repalletizedFromSums, repalletizedToSums) = await PreloadDependentData(validDetails);
-            // Process details
-            var positionIds = validDetails.Select(r => r.Positionid).Distinct().ToList();
-            var positions = await _context.Palletpositions
-                .Include(p => p.Coldstorage)
-                .Where(p => positionIds.Contains(p.Id))
-                .ToDictionaryAsync(p => p.Id);
-
-            var responseDetails = new List<ProductReceivingDetailResponse>();
-
-            foreach (var detail in validDetails)
-            {
-                // Calculate remaining stocks
-                var remaining = CalculateRemainingStocks(detail, dispatchedSums, repalletizedFromSums, repalletizedToSums);
-
-                if (remaining.Quantity <= 0) continue;
-                // Safe position access
-                positions.TryGetValue(detail.Positionid, out var position);
-
-                var detailResponse = _mapper.Map<ProductReceivingDetailResponse>(detail);
-                detailResponse.Quantityinapallet = remaining.Quantity;
-                detailResponse.Totalweight = remaining.Weight;
-
-                responseDetails.Add(detailResponse);
-            }
-            // Build final response
+            var product = await _productQueries.ProductWithReceivingDetail(productCode);
             var response = _mapper.Map<ProductWithReceivingResponse>(product);
-            response.ReceivingDetail = responseDetails;
-            response.Overallweight = Math.Round(receivedReceivings.Sum(r => r.Overallweight), 2);
 
+            if (response.ReceivingDetail?.Any() == true)
+            {
+                var allReceivingDetails = product.Receiving
+                    .SelectMany(r => r.Receivingdetails)
+                    .ToDictionary(r => r.Id);
+
+                foreach (var detail in response.ReceivingDetail)
+                {
+                    if (allReceivingDetails.TryGetValue(detail.Id, out var originalDetail))
+                    {
+                        var (quantity, weight) = CalculateRemainingValues(originalDetail);
+                        detail.Remainingquantity = quantity;
+                        detail.Remainingweight = weight;
+                    }
+                    else
+                    {
+                        detail.Remainingquantity = detail.Quantityinapallet;
+                        detail.Remainingweight = detail.Totalweight;
+                    }
+                }
+            }
             return response;
         }
         // [HttpPost("product")]
-        public async Task<ProductResponse> addproduct(ProductRequest request)
+        public async Task<ProductResponse> AddProduct(ProductRequest request)
         {
             _productValidator.ValidateProductRequest(request);
 
@@ -341,20 +300,20 @@ namespace CSMapi.Services
             return _mapper.Map<ProductResponse>(product);
         }
         // [HttpPatch("product/update/{id}")]
-        public async Task<ProductResponse> updateproduct(ProductRequest request, int id)
+        public async Task<ProductResponse> UpdateProduct(ProductRequest request, int id)
         {
-            var product = await getproductid(id);
+            var product = await GetProductId(id);
 
             _mapper.Map(request, product);
 
             await _context.SaveChangesAsync();
 
-            return await productResponse(product.Id);
+            return await ProductResponse(product.Id);
         }
         // [HttpPatch("product/toggle-active")]
-        public async Task<ProductActiveResponse> toggleactive (int id)
+        public async Task<ProductActiveResponse> ToggleActive(int id)
         {
-            var product = await getproductid(id);
+            var product = await GetProductId(id);
 
             product.Active = !product.Active;
 
@@ -364,111 +323,77 @@ namespace CSMapi.Services
             return _mapper.Map<ProductActiveResponse>(product);
         }
         // [HttpPatch("product/hide/{id}")]
-        public async Task<ProductResponse> hideproduct(int id)
+        public async Task<ProductResponse> HideProduct(int id)
         {
-            var product = await getproductid(id);
+            var product = await GetProductId(id);
 
             product.Removed = !product.Removed;
 
             _context.Products.Update(product);
             await _context.SaveChangesAsync();
 
-            return await productResponse(product.Id);
+            return await ProductResponse(product.Id);
         }
         // [HttpDelete("product/delete/{id}")]
-        public async Task<ProductResponse> deleteproduct(int id)
+        public async Task<ProductResponse> DeleteProduct(int id)
         {
-            var product = await getproductid(id);
+            var product = await GetProductId(id);
 
             _context.Products.Remove(product);
             await _context.SaveChangesAsync();
 
-            return await productResponse(product.Id);
+            return await ProductResponse(product.Id);
         }
         // Helpers
-        private async Task<Product?> getproductid(int id)
+        private async Task<Product?> GetProductId(int id)
         {
-            return await _productQueries.patchmethodproductid(id);
+            return await _productQueries.PatchProductId(id);
         }
-        private async Task<Product?> getproductdata(int id)
+        private async Task<Product?> GetProductData(int id)
         {
-            return await _productQueries.getmethodproductid(id);
+            return await _productQueries.GetProductId(id);
         }
-        private async Task<ProductResponse> productResponse(int id)
+        private async Task<ProductResponse> ProductResponse(int id)
         {
-            var response = await getproductdata(id);
+            var response = await GetProductData(id);
             return _mapper.Map<ProductResponse>(response);
         }
-        // Buld data loading
-        private async Task<(
-            Dictionary<int, (int Quantity, double Weight)>,
-            Dictionary<int, (int Quantity, double Weight)>,
-            Dictionary<int, (int Quantity, double Weight)>)>
-            PreloadDependentData(List<ReceivingDetail> details)
+        private (int remainingQuantity, double remainingWeight) CalculateRemainingValues(ReceivingDetail receivingDetail)
         {
-            var detailIds = details.Select(d => d.Id).ToList();
-            var palletIds = details.Select(d => d.Palletid).Distinct().ToList();
+            int originalQty = receivingDetail.Quantityinapallet;
+            double originalWgt = receivingDetail.Totalweight;
 
-            var dispatchedSums = await _context.Dispatchingdetails
-                .Where(d => detailIds.Contains(d.Receivingdetailid))
-                .GroupBy(d => d.Receivingdetailid)
-                .Select(g => new
-                {
-                    Id = g.Key,
-                    Quantity = g.Sum(d => (int?)d.Quantity) ?? 0,
-                    Weight = g.Sum(d => (double?)d.Totalweight) ?? 0
-                })
-                .ToDictionaryAsync(x => x.Id, x => (x.Quantity, x.Weight));
+            // Calculate dispatched quantities
+            var validDispatches = receivingDetail.DispatchingDetail?
+                .Where(d => d.Dispatching != null &&
+                           d.Dispatching.Dispatched &&
+                          !d.Dispatching.Declined &&
+                          !d.Dispatching.Removed)
+                .ToList() ?? new List<DispatchingDetail>();
 
-            var repalletizedFromSums = await _context.Repalletizationdetails
-                .Include(r => r.Repalletization)
-                .Where(r => palletIds.Contains(r.Repalletization.Frompalletid) &&
-                            detailIds.Contains(r.Receivingdetailid))
-                .GroupBy(r => r.Receivingdetailid)
-                .Select(g => new
-                {
-                    Id = g.Key,
-                    Quantity = g.Sum(r => (int?)r.Quantitymoved) ?? 0,
-                    Weight = g.Sum(r => (double?)r.Weightmoved) ?? 0
-                })
-                .ToDictionaryAsync(x => x.Id, x => (x.Quantity, x.Weight));
+            int dispatchedQty = validDispatches.Sum(d => d.Quantity);
+            double dispatchedWgt = validDispatches.Sum(d => d.Totalweight);
 
-            var repalletizedToSums = await _context.Repalletizationdetails
-                .Include(r => r.Repalletization)
-                .Where(r => palletIds.Contains(r.Repalletization.Topalletid))
-                .GroupBy(r => r.Repalletization.Topalletid)
-                .Select(g => new
-                {
-                    PalletId = g.Key,
-                    Quantity = g.Sum(r => (int?)r.Quantitymoved) ?? 0,
-                    Weight = g.Sum(r => (double?)r.Weightmoved) ?? 0
-                })
-                .ToDictionaryAsync(x => x.PalletId, x => (x.Quantity, x.Weight));
-            return (dispatchedSums, repalletizedFromSums, repalletizedToSums);
-        }
-        // Stock Calculation
-        private (int Quantity, double Weight) CalculateRemainingStocks(
-            ReceivingDetail detail,
-            Dictionary<int, (int Quantity, double Weight)> dispatchedSums,
-            Dictionary<int, (int Quantity, double Weight)> repalletizedFromSums,
-            Dictionary<int, (int Quantity, double Weight)> repalletizedToSums)
-        {
-            dispatchedSums.TryGetValue(detail.Id, out var dispatched);
-            repalletizedFromSums.TryGetValue(detail.Id, out var repalletizedFrom);
-            repalletizedToSums.TryGetValue(detail.Palletid, out var repalletizedTo);
+            // Calculate repalletization adjustments
+            var outgoingRepallets = receivingDetail.Outgoingrepalletization?.ToList() ?? new List<Repalletization>();
+            var incomingRepallets = receivingDetail.Incomingrepalletization?.ToList() ?? new List<Repalletization>();
 
-            var remainingQuantity = detail.Quantityinapallet
-                - dispatched.Quantity
-                - repalletizedFrom.Quantity
-                + repalletizedTo.Quantity;
+            int outgoingQty = outgoingRepallets.Sum(r => r.Quantitymoved);
+            int incomingQty = incomingRepallets.Sum(r => r.Quantitymoved);
 
-            var remainingWeight = Math.Round(
-                detail.Totalweight
-                - dispatched.Weight
-                - repalletizedFrom.Weight
-                + repalletizedTo.Weight,
-                2);
-            return (remainingQuantity, remainingWeight);
+            // Calculate net remaining quantity
+            int netQtyChange = incomingQty - outgoingQty;
+            int remainingQty = Math.Max(0, originalQty - dispatchedQty + netQtyChange);
+
+            // Calculate weight using original unit weight
+            double wpu = originalQty > 0 ? originalWgt / originalQty : 0;
+            double outgoingWgt = outgoingQty * wpu;
+            double incomingWgt = incomingQty * wpu;
+
+            double remainingWgt = originalWgt - dispatchedWgt - outgoingWgt + incomingWgt;
+            remainingWgt = Math.Max(0, Math.Round(remainingWgt, 2));
+
+            return (remainingQty, remainingWgt);
         }
     }
 }

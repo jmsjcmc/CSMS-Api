@@ -22,16 +22,16 @@ namespace CSMapi.Controller
         }
         // Count all receivings
         [HttpGet("receivings/count-all")]
-        public async Task<ActionResult<ReceivingsCount>> countall()
+        public async Task<ActionResult<ReceivingsCount>> CountAll()
         {
             try
             {
                 var count = new ReceivingsCount
                 {
-                    Total = await _receivingService.totalcount(),
-                    Pending = await _receivingService.pendingcount(),
-                    Received = await _receivingService.receivedcount(),
-                    Declined = await _receivingService.declinedcount(),
+                    Total = await _receivingService.TotalCount(),
+                    Pending = await _receivingService.PendingCount(),
+                    Received = await _receivingService.ReceivedCount(),
+                    Declined = await _receivingService.DeclinedCount(),
                 };
 
                 return count;
@@ -42,7 +42,7 @@ namespace CSMapi.Controller
         }
         // Fetch all receiving request
         [HttpGet("receivings")]
-        public async Task<ActionResult<Pagination<ReceivingResponse>>> allreceivings(
+        public async Task<ActionResult<Pagination<ReceivingResponse>>> AllReceivings(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 10,
             [FromQuery] string? searchTerm = null,
@@ -51,7 +51,7 @@ namespace CSMapi.Controller
         {
             try
             {
-                var response = await _receivingService.allreceivings(pageNumber, pageSize, searchTerm, categoryId, status);
+                var response = await _receivingService.AllReceivings(pageNumber, pageSize, searchTerm, categoryId, status);
                 return response;
             } catch (Exception e)
             {
@@ -60,14 +60,14 @@ namespace CSMapi.Controller
         }
         // Fetch all pending receiving request
         [HttpGet("receivings/pending")]
-        public async Task<ActionResult<Pagination<ReceivingResponse>>> allpendings(
+        public async Task<ActionResult<Pagination<ReceivingResponse>>> AllPendings(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 10,
             [FromQuery] int? id = null)
         {
             try
             {
-                var response = await _receivingService.allpendings(pageNumber, pageSize, id);
+                var response = await _receivingService.AllPendings(pageNumber, pageSize, id);
                 return response;
             } catch (Exception e)
             {
@@ -76,11 +76,11 @@ namespace CSMapi.Controller
         }
         // Fetch all pallets connected to specific product through receiving details
         [HttpGet("receiving-details/product-id")]
-        public async Task<ActionResult<List<ProductBasesPallet>>> productbasedpallets(int productId)
+        public async Task<ActionResult<List<ProductBasesPallet>>> ProductBasedPallets(int productId)
         {
             try
             {
-                var response = await _receivingService.productbasedpallets(productId);
+                var response = await _receivingService.ProductBasedPallets(productId);
                 return response;
             } catch (Exception e)
             {
@@ -89,11 +89,11 @@ namespace CSMapi.Controller
         }
         // Fetch specific receiving request
         [HttpGet("receiving/{id}")]
-        public async Task<ActionResult<ReceivingResponse>> getreceiving(int id)
+        public async Task<ActionResult<ReceivingResponse>> GetReceiving(int id)
         {
             try
             {
-                var response = await _receivingService.getreceiving(id);
+                var response = await _receivingService.GetReceiving(id);
                 return response;
             } catch (Exception e)
             {
@@ -102,11 +102,11 @@ namespace CSMapi.Controller
         }
         // Generate Document Number for receiving
         [HttpGet("receiving/generate-documentNo")]
-        public async Task<ActionResult<DocumentNumberResponse>> generatedocumentnumber(string? category)
+        public async Task<ActionResult<DocumentNumberResponse>> GenerateDocumentNumber(string? category)
         {
             try
             {
-                var response = await _receivingService.generatedocumentnumber(category);
+                var response = await _receivingService.GenerateDocumentNumber(category);
                 return response;
             } catch (Exception e)
             {
@@ -115,7 +115,7 @@ namespace CSMapi.Controller
         }
         // Generate receivings template
         [HttpGet("receivings/template")]
-        public async Task<ActionResult> receivingstemplate()
+        public async Task<ActionResult> ReceivingsTemplate()
         {
             try
             {
@@ -128,11 +128,11 @@ namespace CSMapi.Controller
         }
         // Export receivings
         [HttpGet("receivings/export")]
-        public async Task<ActionResult> exportreceivings()
+        public async Task<ActionResult> ExportReceivings()
         {
             try
             {
-                var receivings = await _receivingQueries.receivingslist();
+                var receivings = await _receivingQueries.ReceivingsList();
 
                 var file = await _receivingExcel.exportreceivings(receivings);
                 return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Receivings.xlsx");
@@ -143,11 +143,11 @@ namespace CSMapi.Controller
         }
         // Create receiving request
         [HttpPost("receiving")]
-        public async Task<ActionResult<ReceivingResponse>> addreceiving([FromForm] ReceivingRequest request, IFormFile? file)
+        public async Task<ActionResult<ReceivingResponse>> AddReceiving([FromForm] ReceivingRequest request, IFormFile? file)
         {
             try
             {
-                var response = await _receivingService.addreceiving(request, file, User);
+                var response = await _receivingService.AddReceiving(request, file, User);
                 return response;
             } catch (Exception e)
             {
@@ -156,11 +156,11 @@ namespace CSMapi.Controller
         }
         // Approve or decline receiving request
         [HttpPatch("receiving/toggle-request")]
-        public async Task<ActionResult<ReceivingResponse>> request(string status, int documentId, string? note = null)
+        public async Task<ActionResult<ReceivingResponse>> ToggleRequest(string status, int documentId, string? note = null)
         {
             try
             {
-                var response = await _receivingService.request(User ,status, documentId, note);
+                var response = await _receivingService.Request(User ,status, documentId, note);
                 return response;
             } catch (Exception e)
             {
@@ -169,11 +169,11 @@ namespace CSMapi.Controller
         }
         // Update specific receiving request
         [HttpPatch("receiving/update/{id}")]
-        public async Task<ActionResult<ReceivingResponse>> updatereceiving([FromForm] ReceivingRequest request,IFormFile? file, int id)
+        public async Task<ActionResult<ReceivingResponse>> UpdateReceiving([FromForm] ReceivingRequest request,IFormFile? file, int id)
         {
             try
             {
-                var response = await _receivingService.updatereceiving(request, file, id, User);
+                var response = await _receivingService.UpdateReceiving(request, file, id, User);
                 return response;
             } catch (Exception e)
             {
@@ -182,11 +182,11 @@ namespace CSMapi.Controller
         }
         // Remove specific receiving request without removing in Database (Soft Delete) 
         [HttpPatch("receiving/hide/{id}")]
-        public async Task<ActionResult<ReceivingResponse>> hidereceiving(int id)
+        public async Task<ActionResult<ReceivingResponse>> HideReceiving(int id)
         {
             try
             {
-                var response = await _receivingService.hidereceiving(id);
+                var response = await _receivingService.HideReceiving(id);
                 return response;
             } catch (Exception e)
             {
@@ -195,11 +195,11 @@ namespace CSMapi.Controller
         }
         // Delete specific receiving request in Database
         [HttpDelete("receiving/delete/{id}")]
-        public async Task<ActionResult<ReceivingResponse>> deletereceiving(int id)
+        public async Task<ActionResult<ReceivingResponse>> DeleteReceiving(int id)
         {
             try
             {
-                var response = await _receivingService.deletereceiving(id);
+                var response = await _receivingService.DeleteReceiving(id);
                 return response;
             } catch (Exception e)
             {

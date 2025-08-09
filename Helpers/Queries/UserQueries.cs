@@ -1,4 +1,5 @@
 ﻿using CSMapi.Models;
+using CSMapi.Validators;
 using Microsoft.EntityFrameworkCore;
 
 namespace CSMapi.Helpers.Queries
@@ -6,17 +7,19 @@ namespace CSMapi.Helpers.Queries
     public class UserQueries
     {
         private readonly AppDbContext _context;
-        public UserQueries(AppDbContext context)
+        private readonly UserValidator _validator;
+        public UserQueries(AppDbContext context, UserValidator validator)
         {
             _context = context;
+            _validator = validator;
         }
         // Query for fetching all users with optional filter for last name
-        public IQueryable<User> usersquery (string? searchTerm = null)
+        public IQueryable<User> UsersQuery(string? searchTerm = null)
         {
             var query = _context.Users
                     .AsNoTracking()
-                    .OrderByDescending(u => u.Createdon)
                     .Where(u => !u.Removed)
+                    .OrderByDescending(u => u.Createdon)
                     .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(searchTerm))
@@ -26,16 +29,16 @@ namespace CSMapi.Helpers.Queries
             return query;
         }
         // Query for fetching all roles
-        public async Task<List<Role>> rolesquery()
+        public async Task<List<Role>> RolesQuery()
         {
             return await _context.Roles
                    .AsNoTracking()
-                   .OrderByDescending(r => r.Id)
                    .Where(r => !r.Removed)
+                   .OrderByDescending(r => r.Id)
                    .ToListAsync();
         }
         // Query for fetching all users with business unit "SubZero Ice and Cold Storage Inc"
-        public async Task<List<User>> lessorsquery()
+        public async Task<List<User>> LessorsQuery()
         {
             return await _context.Users
                     .Where(u => u.Businessunit == "SubZero Ice and Cold Storage Inc")
@@ -43,28 +46,40 @@ namespace CSMapi.Helpers.Queries
                     .ToListAsync();
         }
         // Query for fetching specific user for GET method
-        public async Task<User?> getmethoduserid(int id)
+        public async Task<User?> GetUserId(int id)
         {
+            // Validate id if it exist
+            await _validator.ValidateSpecificId(id);
+
             return await _context.Users
                 .AsNoTracking()
                 .FirstOrDefaultAsync(u => u.Id == id);
         }
         // Query for fetching specific role for GET method
-        public async Task<Role?> getmethodroleid(int id)
+        public async Task<Role?> GetRoleId(int id)
         {
+            // Validate id if it exist
+            await _validator.ValidateSpecificId(id);
+
             return await _context.Roles
                 .AsNoTracking()
                 .FirstOrDefaultAsync(r => r.Id == id);
         }
         // Query for fetching specific user for PATCH/PUT/DELETE methods
-        public async Task<User?> patchmethoduserid(int id)
+        public async Task<User?> PatchUserId(int id)
         {
+            // Validate id if it exist
+            await _validator.ValidateSpecificId(id);
+
             return await _context.Users
                 .FirstOrDefaultAsync(u => u.Id == id);
         }
         // Query for fetching specific role for PATCH/PUT/DELETE methods
-        public async Task<Role?> patchmethodroleid(int id)
+        public async Task<Role?> PatchRoleId(int id)
         {
+            // Validate id if it exist
+            await _validator.ValidateSpecificId(id);
+
             return await _context.Roles
                 .FirstOrDefaultAsync(r => r.Id == id);
         }

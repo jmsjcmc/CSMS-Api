@@ -87,5 +87,17 @@ namespace CSMapi.Validators
                 }
             }
         }
+        public async Task ValidateSpecificDispatching(int id)
+        {
+            if (!await _context.Dispatchings.AnyAsync(d => d.Id == id))
+            {
+                throw new ArgumentException($"Dispatching ID {id} not found.");
+            }
+
+            if (!await _context.Dispatchingdetails.AnyAsync(d => d.Id == id))
+            {
+                throw new ArgumentException($"Dispatching Detail ID {id} not found.");
+            }
+        }
     }
 }

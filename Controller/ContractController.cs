@@ -15,14 +15,14 @@ namespace CSMapi.Controller
         }
         // Fetch all contracts
         [HttpGet("contracts")]
-        public async Task<ActionResult<Pagination<ContractResponse>>> allcontracts(
+        public async Task<ActionResult<Pagination<ContractResponse>>> AllContracts(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 10,
             [FromQuery] string? searchTerm = null)
         {
             try
             {
-                var response = await _contractService.allcontracts(pageNumber, pageSize, searchTerm);
+                var response = await _contractService.AllContracts(pageNumber, pageSize, searchTerm);
                 return response;
             }
             catch (Exception e)
@@ -32,11 +32,11 @@ namespace CSMapi.Controller
         }
         // Fetch specific contract
         [HttpGet("contract/{id}")]
-        public async Task<ActionResult<ContractResponse>> getcontract(int id)
+        public async Task<ActionResult<ContractResponse>> GetContract(int id)
         {
             try
             {
-                var response = await _contractService.getcontract(id);
+                var response = await _contractService.GetContract(id);
                 return response;
             } catch (Exception e)
             {
@@ -45,11 +45,11 @@ namespace CSMapi.Controller
         }
         // Crete contract
         [HttpPost("contract")]
-        public async Task<ActionResult<ContractResponse>> addcontract([FromBody] ContractRequest request)
+        public async Task<ActionResult<ContractResponse>> AddContract([FromBody] ContractRequest request)
         {
             try
             {
-                var response = await _contractService.addcontract(request, User);
+                var response = await _contractService.AddContract(request, User);
                 return response;
             } catch (Exception e)
             {
@@ -58,11 +58,11 @@ namespace CSMapi.Controller
         }
         // Update specific contract
         [HttpPatch("contract/update/{id}")]
-        public async Task<ActionResult<ContractResponse>> updatecontract([FromBody] ContractRequest request, int id)
+        public async Task<ActionResult<ContractResponse>> UpdateContract([FromBody] ContractRequest request, int id)
         {
             try
             {
-                var response = await _contractService.updatecontract(request, id, User);
+                var response = await _contractService.UpdateContract(request, id, User);
                 return response;
 
             } catch (Exception e)
@@ -72,11 +72,11 @@ namespace CSMapi.Controller
         }
         // Toggle specific contract active status
         [HttpPatch("contract/toggle-active")]
-        public async Task<ActionResult<ContractResponse>> toggleactive(int id)
+        public async Task<ActionResult<ContractResponse>> ToggleActive(int id)
         {
             try
             {
-                var response = await _contractService.toggleactive(id);
+                var response = await _contractService.ToggleActive(id);
                 return response;
             } catch (Exception e)
             {
@@ -85,11 +85,11 @@ namespace CSMapi.Controller
         }
         // Remove specific contract without removing in Database (Soft Delete)
         [HttpPatch("contract/hide/{id}")]
-        public async Task<ActionResult<ContractResponse>> hidecontract(int id)
+        public async Task<ActionResult<ContractResponse>> HideContract(int id)
         {
             try
             {
-                var response = await _contractService.hidecontract(id);
+                var response = await _contractService.HideContract(id);
                 return response;
             } catch (Exception e)
             {
@@ -98,11 +98,11 @@ namespace CSMapi.Controller
         }
         // Delete specific contract in Database
         [HttpDelete("contract/delete/{id}")]
-        public async Task<ActionResult<ContractResponse>> deletecontract(int id)
+        public async Task<ActionResult<ContractResponse>> DeleteContract(int id)
         {
             try
             {
-                var response = await _contractService.deletecontract(id);
+                var response = await _contractService.DeleteContract(id);
                 return response;
             } catch (Exception e)
             {

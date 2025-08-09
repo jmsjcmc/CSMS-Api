@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CSMapi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250707061257_5")]
+    [Migration("20250809013236_5")]
     partial class _5
     {
         /// <inheritdoc />
@@ -128,6 +128,9 @@ namespace CSMapi.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Agreementdate")
                         .IsRequired()
@@ -327,9 +330,6 @@ namespace CSMapi.Migrations
                     b.Property<int>("Productid")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("Productiondate")
-                        .HasColumnType("datetime2");
-
                     b.Property<bool>("Removed")
                         .HasColumnType("bit");
 
@@ -338,9 +338,6 @@ namespace CSMapi.Migrations
 
                     b.Property<string>("Sealno")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Temperature")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("Updatedon")
@@ -381,6 +378,9 @@ namespace CSMapi.Migrations
 
                     b.Property<int>("Positionid")
                         .HasColumnType("int");
+
+                    b.Property<DateTime?>("Productiondate")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
@@ -744,40 +744,25 @@ namespace CSMapi.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("Approvedon")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime>("Createdon")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("Creatorid")
                         .HasColumnType("int");
 
-                    b.Property<int>("Frompalletid")
+                    b.Property<int>("Fromreceivingdetailid")
                         .HasColumnType("int");
-
-                    b.Property<int>("Topalletid")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Creatorid");
-
-                    b.ToTable("Repalletizations");
-                });
-
-            modelBuilder.Entity("CSMapi.Models.RepalletizationDetail", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("Quantitymoved")
                         .HasColumnType("int");
 
-                    b.Property<int>("Receivingdetailid")
+                    b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<int>("Repalletizationid")
+                    b.Property<int>("Toreceivingdetailtid")
                         .HasColumnType("int");
 
                     b.Property<double>("Weightmoved")
@@ -785,12 +770,13 @@ namespace CSMapi.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Receivingdetailid")
-                        .IsUnique();
+                    b.HasIndex("Creatorid");
 
-                    b.HasIndex("Repalletizationid");
+                    b.HasIndex("Fromreceivingdetailid");
 
-                    b.ToTable("Repalletizationdetails");
+                    b.HasIndex("Toreceivingdetailtid");
+
+                    b.ToTable("Repalletizations");
                 });
 
             modelBuilder.Entity("CSMapi.Models.Role", b =>
@@ -840,6 +826,9 @@ namespace CSMapi.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Businessunit")
                         .IsRequired()
@@ -897,13 +886,14 @@ namespace CSMapi.Migrations
                         new
                         {
                             Id = 1,
+                            Active = false,
                             Businessunit = "ABFI Central Office",
                             Businessunitlocation = "Binugao, Toril, Davao City",
-                            Createdon = new DateTime(2025, 7, 7, 14, 12, 56, 908, DateTimeKind.Unspecified).AddTicks(8030),
+                            Createdon = new DateTime(2025, 8, 9, 9, 32, 36, 85, DateTimeKind.Unspecified).AddTicks(8783),
                             Department = "Cisdevo",
                             Firstname = "James Jecemeco",
                             Lastname = "Tabilog",
-                            Password = "$2a$11$HmBDid/vyjCDMzdyoGe1KeLEPAb4Ftw0TY6BVE2HoVJvrCNpCUbq2",
+                            Password = "$2a$11$wJKiq5MCbF53O.cRqrVfd.WRa2Oo9Qwy9nCgXn/NCzD/GP1q2LMQK",
                             Position = "Software Developer",
                             Removed = false,
                             Role = "Admin, User, Approver",
@@ -912,13 +902,14 @@ namespace CSMapi.Migrations
                         new
                         {
                             Id = 2,
+                            Active = false,
                             Businessunit = "SubZero Ice and Cold Storage Inc",
                             Businessunitlocation = "Binugao, Toril, Davao City",
-                            Createdon = new DateTime(2025, 7, 7, 14, 12, 57, 97, DateTimeKind.Unspecified).AddTicks(4036),
+                            Createdon = new DateTime(2025, 8, 9, 9, 32, 36, 256, DateTimeKind.Unspecified).AddTicks(7627),
                             Department = "Executive",
                             Firstname = "Shiela",
                             Lastname = "Hernando",
-                            Password = "$2a$11$MUPzJbYh1rgk3.1LGI7txerVqoPdQ/uInPbtXoykDMGKgJonSzGiC",
+                            Password = "$2a$11$Ok8VJqb.pSogMQyIpkjSjOxkyBWLTX0qApThkt2LxHOIp9hYE8zVe",
                             Position = "Senior Operations Manager",
                             Removed = false,
                             Role = "Approver",
@@ -927,13 +918,14 @@ namespace CSMapi.Migrations
                         new
                         {
                             Id = 3,
+                            Active = false,
                             Businessunit = "ABFI Central Office",
                             Businessunitlocation = "Binugao, Toril, Davao City",
-                            Createdon = new DateTime(2025, 7, 7, 14, 12, 57, 278, DateTimeKind.Unspecified).AddTicks(2193),
+                            Createdon = new DateTime(2025, 8, 9, 9, 32, 36, 427, DateTimeKind.Unspecified).AddTicks(2377),
                             Department = "Cisdevo",
                             Firstname = "Jerecho",
                             Lastname = "Asilum",
-                            Password = "$2a$11$Lu.evyefpX7Im9PoYtG6depKHudZA67Uredyy/ZFBbIWI.hBLGwE.",
+                            Password = "$2a$11$ucehgFOnbLfysvH3OjCBtedrK40ysqQVC96Qmvp55QlJAPydgteVO",
                             Position = "Software Developer",
                             Removed = false,
                             Role = "Admin, User, Approver",
@@ -1140,26 +1132,23 @@ namespace CSMapi.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Creator");
-                });
-
-            modelBuilder.Entity("CSMapi.Models.RepalletizationDetail", b =>
-                {
-                    b.HasOne("CSMapi.Models.ReceivingDetail", "Receivingdetail")
-                        .WithOne("RepalletizationDetail")
-                        .HasForeignKey("CSMapi.Models.RepalletizationDetail", "Receivingdetailid")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CSMapi.Models.Repalletization", "Repalletization")
-                        .WithMany("RepalletizationDetail")
-                        .HasForeignKey("Repalletizationid")
+                    b.HasOne("CSMapi.Models.ReceivingDetail", "Fromreceivingdetail")
+                        .WithMany("Outgoingrepalletization")
+                        .HasForeignKey("Fromreceivingdetailid")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Receivingdetail");
+                    b.HasOne("CSMapi.Models.ReceivingDetail", "Toreceivingdetail")
+                        .WithMany("Incomingrepalletization")
+                        .HasForeignKey("Toreceivingdetailtid")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
-                    b.Navigation("Repalletization");
+                    b.Navigation("Creator");
+
+                    b.Navigation("Fromreceivingdetail");
+
+                    b.Navigation("Toreceivingdetail");
                 });
 
             modelBuilder.Entity("CSMapi.Models.Category", b =>
@@ -1224,13 +1213,9 @@ namespace CSMapi.Migrations
                 {
                     b.Navigation("DispatchingDetail");
 
-                    b.Navigation("RepalletizationDetail")
-                        .IsRequired();
-                });
+                    b.Navigation("Incomingrepalletization");
 
-            modelBuilder.Entity("CSMapi.Models.Repalletization", b =>
-                {
-                    b.Navigation("RepalletizationDetail");
+                    b.Navigation("Outgoingrepalletization");
                 });
 #pragma warning restore 612, 618
         }

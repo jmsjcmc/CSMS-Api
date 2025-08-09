@@ -20,25 +20,23 @@ namespace CSMapi.Services
             _contractQueries = contractQueries;
         }
         // [HttpGet("contracts")]
-        public async Task<Pagination<ContractResponse>> allcontracts(
+        public async Task<Pagination<ContractResponse>> AllContracts(
             int pageNumber = 1,
             int pageSize = 10,
             string? searchTerm = null)
         {
-            var query = _contractQueries.contractsquery(searchTerm);
-            return await PaginationHelper.paginateandmap<Contract, ContractResponse>(query, pageNumber, pageSize, _mapper);
+            var query = _contractQueries.ContractsQuery(searchTerm);
+            return await PaginationHelper.PaginateAndMap<Contract, ContractResponse>(query, pageNumber, pageSize, _mapper);
         }
         // [HttpGet("contract/{id}")]
-        public async Task<ContractResponse> getcontract(int id)
+        public async Task<ContractResponse> GetContract(int id)
         {
-            await _contractValidator.ValidateFetchContract(id);
-
-            var contract = await getcontractdata(id);
+            var contract = await GetContractData(id);
 
             return _mapper.Map<ContractResponse>(contract);
         }
         // [HttpPost("contract")]
-        public async Task<ContractResponse> addcontract(ContractRequest request, ClaimsPrincipal user)
+        public async Task<ContractResponse> AddContract(ContractRequest request, ClaimsPrincipal user)
         {
             _contractValidator.ValidateContractRequest(request);
 
@@ -50,12 +48,12 @@ namespace CSMapi.Services
             await _context.Contracts.AddAsync(contract);
             await _context.SaveChangesAsync();
 
-            return await contractResponse(contract.Id);
+            return await ContractResponse(contract.Id);
         }
         // [HttpPatch("contract/update/{id}")]
-        public async Task<ContractResponse> updatecontract(ContractRequest request, int id, ClaimsPrincipal user)
+        public async Task<ContractResponse> UpdateContract(ContractRequest request, int id, ClaimsPrincipal user)
         {
-            var contract = await getcontractid(id);
+            var contract = await GetContractId(id);
 
             _mapper.Map(request, contract);
             contract.Creatorid = AuthUserHelper.GetUserId(user);
@@ -63,56 +61,54 @@ namespace CSMapi.Services
 
             await _context.SaveChangesAsync();
 
-            return await contractResponse(contract.Id);
+            return await ContractResponse(contract.Id);
         }
         // [HttpPatch("contract/toggle-active")]
-        public async Task<ContractResponse> toggleactive(int id)
+        public async Task<ContractResponse> ToggleActive(int id)
         {
-            var contract = await getcontractid(id);
+            var contract = await GetContractId(id);
 
             contract.Active = !contract.Active;
 
             _context.Contracts.Update(contract);
             await _context.SaveChangesAsync();
 
-            return await contractResponse(contract.Id);
+            return await ContractResponse(contract.Id);
         }
         // [HttpPatch("contract/hide/{id}")]
-        public async Task<ContractResponse> hidecontract(int id)
+        public async Task<ContractResponse> HideContract(int id)
         {
-            var contract = await getcontractid(id);
+            var contract = await GetContractId(id);
 
             contract.Removed = !contract.Removed;
 
             _context.Contracts.Update(contract);
             await _context.SaveChangesAsync();
 
-            return await contractResponse(contract.Id);
+            return await ContractResponse(contract.Id);
         }
         // [HttpDelete("contract/delete/{id}")]
-        public async Task<ContractResponse> deletecontract(int id)
+        public async Task<ContractResponse> DeleteContract(int id)
         {
-            var contract = await getcontractid(id);
+            var contract = await GetContractId(id);
 
             _context.Contracts.Remove(contract);
             await _context.SaveChangesAsync();
 
-            return await contractResponse(contract.Id);
+            return await ContractResponse(contract.Id);
         }
         // Helpers
-        private async Task<Contract> getcontractid(int id)
+        private async Task<Contract?> GetContractId(int id)
         {
-            return await _contractQueries.patchmethodcontractid(id) ?? 
-                throw new ArgumentException($"Contract with id {id} not found.");
+            return await _contractQueries.PatchContractId(id);
         }
-        private async Task<Contract> getcontractdata(int id)
+        private async Task<Contract?> GetContractData(int id)
         {
-            return await _contractQueries.getmethodcontractid(id) ??
-                throw new ArgumentException($"Contract with id {id} not found.");
+            return await _contractQueries.GetContractId(id);
         }
-        private async Task<ContractResponse> contractResponse(int id)
+        private async Task<ContractResponse> ContractResponse(int id)
         {
-            var response = await getcontractdata(id);
+            var response = await GetContractData(id);
             return _mapper.Map<ContractResponse>(response);
         }
     }

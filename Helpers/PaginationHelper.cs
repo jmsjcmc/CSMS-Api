@@ -7,7 +7,7 @@ namespace CSMapi.Helpers
 {
     public static class PaginationHelper
     {
-        public static async Task<List<TDestination>> paginateandproject<TSource, TDestination>(
+        public static async Task<List<TDestination>> PaginatedAndProject<TSource, TDestination>(
            IQueryable<TSource> query,
            int pageNumber,
            int pageSize,
@@ -19,7 +19,7 @@ namespace CSMapi.Helpers
                 .ProjectTo<TDestination>(mapper.ConfigurationProvider)
                 .ToListAsync();
         }
-        public static Pagination<T> paginatedresponse<T>(
+        public static Pagination<T> PaginatedResponse<T>(
             List<T> items,
             int totalCount,
             int pageNumber,
@@ -33,16 +33,16 @@ namespace CSMapi.Helpers
                 Pagesize = pageSize
             };
         }
-        public static async Task<Pagination<TDestination>> paginateandmap<TSource, TDestination>(
+        public static async Task<Pagination<TDestination>> PaginateAndMap<TSource, TDestination>(
             IQueryable<TSource> query,
             int pageNumber,
             int pageSize,
             IMapper mapper)
         {
             var totalCount = await query.CountAsync();
-            var items = await paginateandproject<TSource, TDestination>(query, pageNumber, pageSize, mapper);
+            var items = await PaginatedAndProject<TSource, TDestination>(query, pageNumber, pageSize, mapper);
 
-            return paginatedresponse(items, totalCount, pageNumber, pageSize);
+            return PaginatedResponse(items, totalCount, pageNumber, pageSize);
         }
     }
 

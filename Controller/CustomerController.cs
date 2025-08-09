@@ -20,14 +20,14 @@ namespace CSMapi.Controller
         }
         // Fetch all customers
         [HttpGet("customers")]
-        public async Task<ActionResult<Pagination<CustomerResponse>>> allcustomers(
+        public async Task<ActionResult<Pagination<CustomerResponse>>> AllCustomers(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 10,
             [FromQuery] string? searchTerm = null)
         {
             try
             {
-                var response = await _customerService.allcustomers(pageNumber, pageSize, searchTerm);
+                var response = await _customerService.AllCustomers(pageNumber, pageSize, searchTerm);
                 return response;
             } catch (Exception e)
             {
@@ -36,11 +36,11 @@ namespace CSMapi.Controller
         }
         // Fetch all active customers (name and id only)
         [HttpGet("customers/active-companies")]
-        public async Task<ActionResult<List<CompanyNameOnlyResponse>>> allactivecompanies()
+        public async Task<ActionResult<List<CompanyNameOnlyResponse>>> AllActiveCompanies()
         {
             try
             {
-                var response = await _customerService.allactivecompanynames();
+                var response = await _customerService.AllActiveCompanyNames();
                 return response;
             } catch (Exception e)
             {
@@ -49,11 +49,11 @@ namespace CSMapi.Controller
         }
         // Fetch all active customers
         [HttpGet("customers/active")]
-        public async Task<ActionResult<List<CustomerResponse>>> allactivecustomers()
+        public async Task<ActionResult<List<CustomerResponse>>> AllActiveCustomers()
         {
             try
             {
-                var response = await _customerService.allactivecustomers();
+                var response = await _customerService.AllActiveCustomers();
                 return response;
             } catch (Exception e)
             {
@@ -62,7 +62,7 @@ namespace CSMapi.Controller
         }
         // Customer Template
         [HttpGet("customers/template")]
-        public async Task<ActionResult> customertemplate()
+        public async Task<ActionResult> CustomerTemplate()
         {
             try
             {
@@ -75,7 +75,7 @@ namespace CSMapi.Controller
         }
         // Export customers
         [HttpGet("customers/export")]
-        public async Task<ActionResult> exportcustomers()
+        public async Task<ActionResult> ExportCustomers()
         {
             try
             {
@@ -91,11 +91,11 @@ namespace CSMapi.Controller
         }
         // Fetch specific customer
         [HttpGet("customer/{id}")]
-        public async Task<ActionResult<CustomerResponse>> getcustomer(int id)
+        public async Task<ActionResult<CustomerResponse>> GetCustomer(int id)
         {
             try
             {
-                var response = await _customerService.getcustomer(id);
+                var response = await _customerService.GetCustomer(id);
                 return response;
             } catch (Exception e)
             {
@@ -104,7 +104,7 @@ namespace CSMapi.Controller
         }
         // Import customers
         [HttpPost("customers/import")]
-        public async Task<ActionResult<List<CustomerResponse>>> importcustomers(IFormFile file)
+        public async Task<ActionResult<List<CustomerResponse>>> ImportCustomers(IFormFile file)
         {
             try
             {
@@ -120,11 +120,11 @@ namespace CSMapi.Controller
         }
         // Create customer
         [HttpPost("customer")]
-        public async Task<ActionResult<CustomerResponse>> addcustomer([FromBody] CustomerRequest request)
+        public async Task<ActionResult<CustomerResponse>> AddCustomer([FromBody] CustomerRequest request)
         {
             try
             {
-                var response = await _customerService.addcustomer(request);
+                var response = await _customerService.AddCustomer(request);
                 return response;
             }
             catch (Exception e)
@@ -134,11 +134,11 @@ namespace CSMapi.Controller
         }
         // Update specific customer
         [HttpPatch("customer/update/{id}")]
-        public async Task<ActionResult<CustomerResponse>> updatecustomer([FromBody] CustomerRequest request, int id)
+        public async Task<ActionResult<CustomerResponse>> UpdateCustomer([FromBody] CustomerRequest request, int id)
         {
             try
             {
-                var response = await _customerService.updatecustomer(request, id);
+                var response = await _customerService.UpdateCustomer(request, id);
                 return response;
             } catch (Exception e)
             {
@@ -147,11 +147,11 @@ namespace CSMapi.Controller
         }
         // Toggle specific customer active status to true/false
         [HttpPatch("customer/toggle-active")]
-        public async Task<ActionResult<CustomerResponse>> toggleactive(int id)
+        public async Task<ActionResult<CustomerResponse>> ToggleActive(int id)
         {
             try
             {
-                var response = await _customerService.toggleactive(id);
+                var response = await _customerService.ToggleActive(id);
                 return response;
             } catch (Exception e)
             {
@@ -160,11 +160,11 @@ namespace CSMapi.Controller
         }
         // Remove specific customer without removing in Database (Soft Delete)
         [HttpPatch("customer/hide/{id}")]
-        public async Task<ActionResult<CustomerResponse>> hidecustomer(int id)
+        public async Task<ActionResult<CustomerResponse>> HideCustomer(int id)
         {
             try
             {
-                var response = await _customerService.hidecustomer(id);
+                var response = await _customerService.HideCustomer(id);
                 return response;
             } catch (Exception e)
             {
@@ -173,11 +173,11 @@ namespace CSMapi.Controller
         }
         // Delete specific customer in Database
         [HttpDelete("customer/delete/{id}")]
-        public async Task<ActionResult<CustomerResponse>> deletecustomer(int id)
+        public async Task<ActionResult<CustomerResponse>> DeleteCustomer(int id)
         {
             try
             {
-                var response = await _customerService.deletecustomer(id);
+                var response = await _customerService.DeleteCustomer(id);
                 return response;
             } catch (Exception e)
             {

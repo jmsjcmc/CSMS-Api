@@ -4,8 +4,8 @@ namespace CSMapi.Interfaces
 {
     public interface IProductService
     {
-        Task<List<ProductOnlyResponse>> productslist(int id);
-        Task<Pagination<ProductResponse>> allproducts(
+        Task<List<ProductOnlyResponse>> ProductsList(int id);
+        Task<Pagination<ProductResponse>> AllProducts(
             int pageNumber = 1,
             int pageSize = 10,
             string? searchTerm = null);
@@ -14,39 +14,40 @@ namespace CSMapi.Interfaces
             int pageSize = 10,
             int? companyId = null,
             DateTime? asOf = null);
-        Task<Pagination<ProductWithReceivingAndDispatchingResponse>> customerbasedproducts_fromto(
+        Task<ProductWithReceivingResponse> GetProductWithReceivingDetail(string productCode);
+        Task<Pagination<ProductWithReceivingAndDispatchingResponse>> CustomerBasedProducts_FromTo(
             int pageNumber = 1,
             int pageSize = 10,
             string? company = null,
             DateTime? from = null,
             DateTime? to = null);
-        Task<Pagination<ProductBasedReceiving>> productbasedreceivings(
+        Task<Pagination<ProductBasedReceiving>> ProductBasedReceivings(
            int pageNumber = 1,
            int pageSize = 10,
            int? productId = null,
            DateTime? from = null,
            DateTime? to = null);
-        Task<Pagination<ProductBasedDispatching>> productbaseddispatchings(
+        Task<Pagination<ProductBasedDispatching>> ProductBasedDispatchings(
             int pageNumber = 1,
             int pageSize = 10,
             int? productId = null,
             DateTime? from = null,
             DateTime? to = null);
-        Task<List<BasicProductResponse>> customerbasedproductsbasic(int id);
+        Task<List<BasicProductResponse>> CustomerBasedProductsBasic(int id);
         //Task<Pagination<ProductSummary>> customerbasedproducts_summary(
         //    int pageNumber = 1,
         //    int pageSize = 10,
         //    string? company = null,
         //    DateTime? from = null,
         //    DateTime? to = null);
-        Task<ProductResponse> getproduct(int id);
-        Task<ProductResponse> getproductbycode(string productCode);
-        Task<List<ProductCodeResponse>> getproductcodefordispatch();
-        Task<ProductWithReceivingResponse> getproductwithreceivingdetail(string productCode);
-        Task<ProductResponse> addproduct(ProductRequest request);
-        Task<ProductResponse> updateproduct(ProductRequest request, int id);
-        Task<ProductActiveResponse> toggleactive(int id);
-        Task<ProductResponse> hideproduct(int id);
-        Task<ProductResponse> deleteproduct(int id);
+        Task<ProductResponse> GetProduct(int id);
+        Task<ProductResponse> GetProductByCode(string productCode);
+        Task<List<ProductCodeResponse>> GetProductCodeForDispatch();
+        //Task<ProductWithReceivingResponse> getproductwithreceivingdetail(string productCode);
+        Task<ProductResponse> AddProduct(ProductRequest request);
+        Task<ProductResponse> UpdateProduct(ProductRequest request, int id);
+        Task<ProductActiveResponse> ToggleActive(int id);
+        Task<ProductResponse> HideProduct(int id);
+        Task<ProductResponse> DeleteProduct(int id);
     }
 }

@@ -124,7 +124,17 @@ namespace CSMapi.Validators
 
             return Task.CompletedTask;
         }
-
+        public async Task ValidateSpecificId(int id)
+        {
+            if(!await _context.Users.AnyAsync(u => u.Id == id))
+            {
+                throw new ArgumentException($"User ID {id} not found.");
+            }
+            if(!await _context.Roles.AnyAsync(r => r.Id == id))
+            {
+                throw new ArgumentException($"Role ID {id} not found.");
+            }
+        }
         public static int ValidateUserClaim(ClaimsPrincipal user)
         {
             var useridClaim = user.FindFirst(ClaimTypes.NameIdentifier);

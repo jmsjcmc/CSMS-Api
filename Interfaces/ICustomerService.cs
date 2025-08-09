@@ -5,17 +5,17 @@ namespace CSMapi.Interfaces
 {
     public interface ICustomerService
     {
-        Task<Pagination<CustomerResponse>> allcustomers(
+        Task<Pagination<CustomerResponse>> AllCustomers(
             int pageNumber = 1,
             int pageSize = 10,
             string? searchTerm = null);
-        Task<List<CompanyNameOnlyResponse>> allactivecompanynames();
-        Task<List<CustomerResponse>> allactivecustomers();
-        Task<CustomerResponse> getcustomer(int id);
-        Task<CustomerResponse> addcustomer(CustomerRequest request);
-        Task<CustomerResponse> updatecustomer(CustomerRequest request, int id);
-        Task<CustomerResponse> toggleactive(int id);
-        Task<CustomerResponse> hidecustomer(int id);
-        Task<CustomerResponse> deletecustomer(int id);
+        Task<List<CompanyNameOnlyResponse>> AllActiveCompanyNames();
+        Task<List<CustomerResponse>> AllActiveCustomers();
+        Task<CustomerResponse> GetCustomer(int id);
+        Task<CustomerResponse> AddCustomer(CustomerRequest request);
+        Task<CustomerResponse> UpdateCustomer(CustomerRequest request, int id);
+        Task<CustomerResponse> ToggleActive(int id);
+        Task<CustomerResponse> HideCustomer(int id);
+        Task<CustomerResponse> DeleteCustomer(int id);
     }
 }

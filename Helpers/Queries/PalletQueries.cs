@@ -1,20 +1,45 @@
 ﻿using CSMapi.Models;
+using CSMapi.Validators;
+using CsvHelper;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace CSMapi.Helpers.Queries
 {
     public class PalletQueries
     {
         private readonly AppDbContext _context;
-        public PalletQueries(AppDbContext context)
+        private readonly PalletValidator _validator;
+        public PalletQueries(AppDbContext context, PalletValidator validator)
         {
             _context = context;
+            _validator = validator;
+        }
+        // Query for fetching repalletization draft display
+        public IQueryable<Repalletization> PaginatedRepalletizationDraftQuery(int status)
+        {
+            var query = _context.Repalletizations
+                .AsNoTracking()
+                .Where(r => r.Status == status)
+                .Include(r => r.Fromreceivingdetail.Pallet)
+                .Include(r => r.Fromreceivingdetail.PalletPosition.Coldstorage)
+                .Include(r => r.Fromreceivingdetail.DispatchingDetail)
+                .ThenInclude(d => d.Dispatching)
+                .Include(r => r.Toreceivingdetail.Pallet)
+                .Include(r => r.Toreceivingdetail.PalletPosition.Coldstorage)
+                .Include(r => r.Toreceivingdetail.DispatchingDetail)
+                .ThenInclude(d => d.Dispatching)
+                .OrderByDescending(r => r.Id)
+                .AsQueryable();
+
+            return query;
         }
         // Query for fetching all filtered pallets based on product id
-        public async Task<List<Pallet>> productbasedoccupiedpallets(int id)
+        public async Task<List<Pallet>> ProductBasedOccupiedPallets(int id)
         {
             return await _context.Pallets
                 .AsNoTracking()
+                .Where(p => p.Occupied && p.ReceivingDetail.Any(r => r.Receiving.Product.Id == id))
                 .Include(p => p.DispatchDetail)
                 .Include(p => p.ReceivingDetail)
                 .ThenInclude(r => r.Receiving)
@@ -25,14 +50,19 @@ namespace CSMapi.Helpers.Queries
                 .ThenInclude(r => r.Product)
                 .ThenInclude(r => r.Category)
                 .Include(p => p.Creator)
-                .Where(p => p.Occupied && p.ReceivingDetail.Any(r => r.Receiving.Product.Id == id))
                 .OrderByDescending(p => p.Id)
                 .ToListAsync();
         }
         // Query for fetching all occupied pallets with optional filter for pallet number
-        public IQueryable<Pallet> occupiedpalletsquery(string? searchTerm = null)
+        public IQueryable<Pallet> OccupiedPalletsQuery(string? searchTerm = null)
         {
-            var query = batchpalletgetquery();
+            var query = _context.Pallets
+                .AsNoTracking()
+                .Where(p => p.Occupied)
+                .Include(p => p.ReceivingDetail)
+                .ThenInclude(r => r.Receiving.Product)
+                .OrderByDescending(p => p.Id)
+                .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {
@@ -41,10 +71,11 @@ namespace CSMapi.Helpers.Queries
             return query;
         }
         // Query for fetching all occupied pallets
-        public async Task<List<Pallet>> occupiedpallets()
+        public async Task<List<Pallet>> OccupiedPallets()
         {
             return await _context.Pallets
                 .AsNoTracking()
+                .Where(p => p.Active && p.Occupied && !p.Removed)
                 .Include(p => p.DispatchDetail)
                 .Include(p => p.ReceivingDetail)
                 .ThenInclude(r => r.Receiving)
@@ -56,14 +87,15 @@ namespace CSMapi.Helpers.Queries
                 .ThenInclude(r => r.Category)
                 .Include(p => p.Creator)
                 .OrderByDescending(p => p.Id)
-                .Where(p => p.Active && p.Occupied && !p.Removed)
                 .ToListAsync();
         }
+
         // Query for fetching active pallets with optional filter for pallet type
-        public async Task<List<Pallet>> pallettypepalletslist(string searchTerm)
+        public async Task<List<Pallet>> PalletTypePalletsList(string searchTerm)
         {
             return await _context.Pallets
                   .AsNoTracking()
+                  .Where(p => p.Active && !p.Occupied && !p.Removed && p.Pallettype == searchTerm)
                   .Include(p => p.DispatchDetail)
                   .Include(p => p.ReceivingDetail)
                   .ThenInclude(r => r.Receiving)
@@ -75,14 +107,14 @@ namespace CSMapi.Helpers.Queries
                   .ThenInclude(r => r.Category)
                   .Include(p => p.Creator)
                   .OrderByDescending(p => p.Id)
-                  .Where(p => p.Active && !p.Occupied && !p.Removed && p.Pallettype == searchTerm)
                   .ToListAsync();
         }
         // Query for fetching all active pallets
-        public async Task<List<Pallet>> activepallets()
+        public async Task<List<Pallet>> ActivePallets()
         {
             return await _context.Pallets
                    .AsNoTracking()
+                   .Where(p => p.Active && !p.Occupied && !p.Removed)
                   .Include(p => p.DispatchDetail)
                   .Include(p => p.ReceivingDetail)
                   .ThenInclude(r => r.Receiving)
@@ -93,14 +125,29 @@ namespace CSMapi.Helpers.Queries
                   .ThenInclude(r => r.Product)
                   .ThenInclude(r => r.Category)
                   .Include(p => p.Creator)
-                   .OrderByDescending(p => p.Createdon)
-                   .Where(p => p.Active && !p.Occupied && !p.Removed)
-                   .ToListAsync();
+                  .OrderByDescending(p => p.Createdon)
+                  .ToListAsync();
         }
         // Query for fetching all pallets with optional filter for pallet number
-        public IQueryable<Pallet> palletsquery(string? searchTerm = null)
+        public IQueryable<Pallet> PalletsQuery(string? searchTerm = null)
         {
-            var query = batchpalletgetquery();
+            var query = _context.Pallets
+                .AsNoTracking()
+                .Where(p => !p.Removed)
+                .Include(p => p.Creator)
+                .Include(p => p.ReceivingDetail)
+                .ThenInclude(r => r.Receiving)
+                .Include(p => p.ReceivingDetail)
+                .ThenInclude(p => p.Pallet)
+                .Include(p => p.ReceivingDetail)
+                .ThenInclude(r => r.PalletPosition)
+                .ThenInclude(p => p.Coldstorage)
+                .Include(p => p.ReceivingDetail)
+                .ThenInclude(r => r.DispatchingDetail)
+                .Include(p => p.ReceivingDetail)
+                .Include(p => p.DispatchDetail)
+                .OrderByDescending(p => p.Id)
+                .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {
@@ -110,7 +157,7 @@ namespace CSMapi.Helpers.Queries
             return query;
         }
         // Query for fetching all active cold storages
-        public async Task<List<ColdStorage>> activecoldstorages()
+        public async Task<List<ColdStorage>> ActiveColdStorages()
         {
             return await _context.Coldstorages
                     .AsNoTracking()
@@ -118,7 +165,7 @@ namespace CSMapi.Helpers.Queries
                     .ToListAsync();
         }
         // Query for fetching specific pallet for GET method
-        public async Task<Pallet?> getmethodpalletid(int id)
+        public async Task<Pallet?> GetPalletId(int id)
         {
             return await _context.Pallets
                  .AsNoTracking()
@@ -136,59 +183,50 @@ namespace CSMapi.Helpers.Queries
                  .FirstOrDefaultAsync(p => p.Id == id);
         }
         // Query for fetching specific cold storage for GET method
-        public async Task<ColdStorage> getmethodcoldstorageid(int id)
+        public async Task<ColdStorage?> GetColdStorageId(int id)
         {
-            ValidateID(id);
+            // Validate id if it exist
+            await _validator.ValidateSpecificId(id);
 
-            var cs = await _context.Coldstorages
+            return await _context.Coldstorages
                     .AsNoTracking()
                     .FirstOrDefaultAsync(c => c.Id == id);
-
-            return cs ??
-                throw new ArgumentException("Cold storage not found.");
-            
         }
         // Query for fetching specific pallet position for GET method
-        public async Task<PalletPosition> getmethodpositionid(int id)
+        public async Task<PalletPosition?> GetPositionId(int id)
         {
-            ValidateID(id);
+            // Validate id if it exist
+            await _validator.ValidateSpecificId(id);
 
-            var position = await _context.Palletpositions
+            return await _context.Palletpositions
                 .AsNoTracking()
                 .Include(p => p.Coldstorage)
                 .FirstOrDefaultAsync(p => p.Id == id);
-
-            return position ??
-                throw new ArgumentException("Pallet position not found.");
         }
         // Query for fetching specific repalletization for GET method
-        public async Task<Repalletization?> getmethodrepalletizationid(int id)
+        public async Task<Repalletization?> GetRepalletizationId(int id)
         {
-            ValidateID(id);
+            // Validate id if it exist
+            await _validator.ValidateSpecificId(id);
 
-            var repallet = await _context.Repalletizations
+            return await _context.Repalletizations
                 .AsNoTracking()
-                .Include(r => r.RepalletizationDetail)
                 .FirstOrDefaultAsync(r => r.Id == id);
-
-            return repallet ??
-                throw new ArgumentException("Repalletization not found.");
         }
         // Query for fetching pallet positions based on cs id
-        public async Task<List<PalletPosition>> getpositionsbasedoncs(int id)
+        public async Task<List<PalletPosition>> GetPositionByCs(int id)
         {
-            ValidateID(id);
+            // Validate id if it exist
+            await _validator.ValidateSpecificId(id);
 
             return await _context.Palletpositions
                 .AsNoTracking()
                 .Include(c => c.Coldstorage)
                 .Where(c => c.Csid == id && !c.Hidden && !c.Removed)
                 .ToListAsync();
-
-            
         }
         // Query for fetching all pallet positions
-        public async Task<List<PalletPosition>> palletpositionsquery()
+        public async Task<List<PalletPosition>> PalletPositionsQuery()
         {
             return await _context.Palletpositions
                     .AsNoTracking()
@@ -197,8 +235,11 @@ namespace CSMapi.Helpers.Queries
                     .ToListAsync();
         }
         // Query for fetching specific pallet for PATCH/PUT/DELETE methods
-        public async Task<Pallet?> patchmethodpalletid(int id)
+        public async Task<Pallet?> PatchPalletId(int id)
         {
+            // Validate id if it exist
+            await _validator.ValidateSpecificId(id);
+
             return await _context.Pallets
                 .Include(p => p.Creator)
                 .Include(p => p.ReceivingDetail)
@@ -206,48 +247,40 @@ namespace CSMapi.Helpers.Queries
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
         // Query for fetching specific pallet position for PATCH/PUT/DELETE methods
-        public async Task<PalletPosition?> patchmethodpositionid(int id)
+        public async Task<PalletPosition?> PatchPositionId(int id)
         {
-            return await patchpositionquery()
+            // Validate id if it exist
+            await _validator.ValidateSpecificId(id);
+
+            return await _context.Palletpositions
+                .Include(p => p.Coldstorage)
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
         // Query for fetching specific cold storage for PATCH/PUT/DELETE methods
-        public async Task<ColdStorage?> patchmethodcoldstorageid(int id)
+        public async Task<ColdStorage?> PatchCsId(int id)
         {
+            // Validate id if it exist
+            await _validator.ValidateSpecificId(id);
+
             return await _context.Coldstorages.
                 FirstOrDefaultAsync(c => c.Id == id);
         }
-        // Helpers
-        private void ValidateID(int id)
+        // Query for fetching specific repalletizaiton draft for PATCH/PUT/DELETE methods 
+        public async Task<Repalletization?> PatchRepalletizationsDraftId(int id)
         {
-            if (id <= 0)
-                throw new ArgumentException("Invalid ID provided.");
-        }
-        private IQueryable<Pallet> batchpalletgetquery()
-        {
-            return _context.Pallets
-                .AsNoTracking()
-                .Include(p => p.Creator)
-                .Include(p => p.ReceivingDetail)
-                .ThenInclude(r => r.Receiving)
-                .Include(p => p.ReceivingDetail)
-                .ThenInclude(p => p.Pallet)
-                .Include(p => p.ReceivingDetail)
-                .ThenInclude(r => r.PalletPosition)
-                .ThenInclude(p => p.Coldstorage)
-                .Include(p => p.ReceivingDetail)
-                .ThenInclude(r => r.DispatchingDetail)
-                .Include(p => p.ReceivingDetail)
-                .ThenInclude(r => r.RepalletizationDetail)
-                .Include(p => p.DispatchDetail)
-                .Where(p => !p.Removed)
-                .OrderByDescending(p => p.Id);
-        }
-        private IQueryable<PalletPosition> patchpositionquery()
-        {
-            return _context.Palletpositions
-                .Include(p => p.Coldstorage)
-                .Where(p => !p.Removed);
+            // Validate id if it exist
+            await _validator.ValidateSpecificId(id);
+
+            return await _context.Repalletizations
+                .Include(r => r.Fromreceivingdetail.Pallet)
+                .Include(r => r.Fromreceivingdetail.PalletPosition.Coldstorage)
+                .Include(r => r.Fromreceivingdetail.DispatchingDetail)
+                .ThenInclude(d => d.Dispatching)
+                .Include(r => r.Toreceivingdetail.Pallet)
+                .Include(r => r.Toreceivingdetail.PalletPosition.Coldstorage)
+                .Include(r => r.Toreceivingdetail.DispatchingDetail)
+                .ThenInclude(d => d.Dispatching)
+                .FirstOrDefaultAsync(r => r.Id == id);
         }
     }
 }

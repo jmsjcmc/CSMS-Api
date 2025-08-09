@@ -103,6 +103,8 @@ namespace CSMapi.Models
         public double Totalweight { get; set; }
         public PalletResponse Pallet { get; set; }
         public PalletPositionResponse Position { get; set; }
+        public int Remainingquantity { get; set; }
+        public double Remainingweight { get; set; }
     }
     public class ProductBasedReceivingDetailResponse
     {
@@ -182,14 +184,17 @@ namespace CSMapi.Models
     public class ProductBasesPallet
     {
         public int Id { get; set; }
+        public int Palletid { get; set; }
         public string Taggingnumber { get; set; }
         public int? Palletno { get; set; }
         public int Quantityinapallet { get; set; }
+        public int Remainingquantity { get; set; }
+        public double Remainingweight { get; set; }
         public string Csnumber { get; set; } // Pallet Position -> Cold Storage
         public string Wing { get; set; } // Pallet Position
         public string Floor { get; set; } // Pallet Position
         public string? Column { get; set; } // Pallet Position
         public string? Side { get; set; } // Pallet Position
-        public double Totalweight { get; set; } 
+        public double Totalweight { get; set; }
     }
 }

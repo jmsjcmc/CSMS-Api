@@ -21,91 +21,98 @@ namespace CSMapi.Controller
         }
         // Count all dispatchings
         [HttpGet("dispatchings/count-all")]
-        public async Task<ActionResult<DispatchingsCount>> countall()
+        public async Task<ActionResult<DispatchingsCount>> CountAll()
         {
             try
             {
                 var count = new DispatchingsCount
                 {
-                    Total = await _dispatchingService.totalcount(),
-                    Pending = await _dispatchingService.pendingcount(),
-                    Dispatched = await _dispatchingService.dispatchedcount(),
-                    Declined = await _dispatchingService.declinedcount()
+                    Total = await _dispatchingService.TotalCount(),
+                    Pending = await _dispatchingService.PendingCount(),
+                    Dispatched = await _dispatchingService.DispatchedCount(),
+                    Declined = await _dispatchingService.DeclinedCount()
                 };
                 return count;
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 return HandleException(e);
             }
         }
         // Fetch all pending dispatching request
         [HttpGet("dispatchings/pending")]
-        public async Task<ActionResult<Pagination<DispatchingResponse>>> allpendings(
+        public async Task<ActionResult<Pagination<DispatchingResponse>>> AllPendings(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 10,
             [FromQuery] int? id = null)
         {
             try
             {
-                var response = await _dispatchingService.allpendings(pageNumber, pageSize, id);
+                var response = await _dispatchingService.AllPendings(pageNumber, pageSize, id);
                 return response;
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 return HandleException(e);
             }
         }
         // Fetch all dispatching request
         [HttpGet("dispatchings")]
-        public async Task<ActionResult<Pagination<DispatchingResponse>>> alldispatched(
+        public async Task<ActionResult<Pagination<DispatchingResponse>>> AllDispatched(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 10,
-            [FromQuery] int? id = null)
+            [FromQuery] int? id = null,
+            [FromQuery] string? documentNumber = null)
         {
             try
             {
-                var response = await _dispatchingService.alldispatched(pageNumber, pageSize, id);
+                var response = await _dispatchingService.AllDispatched(pageNumber, pageSize, id, documentNumber);
                 return response;
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 return HandleException(e);
             }
         }
         // Generate Document Number for dispatching
         [HttpGet("dispatching/generate-documentNo")]
-        public async Task<ActionResult<DocumentNumberResponse>> generatedocumentnumber()
+        public async Task<ActionResult<DocumentNumberResponse>> GenerateDocumentNumber()
         {
             try
             {
-                var response = await _dispatchingService.generatedocumentnumber();
+                var response = await _dispatchingService.GenerateDocumentNumber();
                 return response;
-            }catch (Exception e)
+            }
+            catch (Exception e)
             {
                 return HandleException(e);
             }
         }
         // Fetch specific dispatching request
         [HttpGet("dispatching/{id}")]
-        public async Task<ActionResult<DispatchingResponse>> getdispatch (int id)
+        public async Task<ActionResult<DispatchingResponse>> GetDispatch(int id)
         {
             try
             {
-                var response = await _dispatchingService.getdispatch(id);
+                var response = await _dispatchingService.GetDispatch(id);
                 return response;
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 return HandleException(e);
             }
         }
         // Export dispatchings
         [HttpGet("dispatchings/export")]
-        public async Task<ActionResult> exportdispatchings()
+        public async Task<ActionResult> ExportDispatchings()
         {
             try
             {
-                var dispatchings = await _dispatchingQueries.dispatchingslist();
+                var dispatchings = await _dispatchingQueries.DispatchingsList();
                 var file = await _dispatchingExcel.exportdispatching(dispatchings);
                 return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Dispatchings.xlsx");
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 return HandleException(e);
             }
@@ -113,13 +120,14 @@ namespace CSMapi.Controller
         // Dispatch multiple request 
         // Support partial and full dispatching 
         [HttpPost("dispatching/multiple")]
-        public async Task<ActionResult<DispatchingResponse>> addmultipledispatch([FromBody] DispatchingRequest request)
+        public async Task<ActionResult<DispatchingResponse>> AddMultipleDispatch([FromBody] DispatchingRequest request)
         {
             try
             {
-                var response = await _dispatchingService.addmultipledispatch(request, User);
+                var response = await _dispatchingService.AddMultipleDispatch(request, User);
                 return response;
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 return HandleException(e);
             }
@@ -127,79 +135,85 @@ namespace CSMapi.Controller
         // Dispatch single request
         // Support partial and full dispatching
         [HttpPost("dispatching")]
-        public async Task<ActionResult<DispatchingResponse>> addsingledispatch([FromBody] DispatchingRequest request)
+        public async Task<ActionResult<DispatchingResponse>> AddSingleDispatch([FromBody] DispatchingRequest request)
         {
             try
             {
-                var response = await _dispatchingService.addsingledispatch(request, User);
+                var response = await _dispatchingService.AddSingleDispatch(request, User);
                 return response;
 
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 return HandleException(e);
             }
         }
         // Update specific dispatching request
         [HttpPatch("dispatching/update/{id}")]
-        public async Task<ActionResult<DispatchingResponse>> updatedispatch([FromBody] DispatchingRequest request, int id)
+        public async Task<ActionResult<DispatchingResponse>> UpdateDispatch([FromBody] DispatchingRequest request, int id)
         {
             try
             {
-                var response = await _dispatchingService.updatedispatch(User, request, id);
+                var response = await _dispatchingService.UpdateDispatch(User, request, id);
                 return response;
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 return HandleException(e);
             }
         }
         // Add time start and end for specific dispatching request
         [HttpPatch("dispatching/time-start-end")]
-        public async Task<ActionResult<DispatchingTimeStartEndResponse>> addtimestartend (string timeStart, string timeEnd, int id)
+        public async Task<ActionResult<DispatchingTimeStartEndResponse>> AddTimeStartEnd(string timeStart, string timeEnd, int id)
         {
             try
             {
-                var response = await _dispatchingService.addtimestartend(timeStart, timeEnd, id, User);
+                var response = await _dispatchingService.AddTimeStartEnd(timeStart, timeEnd, id, User);
                 return response;
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 return HandleException(e);
             }
         }
         // Approve or decline specific dispatching request
         [HttpPatch("dispatching/toggle-request")]
-        public async Task<ActionResult<DispatchingResponse>> request(string status, int documentId, string? note = null)
+        public async Task<ActionResult<DispatchingResponse>> ToggleRequest(string status, int documentId, string? note = null)
         {
             try
             {
-                var response = await _dispatchingService.request(User, status, documentId, note);
+                var response = await _dispatchingService.Request(User, status, documentId, note);
                 return response;
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 return HandleException(e);
             }
         }
         // Remove specific dispatching request without removing in Database (Soft Delete)
         [HttpPatch("dispatching/hide/{id}")]
-        public async Task<ActionResult<DispatchingResponse>> hidedispatch(int id)
+        public async Task<ActionResult<DispatchingResponse>> HideDispatch(int id)
         {
             try
             {
-                var response = await _dispatchingService.hidedispatch(id);
+                var response = await _dispatchingService.HideDispatch(id);
                 return response;
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 return HandleException(e);
             }
         }
         // Delete specific dispatching request in Database
         [HttpDelete("dispatching/delete/{id}")]
-        public async Task<ActionResult<DispatchingResponse>> deletedispatch(int id)
+        public async Task<ActionResult<DispatchingResponse>> DeleteDispatch(int id)
         {
             try
             {
-                var response = await _dispatchingService.deletedispatch(id);
+                var response = await _dispatchingService.DeleteDispatch(id);
                 return response;
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 return HandleException(e);
             }

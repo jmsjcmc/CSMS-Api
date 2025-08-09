@@ -6,26 +6,26 @@ namespace CSMapi.Interfaces
 {
     public interface IUserService
     {
-        Task<Pagination<UserResponse>> allusers(
+        Task<Pagination<UserResponse>> AllUsers(
             int pageNumber = 1,
             int pageSize = 10,
             string? searchTerm = null);
-        Task<List<RoleResponse>> allroles();
-        Task<List<UserResponse>> alllessors();
-        Task<UserResponse> getuser(int id);
-        Task<RoleResponse> getrole(int id);
-        Task<UserResponse> getuserdetail(ClaimsPrincipal detail);
-        Task<int> totalcount();
-        Task<object> login(Login request);
-        Task<UserResponse> createuser(UserRequest request);
-        Task<RoleResponse> addrole(RoleRequest request);
-        Task<RoleResponse> updaterole(RoleRequest request, int id);
-        Task<UserResponse> updateuser(UserRequest request, int id);
-        Task <UserEsignResponse> addesign(IFormFile file, int id, ClaimsPrincipal requestor);
-        Task<UserResponse> toggleactive(int id);
-        Task<UserResponse> hideuser(int id);
-        Task<RoleResponse> hiderole(int id);
-        Task<UserResponse> deleteuser(int id);
-        Task<RoleResponse> deleterole(int id);
+        Task<List<RoleResponse>> AllRoles();
+        Task<List<UserResponse>> AllLessors();
+        Task<UserResponse> GetUser(int id);
+        Task<RoleResponse> GetRole(int id);
+        Task<UserResponse> GetUserDetail(ClaimsPrincipal detail);
+        Task<int> TotalCount();
+        Task<object> Login(Login request);
+        Task<UserResponse> CreateUser(UserRequest request);
+        Task<RoleResponse> AddRole(RoleRequest request);
+        Task<RoleResponse> UpdateRole(RoleRequest request, int id);
+        Task<UserResponse> UpdateUser(UserRequest request, int id);
+        Task <UserEsignResponse> AddEsign(IFormFile file, int id, ClaimsPrincipal requestor);
+        Task<UserResponse> ToggleActive(int id);
+        Task<UserResponse> HideUser(int id);
+        Task<RoleResponse> HideRole(int id);
+        Task<UserResponse> DeleteUser(int id);
+        Task<RoleResponse> DeleteRole(int id);
     }
 }

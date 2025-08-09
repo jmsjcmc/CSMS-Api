@@ -32,6 +32,7 @@ namespace CSMapi.Extensions
             service.AddScoped<ReceivingValidator>();
             service.AddScoped<UserValidator>();
             service.AddScoped<PalletValidator>();
+            service.AddScoped<CategoryValidators>();
             service.AddScoped<ProductValidator>();
             // Services
             service.AddScoped<ReceivingService>();

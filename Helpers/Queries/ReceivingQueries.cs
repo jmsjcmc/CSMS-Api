@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using CSMapi.Models;
+using CSMapi.Validators;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 
@@ -8,14 +9,17 @@ namespace CSMapi.Helpers.Queries
     public class ReceivingQueries
     {
         private readonly AppDbContext _context;
-        public ReceivingQueries(AppDbContext context)
+        private readonly ReceivingValidator _validator;
+        public ReceivingQueries(AppDbContext context, ReceivingValidator validator)
         {
             _context = context;
+            _validator = validator;
         }
         // Query for fetching all receivings in list
-        public async Task<List<Receiving>> receivingslist()
+        public async Task<List<Receiving>> ReceivingsList()
         {
             return await _context.Receivings
+                .Where(r => !r.Removed)
                 .Include(r => r.Document)
                 .Include(r => r.Product)
                 .ThenInclude(p => p.Category)
@@ -27,12 +31,11 @@ namespace CSMapi.Helpers.Queries
                 .ThenInclude(r => r.Pallet)
                 .Include(r => r.Receivingdetails)
                 .ThenInclude(r => r.PalletPosition)
-                .Where(r => !r.Removed)
                 .OrderByDescending(r => r.Id)
                 .ToListAsync();
         }
         // Query for fetching receivings for receiving management display
-        public IQueryable<Receiving> receivingdisplayquery(
+        public IQueryable<Receiving> ReceivingDisplayQuery(
             string? searchTerm = null,
             int? categoryId = null,
             string? status = null)
@@ -111,7 +114,7 @@ namespace CSMapi.Helpers.Queries
         }
 
         // Query for fetching all receivings with optional filter for document number, category, and status
-        public IQueryable<Receiving> receivingsquery(
+        public IQueryable<Receiving> ReceivingsQuery(
             string? searchTerm = null,
             int? categoryId = null,
             string? status = null)
@@ -130,7 +133,7 @@ namespace CSMapi.Helpers.Queries
 
                 if (!string.IsNullOrWhiteSpace(searchTerm))
                 {
-                    query = query.Where(r => r.Document.Documentno.Contains(searchTerm) || 
+                    query = query.Where(r => r.Document.Documentno.Contains(searchTerm) ||
                     r.Product.Customer.Companyname.Contains(searchTerm) ||
                     r.Product.Productname.Contains(searchTerm));
                 }
@@ -167,7 +170,7 @@ namespace CSMapi.Helpers.Queries
                 if (!string.IsNullOrWhiteSpace(searchTerm))
                 {
                     query = query.Where(r => r.Document.Documentno.Contains(searchTerm) ||
-                    r.Product.Customer.Companyname.Contains(searchTerm) || 
+                    r.Product.Customer.Companyname.Contains(searchTerm) ||
                     r.Product.Productname.Contains(searchTerm));
                 }
 
@@ -191,7 +194,7 @@ namespace CSMapi.Helpers.Queries
             }
         }
         // Query for fetching all pending receivings with optional filter for category
-        public IQueryable<Receiving> pendingreceivingsquery(int? id = null)
+        public IQueryable<Receiving> PendingReceivingsQuery(int? id = null)
         {
             if (id.HasValue)
             {
@@ -223,8 +226,11 @@ namespace CSMapi.Helpers.Queries
             }
         }
         // Query for fetching specific receiving for GET method
-        public async Task<Receiving?> getmethodreceivingid(int id)
+        public async Task<Receiving?> GetReceivingId(int id)
         {
+            // Validate id if it exist
+            await _validator.ValidateSpecificReceiving(id);
+
             return await _context.Receivings
                     .AsNoTracking()
                     .Include(r => r.Document)
@@ -240,8 +246,11 @@ namespace CSMapi.Helpers.Queries
                     .FirstOrDefaultAsync(r => r.Id == id);
         }
         // Query for fetching specific receiving request for PATCH/PUT/DELETE methods
-        public async Task<Receiving?> patchmethodreceivingid(int id)
+        public async Task<Receiving?> PatchReceivingId(int id)
         {
+            // Validate id if it exist
+            await _validator.ValidateSpecificReceiving(id);
+
             return await _context.Receivings
                    .Include(r => r.Document)
                    .Include(r => r.Product.Category)
@@ -256,7 +265,7 @@ namespace CSMapi.Helpers.Queries
                    .FirstOrDefaultAsync(r => r.Id == id);
         }
         // Query for fetching all receiving details 
-        public async Task<List<ReceivingDetail>> receivingdetaillist(int? productId)
+        public async Task<List<ReceivingDetail>> ReceivingDetailList(int? productId)
         {
             if (productId.HasValue)
             {
@@ -265,6 +274,10 @@ namespace CSMapi.Helpers.Queries
                     .Where(r => r.Receiving.Productid == productId)
                     .Include(r => r.PalletPosition.Coldstorage)
                     .Include(r => r.Pallet)
+                    .Include(r => r.DispatchingDetail)
+                    .ThenInclude(d => d.Dispatching)
+                    .Include(r => r.Outgoingrepalletization)
+                    .Include(r => r.Incomingrepalletization)
                     .OrderByDescending(r => r.Id)
                     .ToListAsync();
             }
@@ -273,6 +286,11 @@ namespace CSMapi.Helpers.Queries
                 return await _context.Receivingdetails
                    .AsNoTracking()
                    .Include(r => r.PalletPosition.Coldstorage)
+                   .Include(r => r.Pallet)
+                   .Include(r => r.DispatchingDetail)
+                   .ThenInclude(d => d.Dispatching)
+                   .Include(r => r.Outgoingrepalletization)
+                    .Include(r => r.Incomingrepalletization)
                    .OrderByDescending(r => r.Id)
                    .ToListAsync();
             }

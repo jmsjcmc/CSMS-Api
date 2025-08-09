@@ -4,11 +4,11 @@ namespace CSMapi.Interfaces
 {
     public interface ICategoryService
     {
-        Task<List<CategoryResponse>> categorieslist(string? searchTerm = null);
-        Task<CategoryResponse> getcategory(int id);
-        Task<CategoryResponse> createcategory(CategoryRequest request);
-        Task<CategoryResponse> updatecategory(CategoryRequest request, int id);
-        Task<CategoryResponse> removecategory(int id);
-        Task<CategoryResponse> deletecategory(int id);
+        Task<List<CategoryResponse>> CategoriesList(string? searchTerm = null);
+        Task<CategoryResponse> GetCategory(int id);
+        Task<CategoryResponse> CreateCategory(CategoryRequest request);
+        Task<CategoryResponse> UpdateCategory(CategoryRequest request, int id);
+        Task<CategoryResponse> RemoveCategory(int id);
+        Task<CategoryResponse> DeleteCategory(int id);
     }
 }

@@ -109,6 +109,7 @@ namespace CSMapi.Migrations
                     Esignature = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Createdon = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Updatedon = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Active = table.Column<bool>(type: "bit", nullable: false),
                     Removed = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -194,8 +195,8 @@ namespace CSMapi.Migrations
                     Lesseerepresentative = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Lesseerepresentativeposition = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Lesseecompanylocation = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Startlease = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Endlease = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Startlease = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Endlease = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Notarylocation = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Lessoridtype = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Lessoriddetail = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -205,6 +206,7 @@ namespace CSMapi.Migrations
                     Createdon = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Creatorid = table.Column<int>(type: "int", nullable: false),
                     Updatedon = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Active = table.Column<bool>(type: "bit", nullable: false),
                     Removed = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -224,8 +226,9 @@ namespace CSMapi.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    Taggingnumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Pallettype = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Palletno = table.Column<int>(type: "int", nullable: false),
+                    Palletno = table.Column<int>(type: "int", nullable: true),
                     Creatorid = table.Column<int>(type: "int", nullable: false),
                     Createdon = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Updatedon = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -238,28 +241,6 @@ namespace CSMapi.Migrations
                     table.PrimaryKey("PK_Pallets", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Pallets_Users_Creatorid",
-                        column: x => x.Creatorid,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Repalletizations",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Frompalletid = table.Column<int>(type: "int", nullable: false),
-                    Topalletid = table.Column<int>(type: "int", nullable: false),
-                    Createdon = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Creatorid = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Repalletizations", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Repalletizations_Users_Creatorid",
                         column: x => x.Creatorid,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -281,8 +262,6 @@ namespace CSMapi.Migrations
                     Dispatchplateno = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Sealno = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Overallweight = table.Column<double>(type: "float", nullable: false),
-                    Temperature = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Productiondate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Note = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Requestorid = table.Column<int>(type: "int", nullable: false),
                     Approverid = table.Column<int>(type: "int", nullable: true),
@@ -411,10 +390,13 @@ namespace CSMapi.Migrations
                     Positionid = table.Column<int>(type: "int", nullable: false),
                     Productiondate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Quantityinapallet = table.Column<int>(type: "int", nullable: false),
+                    Duquantity = table.Column<int>(type: "int", nullable: false),
+                    Duweight = table.Column<double>(type: "float", nullable: false),
                     Totalweight = table.Column<double>(type: "float", nullable: false),
                     Received = table.Column<bool>(type: "bit", nullable: false),
                     Partialdispatched = table.Column<bool>(type: "bit", nullable: false),
-                    Fulldispatched = table.Column<bool>(type: "bit", nullable: false)
+                    Fulldispatched = table.Column<bool>(type: "bit", nullable: false),
+                    MyProperty = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -449,6 +431,7 @@ namespace CSMapi.Migrations
                     Dispatchingid = table.Column<int>(type: "int", nullable: false),
                     Palletid = table.Column<int>(type: "int", nullable: false),
                     Positionid = table.Column<int>(type: "int", nullable: false),
+                    Productiondate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Quantity = table.Column<int>(type: "int", nullable: false),
                     Totalweight = table.Column<double>(type: "float", nullable: false),
                     Partialdispatched = table.Column<bool>(type: "bit", nullable: false),
@@ -481,31 +464,39 @@ namespace CSMapi.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Repalletizationdetails",
+                name: "Repalletizations",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Repalletizationid = table.Column<int>(type: "int", nullable: false),
-                    Receivingdetailid = table.Column<int>(type: "int", nullable: false),
+                    Frompalletid = table.Column<int>(type: "int", nullable: false),
+                    Topalletid = table.Column<int>(type: "int", nullable: false),
                     Quantitymoved = table.Column<int>(type: "int", nullable: false),
-                    Weightmoved = table.Column<double>(type: "float", nullable: false)
+                    Createdon = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Creatorid = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Repalletizationdetails", x => x.Id);
+                    table.PrimaryKey("PK_Repalletizations", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Repalletizationdetails_Receivingdetails_Receivingdetailid",
-                        column: x => x.Receivingdetailid,
+                        name: "FK_Repalletizations_Receivingdetails_Frompalletid",
+                        column: x => x.Frompalletid,
                         principalTable: "Receivingdetails",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Repalletizationdetails_Repalletizations_Repalletizationid",
-                        column: x => x.Repalletizationid,
-                        principalTable: "Repalletizations",
+                        name: "FK_Repalletizations_Receivingdetails_Topalletid",
+                        column: x => x.Topalletid,
+                        principalTable: "Receivingdetails",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Repalletizations_Users_Creatorid",
+                        column: x => x.Creatorid,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.InsertData(
@@ -536,12 +527,12 @@ namespace CSMapi.Migrations
 
             migrationBuilder.InsertData(
                 table: "Users",
-                columns: new[] { "Id", "Businessunit", "Businessunitlocation", "Createdon", "Department", "Esignature", "Firstname", "Lastname", "Password", "Position", "Removed", "Role", "Updatedon", "Username" },
+                columns: new[] { "Id", "Active", "Businessunit", "Businessunitlocation", "Createdon", "Department", "Esignature", "Firstname", "Lastname", "Password", "Position", "Removed", "Role", "Updatedon", "Username" },
                 values: new object[,]
                 {
-                    { 1, "ABFI Central Office", "Binugao, Toril, Davao City", new DateTime(2025, 7, 1, 9, 48, 15, 544, DateTimeKind.Unspecified).AddTicks(2693), "Cisdevo", null, "James Jecemeco", "Tabilog", "$2a$11$rTgN2hzO.eTYKilpvZyxtuHKLpRhxhoUkxpXYUc9POoPI1xhPWIlG", "Software Developer", false, "Admin, User, Approver", null, "211072" },
-                    { 2, "SubZero Ice and Cold Storage Inc", "Binugao, Toril, Davao City", new DateTime(2025, 7, 1, 9, 48, 15, 714, DateTimeKind.Unspecified).AddTicks(1847), "Executive", null, "Shiela", "Hernando", "$2a$11$9rYgbQ94Ahpk92rTKFk3meZTpA5amF9CspSCotconJv5lKFUL5M8W", "Senior Operations Manager", false, "Approver", null, "211073" },
-                    { 3, "ABFI Central Office", "Binugao, Toril, Davao City", new DateTime(2025, 7, 1, 9, 48, 15, 882, DateTimeKind.Unspecified).AddTicks(7563), "Cisdevo", null, "Jerecho", "Asilum", "$2a$11$T.kiYx.zU/fY7HXE0aRkP.dSjNNhsk1T2mHtYgHN8fmIiL4fCkaTy", "Software Developer", false, "Admin, User, Approver", null, "211028" }
+                    { 1, false, "ABFI Central Office", "Binugao, Toril, Davao City", new DateTime(2025, 8, 6, 16, 39, 31, 705, DateTimeKind.Unspecified).AddTicks(4517), "Cisdevo", null, "James Jecemeco", "Tabilog", "$2a$11$IO86g6JZr1qc4I/0OypDtOWbxgTT9a6xXCasjiquhtuqvvcmAOBJi", "Software Developer", false, "Admin, User, Approver", null, "211072" },
+                    { 2, false, "SubZero Ice and Cold Storage Inc", "Binugao, Toril, Davao City", new DateTime(2025, 8, 6, 16, 39, 31, 883, DateTimeKind.Unspecified).AddTicks(7235), "Executive", null, "Shiela", "Hernando", "$2a$11$nYCIgjidAyMGTooyu658QOcMcEQmYcLon3KpLZG48jomJWBxVhSBm", "Senior Operations Manager", false, "Approver", null, "211073" },
+                    { 3, false, "ABFI Central Office", "Binugao, Toril, Davao City", new DateTime(2025, 8, 6, 16, 39, 32, 66, DateTimeKind.Unspecified).AddTicks(5767), "Cisdevo", null, "Jerecho", "Asilum", "$2a$11$86xDJ8tQavWoMvWVrBRAa./.66nqQPp07EyFj08sNh54DYDMGnD5W", "Software Developer", false, "Admin, User, Approver", null, "211028" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -650,20 +641,19 @@ namespace CSMapi.Migrations
                 column: "Requestorid");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Repalletizationdetails_Receivingdetailid",
-                table: "Repalletizationdetails",
-                column: "Receivingdetailid",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Repalletizationdetails_Repalletizationid",
-                table: "Repalletizationdetails",
-                column: "Repalletizationid");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Repalletizations_Creatorid",
                 table: "Repalletizations",
                 column: "Creatorid");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Repalletizations_Frompalletid",
+                table: "Repalletizations",
+                column: "Frompalletid");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Repalletizations_Topalletid",
+                table: "Repalletizations",
+                column: "Topalletid");
         }
 
         /// <inheritdoc />
@@ -676,7 +666,7 @@ namespace CSMapi.Migrations
                 name: "Leasedpremises");
 
             migrationBuilder.DropTable(
-                name: "Repalletizationdetails");
+                name: "Repalletizations");
 
             migrationBuilder.DropTable(
                 name: "Roles");
@@ -689,9 +679,6 @@ namespace CSMapi.Migrations
 
             migrationBuilder.DropTable(
                 name: "Receivingdetails");
-
-            migrationBuilder.DropTable(
-                name: "Repalletizations");
 
             migrationBuilder.DropTable(
                 name: "Palletpositions");

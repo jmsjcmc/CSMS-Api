@@ -23,7 +23,6 @@ namespace CSMapi
         public DbSet<DispatchingDetail> Dispatchingdetails { get; set; }
         // Repalletization
         public DbSet<Repalletization> Repalletizations { get; set; }
-        public DbSet<RepalletizationDetail> Repalletizationdetails { get; set; }
         // Document
         public DbSet<Document> Documents { get; set; }
         // Customers

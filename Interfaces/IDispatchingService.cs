@@ -5,26 +5,27 @@ namespace CSMapi.Interfaces
 {
     public interface IDispatchingService
     {
-        Task<Pagination<DispatchingResponse>> allpendings(
+        Task<Pagination<DispatchingResponse>> AllPendings(
             int pageNumber = 1,
             int pageSize = 10,
             int? id = null);
-        Task<Pagination<DispatchingResponse>> alldispatched(
+        Task<Pagination<DispatchingResponse>> AllDispatched(
             int pageNumber = 1,
             int pageSize = 10,
-            int? id = null);
-        Task<DocumentNumberResponse> generatedocumentnumber();
-        Task<int> totalcount();
-        Task<int> pendingcount();
-        Task<int> dispatchedcount();
-        Task<int> declinedcount();
-        Task<DispatchingResponse> getdispatch(int id);
-        Task<DispatchingResponse> addmultipledispatch(DispatchingRequest request, ClaimsPrincipal user);
-        Task<DispatchingResponse> addsingledispatch(DispatchingRequest request, ClaimsPrincipal user);
-        Task<DispatchingTimeStartEndResponse> addtimestartend(string timeStart, string timeEnd, int id, ClaimsPrincipal user);
-        Task<DispatchingResponse> request(ClaimsPrincipal user, string status, int documentId, string? note = null);
-        Task<DispatchingResponse> updatedispatch(ClaimsPrincipal user, DispatchingRequest request, int id);
-        Task<DispatchingResponse> hidedispatch(int id);
-        Task<DispatchingResponse> deletedispatch(int id);
+            int? id = null,
+            string? documentNumber = null);
+        Task<DocumentNumberResponse> GenerateDocumentNumber();
+        Task<int> TotalCount();
+        Task<int> PendingCount();
+        Task<int> DispatchedCount();
+        Task<int> DeclinedCount();
+        Task<DispatchingResponse> GetDispatch(int id);
+        Task<DispatchingResponse> AddMultipleDispatch(DispatchingRequest request, ClaimsPrincipal user);
+        Task<DispatchingResponse> AddSingleDispatch(DispatchingRequest request, ClaimsPrincipal user);
+        Task<DispatchingTimeStartEndResponse> AddTimeStartEnd(string timeStart, string timeEnd, int id, ClaimsPrincipal user);
+        Task<DispatchingResponse> Request(ClaimsPrincipal user, string status, int documentId, string? note = null);
+        Task<DispatchingResponse> UpdateDispatch(ClaimsPrincipal user, DispatchingRequest request, int id);
+        Task<DispatchingResponse> HideDispatch(int id);
+        Task<DispatchingResponse> DeleteDispatch(int id);
     }
 }

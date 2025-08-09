@@ -39,26 +39,19 @@
         public bool Active { get; set; }
         public ICollection<PalletPosition> Palletposition { get; set; }
     }
-
     public class Repalletization
     {
         public int Id { get; set; }
-        public int Frompalletid { get; set; }
-        public int Topalletid { get; set; }
-        public DateTime Createdon { get; set; }
-        public int Creatorid { get; set; }
-        public User Creator { get; set; }
-        public ICollection<RepalletizationDetail> RepalletizationDetail { get; set; }
-    }
-
-    public class RepalletizationDetail
-    {
-        public int Id { get; set; }
-        public int Repalletizationid { get; set; }
-        public Repalletization Repalletization { get; set; }
-        public int Receivingdetailid { get; set; }
-        public ReceivingDetail Receivingdetail { get; set; }
+        public int Fromreceivingdetailid { get; set; }
+        public ReceivingDetail Fromreceivingdetail { get; set; }
+        public int Toreceivingdetailtid { get; set; }
+        public ReceivingDetail Toreceivingdetail { get; set; }
         public int Quantitymoved { get; set; }
         public double Weightmoved { get; set; }
+        public DateTime Createdon { get; set; }
+        public DateTime? Approvedon { get; set; } = null;
+        public int Creatorid { get; set; }
+        public User Creator { get; set; }
+        public int Status { get; set; }
     }
 }

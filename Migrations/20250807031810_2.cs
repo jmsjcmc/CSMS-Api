@@ -6,67 +6,67 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace CSMapi.Migrations
 {
     /// <inheritdoc />
-    public partial class _8 : Migration
+    public partial class _2 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<bool>(
-                name: "Active",
-                table: "Contracts",
-                type: "bit",
-                nullable: false,
-                defaultValue: false);
+            migrationBuilder.DropColumn(
+                name: "MyProperty",
+                table: "Receivingdetails");
 
             migrationBuilder.UpdateData(
                 table: "Users",
                 keyColumn: "Id",
                 keyValue: 1,
                 columns: new[] { "Createdon", "Password" },
-                values: new object[] { new DateTime(2025, 7, 15, 16, 43, 13, 132, DateTimeKind.Unspecified).AddTicks(4990), "$2a$11$0VoOryZ/NmmmkjDKaes6M.tiYhpS3I8gSmBswwhCOkryFVypWG/g2" });
+                values: new object[] { new DateTime(2025, 8, 7, 11, 18, 10, 2, DateTimeKind.Unspecified).AddTicks(9844), "$2a$11$l9kk.7USQQWdbMczxSyPMOR.9H.MdLbeavKl6PdRAxTzFoMjZ6pAG" });
 
             migrationBuilder.UpdateData(
                 table: "Users",
                 keyColumn: "Id",
                 keyValue: 2,
                 columns: new[] { "Createdon", "Password" },
-                values: new object[] { new DateTime(2025, 7, 15, 16, 43, 13, 298, DateTimeKind.Unspecified).AddTicks(7193), "$2a$11$KyrpStxp0TcuHEtDiECGkO18yYDHa9mc0IoXJAnVnJUHNalJ5gaTO" });
+                values: new object[] { new DateTime(2025, 8, 7, 11, 18, 10, 185, DateTimeKind.Unspecified).AddTicks(1446), "$2a$11$z41ww/Xm9wEaBrOh.YWK/udY740SFXJ46xPwrnGqD3LLVxAJ2cG.u" });
 
             migrationBuilder.UpdateData(
                 table: "Users",
                 keyColumn: "Id",
                 keyValue: 3,
                 columns: new[] { "Createdon", "Password" },
-                values: new object[] { new DateTime(2025, 7, 15, 16, 43, 13, 462, DateTimeKind.Unspecified).AddTicks(6115), "$2a$11$MkU1qvh/7fFxCFX5EV9nfuFH46dn/GoTcZHN3fTnKKI9Z1Ztcog9G" });
+                values: new object[] { new DateTime(2025, 8, 7, 11, 18, 10, 377, DateTimeKind.Unspecified).AddTicks(7701), "$2a$11$rbP3ruOwQ3Dl4XvYZYHM6OCEXD/PKa.JsXdoehrtKXQo.FZA0q5Xm" });
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "Active",
-                table: "Contracts");
+            migrationBuilder.AddColumn<int>(
+                name: "MyProperty",
+                table: "Receivingdetails",
+                type: "int",
+                nullable: false,
+                defaultValue: 0);
 
             migrationBuilder.UpdateData(
                 table: "Users",
                 keyColumn: "Id",
                 keyValue: 1,
                 columns: new[] { "Createdon", "Password" },
-                values: new object[] { new DateTime(2025, 7, 15, 15, 47, 29, 222, DateTimeKind.Unspecified).AddTicks(2645), "$2a$11$7Wl072m8PyGCqdX6GUPBROu0O0hjka1F7y28yWf8Dhhzo.Exfx28." });
+                values: new object[] { new DateTime(2025, 8, 6, 16, 39, 31, 705, DateTimeKind.Unspecified).AddTicks(4517), "$2a$11$IO86g6JZr1qc4I/0OypDtOWbxgTT9a6xXCasjiquhtuqvvcmAOBJi" });
 
             migrationBuilder.UpdateData(
                 table: "Users",
                 keyColumn: "Id",
                 keyValue: 2,
                 columns: new[] { "Createdon", "Password" },
-                values: new object[] { new DateTime(2025, 7, 15, 15, 47, 29, 414, DateTimeKind.Unspecified).AddTicks(5837), "$2a$11$UXvCrgZH2e0XlZPoC6XtL.0eTKNUXBWQlQLvLMG9WnaS7VU/YARMy" });
+                values: new object[] { new DateTime(2025, 8, 6, 16, 39, 31, 883, DateTimeKind.Unspecified).AddTicks(7235), "$2a$11$nYCIgjidAyMGTooyu658QOcMcEQmYcLon3KpLZG48jomJWBxVhSBm" });
 
             migrationBuilder.UpdateData(
                 table: "Users",
                 keyColumn: "Id",
                 keyValue: 3,
                 columns: new[] { "Createdon", "Password" },
-                values: new object[] { new DateTime(2025, 7, 15, 15, 47, 29, 595, DateTimeKind.Unspecified).AddTicks(8722), "$2a$11$tzak.Yc5EAZlUkGrN7n7SOxxHDO1KaSGb4II0VyOxjdU65UDW.M/K" });
+                values: new object[] { new DateTime(2025, 8, 6, 16, 39, 32, 66, DateTimeKind.Unspecified).AddTicks(5767), "$2a$11$86xDJ8tQavWoMvWVrBRAa./.66nqQPp07EyFj08sNh54DYDMGnD5W" });
         }
     }
 }

@@ -8,47 +8,47 @@ using CSMapi.Validators;
 
 namespace CSMapi.Services
 {
-    public class CustomerService : BaseService , ICustomerService
+    public class CustomerService : BaseService, ICustomerService
     {
         private readonly CustomerValidator _customerValidator;
         private readonly CustomerQueries _customerQueries;
-        public CustomerService(AppDbContext context, IMapper mapper, CustomerValidator customerValidator, CustomerQueries customerQueries) : base (context, mapper)
+        public CustomerService(AppDbContext context, IMapper mapper, CustomerValidator customerValidator, CustomerQueries customerQueries) : base(context, mapper)
         {
             _customerValidator = customerValidator;
             _customerQueries = customerQueries;
         }
         // [HttpGet("customers")]
-        public async Task<Pagination<CustomerResponse>> allcustomers(
+        public async Task<Pagination<CustomerResponse>> AllCustomers(
             int pageNumber = 1,
             int pageSize = 10,
             string? searchTerm = null)
         {
-            var query = _customerQueries.customeronlyquery(searchTerm);
-            return await PaginationHelper.paginateandmap<Customer, CustomerResponse>(query, pageNumber, pageSize, _mapper);
+            var query = _customerQueries.CustomerOnlyQuery(searchTerm);
+            return await PaginationHelper.PaginateAndMap<Customer, CustomerResponse>(query, pageNumber, pageSize, _mapper);
         }
         // [HttpGet("customers/active-companies")]
-        public async Task<List<CompanyNameOnlyResponse>> allactivecompanynames()
+        public async Task<List<CompanyNameOnlyResponse>> AllActiveCompanyNames()
         {
-            var companies = await _customerQueries.activecustomersquery();
+            var companies = await _customerQueries.ActiveCustomersQuery();
 
             return _mapper.Map<List<CompanyNameOnlyResponse>>(companies);
         }
         // [HttpGet("customers/active")]
-        public async Task<List<CustomerResponse>> allactivecustomers()
+        public async Task<List<CustomerResponse>> AllActiveCustomers()
         {
-            var customers = await _customerQueries.activecustomersquery();
+            var customers = await _customerQueries.ActiveCustomersQuery();
 
             return _mapper.Map<List<CustomerResponse>>(customers);
         }
         // [HttpGet("customer/{id}")]
-        public async Task<CustomerResponse> getcustomer(int id)
+        public async Task<CustomerResponse> GetCustomer(int id)
         {
-            var customer = await getcustomerdata(id);
+            var customer = await GetCustomerData(id);
 
             return _mapper.Map<CustomerResponse>(customer);
         }
         // [HttpPost("customer")]
-        public async Task<CustomerResponse> addcustomer(CustomerRequest request)
+        public async Task<CustomerResponse> AddCustomer(CustomerRequest request)
         {
             _customerValidator.ValidateCustomerRequest(request);
 
@@ -58,72 +58,65 @@ namespace CSMapi.Services
             await _context.Customers.AddAsync(customer);
             await _context.SaveChangesAsync();
 
-            return await customerResponse(customer.Id);
+            return await CustomerResponse(customer.Id);
         }
         // [HttpPatch("customer/update/{id}")]
-        public async Task<CustomerResponse> updatecustomer(CustomerRequest request, int id)
+        public async Task<CustomerResponse> UpdateCustomer(CustomerRequest request, int id)
         {
-            var customer = await ValidateCustomer(id);
+            var customer = await GetCustomerId(id);
 
             _mapper.Map(request, customer);
             await _context.SaveChangesAsync();
 
-            return await customerResponse(customer.Id);
+            return await CustomerResponse(customer.Id);
         }
         // [HttpPatch("customer/toggle-active")]
-        public async Task<CustomerResponse> toggleactive(int id)
+        public async Task<CustomerResponse> ToggleActive(int id)
         {
-            var customer = await ValidateCustomer(id);
+            var customer = await GetCustomerId(id);
 
             customer.Active = !customer.Active;
 
             _context.Customers.Update(customer);
             await _context.SaveChangesAsync();
 
-            return await customerResponse(customer.Id);
+            return await CustomerResponse(customer.Id);
         }
         // [HttpPatch("customer/hide/{id}")]
-        public async Task<CustomerResponse> hidecustomer(int id)
+        public async Task<CustomerResponse> HideCustomer(int id)
         {
-            var customer = await ValidateCustomer(id);
+            var customer = await GetCustomerId(id);
 
             customer.Removed = !customer.Removed;
 
             _context.Customers.Update(customer);
             await _context.SaveChangesAsync();
 
-            return await customerResponse(customer.Id);
+            return await CustomerResponse(customer.Id);
         }
         // [HttpDelete("customer/delete/{id}")]
-        public async Task<CustomerResponse> deletecustomer(int id)
+        public async Task<CustomerResponse> DeleteCustomer(int id)
         {
-            var customer = await ValidateCustomer(id);
+            var customer = await GetCustomerId(id);
 
             _context.Customers.Remove(customer);
             await _context.SaveChangesAsync();
 
-            return await customerResponse(customer.Id);
+            return await CustomerResponse(customer.Id);
         }
         // Helpers
-        private async Task<Customer?> getcustomerid(int id)
+        private async Task<Customer?> GetCustomerId(int id)
         {
-            return await _customerQueries.patchmethodcustomerid(id);
+            return await _customerQueries.PatchCustomerId(id);
         }
-        private async Task<Customer?> getcustomerdata(int id)
+        private async Task<Customer?> GetCustomerData(int id)
         {
-            return await _customerQueries.getmethodcustomerid(id);
+            return await _customerQueries.GetCustomerId(id);
         }
-        private async Task<CustomerResponse> customerResponse(int id)
+        private async Task<CustomerResponse> CustomerResponse(int id)
         {
-            var response = await getcustomerdata(id);
+            var response = await GetCustomerData(id);
             return _mapper.Map<CustomerResponse>(response);
-        }
-        // Validators
-        private async Task<Customer> ValidateCustomer(int id)
-        {
-            var customer = await getcustomerid(id);
-            return customer ??
-                throw new ArgumentException($"Customer with id {id} not found.");
         }
     }
 }

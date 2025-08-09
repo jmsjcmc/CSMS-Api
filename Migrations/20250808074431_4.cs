@@ -6,14 +6,14 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace CSMapi.Migrations
 {
     /// <inheritdoc />
-    public partial class _3 : Migration
+    public partial class _4 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<double>(
-                name: "Duweight",
-                table: "Receivingdetails",
+                name: "Weightmoved",
+                table: "Repalletizations",
                 type: "float",
                 nullable: false,
                 defaultValue: 0.0);
@@ -23,50 +23,50 @@ namespace CSMapi.Migrations
                 keyColumn: "Id",
                 keyValue: 1,
                 columns: new[] { "Createdon", "Password" },
-                values: new object[] { new DateTime(2025, 7, 4, 9, 0, 4, 659, DateTimeKind.Unspecified).AddTicks(6437), "$2a$11$IF6PQgU3eV8yLJ.f5g4cU.vF8Ny0SgIQuCYqB.bwafVa2YqzBNenW" });
+                values: new object[] { new DateTime(2025, 8, 8, 15, 44, 30, 602, DateTimeKind.Unspecified).AddTicks(5916), "$2a$11$mvZ.ZntVAX/5MeabMXFrgeCI.ueZr3Rj4Wf.uxABOeGRwafg5.nKu" });
 
             migrationBuilder.UpdateData(
                 table: "Users",
                 keyColumn: "Id",
                 keyValue: 2,
                 columns: new[] { "Createdon", "Password" },
-                values: new object[] { new DateTime(2025, 7, 4, 9, 0, 4, 846, DateTimeKind.Unspecified).AddTicks(8264), "$2a$11$ctZilp.s/CjJ7gXc/k9V2uHxZmj7Wg6emEvhCKLmViz7hnNU6mfdy" });
+                values: new object[] { new DateTime(2025, 8, 8, 15, 44, 30, 772, DateTimeKind.Unspecified).AddTicks(2085), "$2a$11$qO7OAIX4n6kmRYmYMqlcMeagTdBbXklUXjvW72kDQ0G0dIEP67FlO" });
 
             migrationBuilder.UpdateData(
                 table: "Users",
                 keyColumn: "Id",
                 keyValue: 3,
                 columns: new[] { "Createdon", "Password" },
-                values: new object[] { new DateTime(2025, 7, 4, 9, 0, 5, 29, DateTimeKind.Unspecified).AddTicks(6163), "$2a$11$WrK8Y9Ej9VDx8go82CADtutnOycf4AtzloH3EzAgCroq6Lq8KYB8q" });
+                values: new object[] { new DateTime(2025, 8, 8, 15, 44, 30, 941, DateTimeKind.Unspecified).AddTicks(22), "$2a$11$RcUlTjTgQ0V8Dubl09fXruIePdBfo/22fkDUTS5U/zNaKUoLKYRf6" });
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "Duweight",
-                table: "Receivingdetails");
+                name: "Weightmoved",
+                table: "Repalletizations");
 
             migrationBuilder.UpdateData(
                 table: "Users",
                 keyColumn: "Id",
                 keyValue: 1,
                 columns: new[] { "Createdon", "Password" },
-                values: new object[] { new DateTime(2025, 7, 3, 15, 24, 10, 166, DateTimeKind.Unspecified).AddTicks(193), "$2a$11$qoP46X5nAPROzOSyqEAyJuesM5ZP.xYtkPcnrjbDMFU14KYsE/oXK" });
+                values: new object[] { new DateTime(2025, 8, 7, 15, 42, 55, 853, DateTimeKind.Unspecified).AddTicks(8760), "$2a$11$WJGMIGjdRnNTKgtHG46oKueXZnQl1fj2.HX3aj9hwruvkkb7JW.qi" });
 
             migrationBuilder.UpdateData(
                 table: "Users",
                 keyColumn: "Id",
                 keyValue: 2,
                 columns: new[] { "Createdon", "Password" },
-                values: new object[] { new DateTime(2025, 7, 3, 15, 24, 10, 334, DateTimeKind.Unspecified).AddTicks(4532), "$2a$11$RZVPulnNT77vU8FYmMyHpubXgw2OvKDnifYSVYDxu7Lw3PirtwlXa" });
+                values: new object[] { new DateTime(2025, 8, 7, 15, 42, 56, 88, DateTimeKind.Unspecified).AddTicks(1121), "$2a$11$gw4fs6WIy228MXHGeSFatu6V54uv7u3sdJBIWZ3ebt6jX2LIvutgW" });
 
             migrationBuilder.UpdateData(
                 table: "Users",
                 keyColumn: "Id",
                 keyValue: 3,
                 columns: new[] { "Createdon", "Password" },
-                values: new object[] { new DateTime(2025, 7, 3, 15, 24, 10, 505, DateTimeKind.Unspecified).AddTicks(8984), "$2a$11$Ug2JcGux0fCcFVInw7kqdOwfwJPjS3cpW.5pzSsgwXsV9t/IVNXA6" });
+                values: new object[] { new DateTime(2025, 8, 7, 15, 42, 56, 289, DateTimeKind.Unspecified).AddTicks(1117), "$2a$11$mIbzRIPst0NY3J7z55l39OqT3dDzSXe4pdZ3i/3B2yKVNA7kuHtPe" });
         }
     }
 }

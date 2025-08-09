@@ -1,4 +1,5 @@
 ﻿using CSMapi.Models;
+using CSMapi.Validators;
 using Microsoft.EntityFrameworkCore;
 
 namespace CSMapi.Helpers.Queries
@@ -6,14 +7,22 @@ namespace CSMapi.Helpers.Queries
     public class ContractQueries
     {
         private readonly AppDbContext _context;
-        public ContractQueries(AppDbContext context)
+        private readonly ContractValidator _validator;
+        public ContractQueries(AppDbContext context, ContractValidator validator)
         {
             _context = context;
+            _validator = validator;
         }
         // Query for fetching all contracts with optional filter for lesseecompany
-        public IQueryable<Contract> contractsquery(string? searchTerm = null)
+        public IQueryable<Contract> ContractsQuery(string? searchTerm = null)
         {
-            var query = batchgetquery();
+            var query = _context.Contracts
+                .AsNoTracking()
+                .Where(c => !c.Removed)
+                .Include(c => c.Creator)
+                .Include(c => c.Leasedpremises)
+                .OrderByDescending(c => c.Id)
+                .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {
@@ -23,38 +32,51 @@ namespace CSMapi.Helpers.Queries
             return query;
         }
         // Query for fetching all contracts with optional filter for lessee company (List)
-        public async Task<List<Contract>> contracstlist(string? searchTerm = null)
+        public async Task<List<Contract>> ContractsList(string? searchTerm = null)
         {
-            return await contractsquery(searchTerm).ToListAsync();
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                return await _context.Contracts
+                    .AsNoTracking()
+                    .Where(c => c.Lesseecompany == searchTerm && !c.Removed)
+                    .Include(c => c.Creator)
+                    .Include(c => c.Leasedpremises)
+                    .OrderByDescending(c => c.Id)
+                    .ToListAsync();
+
+            }
+            else
+            {
+                return await _context.Contracts
+                    .AsNoTracking()
+                    .Include(c => c.Creator)
+                    .Include(c => c.Leasedpremises)
+                    .OrderByDescending(c => c.Id)
+                    .ToListAsync();
+            }
         }
         // Query for fetching specific contract for GET method
-        public async Task<Contract?> getmethodcontractid(int id)
+        public async Task<Contract?> GetContractId(int id)
         {
-            return await batchgetquery()
-                .FirstOrDefaultAsync(c => c.Id == id);
-        }
-        // Query for fetching specific contract for PATCH/PUT/DELETE methods
-        public async Task<Contract?> patchmethodcontractid(int id)
-        {
-            return await patchquery()
-                .FirstOrDefaultAsync(c => c.Id == id);
-        }
-        // Helpers
-        private IQueryable<Contract> batchgetquery()
-        {
-            return _context.Contracts
+            // Validate id if it exist
+            await _validator.ValidateSpecificContract(id);
+
+            return await _context.Contracts
                 .AsNoTracking()
                 .Include(c => c.Creator)
                 .Include(c => c.Leasedpremises)
-                .Where(c => !c.Removed)
-                .OrderByDescending(c => c.Id);
+                .FirstOrDefaultAsync(c => c.Id == id);
         }
-        private IQueryable<Contract> patchquery()
+        // Query for fetching specific contract for PATCH/PUT/DELETE methods
+        public async Task<Contract?> PatchContractId(int id)
         {
-            return _context.Contracts
+            // Validate id if it exist
+            await _validator.ValidateSpecificContract(id);
+
+            return await _context.Contracts
                 .Include(c => c.Creator)
                 .Include(c => c.Leasedpremises)
-                .Where(c => !c.Removed);
+                .FirstOrDefaultAsync(c => c.Id == id);
         }
     }
 }

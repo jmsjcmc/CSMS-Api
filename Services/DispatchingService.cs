@@ -9,7 +9,7 @@ using System.Security.Claims;
 
 namespace CSMapi.Services
 {
-    public class DispatchingService : BaseService , IDispatchingService
+    public class DispatchingService : BaseService, IDispatchingService
     {
         private readonly DispatchingValidator _dispatchingValidator;
         private readonly DispatchingQueries _dispatchingQueries;
@@ -21,26 +21,27 @@ namespace CSMapi.Services
             _documentHelper = documentHelper;
         }
         // [HttpGet("dispatchings/pending")]
-        public async Task<Pagination<DispatchingResponse>> allpendings(
+        public async Task<Pagination<DispatchingResponse>> AllPendings(
             int pageNumber = 1,
             int pageSize = 10,
             int? id = null)
         {
-            var query = _dispatchingQueries.pendingdispatchingquery(id);
-            return await PaginationHelper.paginateandmap<Dispatching, DispatchingResponse>(query, pageNumber, pageSize, _mapper);
+            var query = _dispatchingQueries.PendingDispatchingQuery(id);
+            return await PaginationHelper.PaginateAndMap<Dispatching, DispatchingResponse>(query, pageNumber, pageSize, _mapper);
         }
         // [HttpGet("dispatchings")]
-        public async Task<Pagination<DispatchingResponse>> alldispatched(
+        public async Task<Pagination<DispatchingResponse>> AllDispatched(
             int pageNumber = 1,
             int pageSize = 10,
-            int? id = null)
+            int? id = null,
+            string? documentNumber = null)
         {
 
-            var query = _dispatchingQueries.dispatchedquery(id);
-            return await PaginationHelper.paginateandmap<Dispatching, DispatchingResponse>(query, pageNumber, pageSize, _mapper);
+            var query = _dispatchingQueries.DispatchedQuery(id, documentNumber);
+            return await PaginationHelper.PaginateAndMap<Dispatching, DispatchingResponse>(query, pageNumber, pageSize, _mapper);
         }
         // [HttpGet("dispatching/generate-documentNo")]
-        public async Task<DocumentNumberResponse> generatedocumentnumber()
+        public async Task<DocumentNumberResponse> GenerateDocumentNumber()
         {
             string prefix = "D3";
 
@@ -69,7 +70,7 @@ namespace CSMapi.Services
             };
         }
         // [HttpGet("dispatchings/count-all")] "Total"
-        public async Task<int> totalcount()
+        public async Task<int> TotalCount()
         {
             return await _context.Dispatchings
                 .AsNoTracking()
@@ -77,7 +78,7 @@ namespace CSMapi.Services
                 .CountAsync();
         }
         // [HttpGet("dispatchings/count-all")] "Pending"
-        public async Task<int> pendingcount()
+        public async Task<int> PendingCount()
         {
             return await _context.Dispatchings
                 .AsNoTracking()
@@ -85,7 +86,7 @@ namespace CSMapi.Services
                 .CountAsync();
         }
         // [HttpGet("dispatchings/count-all")] "Dispatched"
-        public async Task<int> dispatchedcount()
+        public async Task<int> DispatchedCount()
         {
             return await _context.Dispatchings
                 .AsNoTracking()
@@ -93,7 +94,7 @@ namespace CSMapi.Services
                 .CountAsync();
         }
         // [HttpGet("dispatchings/count-all")] "Declined"
-        public async Task<int> declinedcount()
+        public async Task<int> DeclinedCount()
         {
             return await _context.Dispatchings
                 .AsNoTracking()
@@ -101,14 +102,14 @@ namespace CSMapi.Services
                 .CountAsync();
         }
         // [HttpGet("dispatching/{id}")]
-        public async Task<DispatchingResponse> getdispatch(int id)
+        public async Task<DispatchingResponse> GetDispatch(int id)
         {
-            var dispatching = await getdispatchingdata(id);
+            var dispatching = await GetDispatchingId(id);
 
             return _mapper.Map<DispatchingResponse>(dispatching);
         }
         // [HttpPost("dispatching/multiple")]
-        public async Task<DispatchingResponse> addmultipledispatch(DispatchingRequest request, ClaimsPrincipal user)
+        public async Task<DispatchingResponse> AddMultipleDispatch(DispatchingRequest request, ClaimsPrincipal user)
         {
             var transaction = await _context.Database.BeginTransactionAsync();
             await _dispatchingValidator.ValidateDispatchingRequest(request);
@@ -135,7 +136,7 @@ namespace CSMapi.Services
                 var receivingDetail = await _context.Receivingdetails
                     .Include(r => r.Pallet)
                     .FirstOrDefaultAsync(r => r.Id == detail.Receivingdetailid && r.Palletid == detail.Palletid && r.Received);
-               
+
                 var dispatchedQuantity = await _context.Dispatchingdetails
                     .Include(d => d.Pallet)
                     .Where(d => d.Receivingdetailid == detail.Receivingdetailid)
@@ -171,10 +172,10 @@ namespace CSMapi.Services
             await _context.SaveChangesAsync();
             await transaction.CommitAsync();
 
-            return await dispatchingResponse(dispatch.Id);
+            return await DispatchingResponse(dispatch.Id);
         }
         // [HttpPost("dispatching")]
-        public async Task<DispatchingResponse> addsingledispatch(DispatchingRequest request, ClaimsPrincipal user)
+        public async Task<DispatchingResponse> AddSingleDispatch(DispatchingRequest request, ClaimsPrincipal user)
         {
             var transaction = await _context.Database.BeginTransactionAsync();
             await _dispatchingValidator.ValidateDispatchingRequest(request);
@@ -212,7 +213,7 @@ namespace CSMapi.Services
                     .Where(r => r.Palletid == group.Palletid && !r.Fulldispatched && r.Received)
                     .OrderByDescending(r => r.Id)
                     .FirstOrDefaultAsync();
-                
+
                 var dispatchQuantity = await _context.Dispatchingdetails
                     .Include(d => d.Pallet)
                     .Where(d => d.Palletid == group.Palletid && d.Receivingdetailid == receivingDetail.Id)
@@ -252,12 +253,12 @@ namespace CSMapi.Services
             await _context.SaveChangesAsync();
             await transaction.CommitAsync();
 
-            return await dispatchingResponse(dispatch.Id);
+            return await DispatchingResponse(dispatch.Id);
         }
         // [HttpPatch("dispatching/update/{id}")]
-        public async Task<DispatchingResponse> updatedispatch(ClaimsPrincipal user, DispatchingRequest request, int id)
+        public async Task<DispatchingResponse> UpdateDispatch(ClaimsPrincipal user, DispatchingRequest request, int id)
         {
-            var dispatching = await ValidateDispatch(id);
+            var dispatching = await PatchDispatchingId(id);
 
             _mapper.Map(request, dispatching);
 
@@ -265,12 +266,12 @@ namespace CSMapi.Services
             dispatching.Updatedon = TimeHelper.GetPhilippineStandardTime();
 
             await _context.SaveChangesAsync();
-            return await dispatchingResponse(dispatching.Id);
+            return await DispatchingResponse(dispatching.Id);
         }
         // [HttpPatch("dispatching/time-start-end")]
-        public async Task<DispatchingTimeStartEndResponse> addtimestartend (string timeStart, string timeEnd, int id, ClaimsPrincipal user)
+        public async Task<DispatchingTimeStartEndResponse> AddTimeStartEnd(string timeStart, string timeEnd, int id, ClaimsPrincipal user)
         {
-            var dispatching = await ValidateDispatch(id);
+            var dispatching = await PatchDispatchingId(id);
 
             dispatching.Dispatchtimestart = timeStart;
             dispatching.Dispatchtimeend = timeEnd;
@@ -284,38 +285,39 @@ namespace CSMapi.Services
             return _mapper.Map<DispatchingTimeStartEndResponse>(dispatching);
         }
         // [HttpPatch("dispatching/toggle-request")]
-        public async Task<DispatchingResponse> request(ClaimsPrincipal user, string status, int documentId, string? note = null)
+        public async Task<DispatchingResponse> Request(ClaimsPrincipal user, string status, int documentId, string? note = null)
         {
-            var dispatching = await _dispatchingQueries.getdispatchingbasedondocumentid(documentId);
+            var dispatching = await _dispatchingQueries.GetDispatchingBasedOnDocumentId(documentId);
 
             RequestStatusUpdate(user, dispatching, status, note);
+
 
             _context.Dispatchings.Update(dispatching);
             await _context.SaveChangesAsync();
 
-            return await dispatchingResponse(dispatching.Id);
+            return await DispatchingResponse(dispatching.Id);
         }
         // [HttpPatch("dispatching/hide/{id}")]
-        public async Task<DispatchingResponse> hidedispatch(int id)
+        public async Task<DispatchingResponse> HideDispatch(int id)
         {
-            var dispatching = await ValidateDispatch(id);
+            var dispatching = await PatchDispatchingId(id);
 
             dispatching.Removed = !dispatching.Removed;
 
             _context.Dispatchings.Update(dispatching);
             await _context.SaveChangesAsync();
 
-            return await dispatchingResponse(dispatching.Id);
+            return await DispatchingResponse(dispatching.Id);
         }
         // [HttpDelete("dispatching/delete/{id}")]
-        public async Task<DispatchingResponse> deletedispatch(int id)
+        public async Task<DispatchingResponse> DeleteDispatch(int id)
         {
-            var dispatching = await ValidateDispatch(id);
+            var dispatching = await PatchDispatchingId(id);
 
             _context.Dispatchings.Remove(dispatching);
             await _context.SaveChangesAsync();
 
-            return await dispatchingResponse(dispatching.Id);
+            return await DispatchingResponse(dispatching.Id);
         }
         // Helpers
         private void RequestStatusUpdate(ClaimsPrincipal user, Dispatching dispatching, string status, string? note = null)
@@ -330,30 +332,24 @@ namespace CSMapi.Services
                     break;
                 case "decline":
                     dispatching.Declined = true;
+                    dispatching.Pending = false;
                     dispatching.Approverid = AuthUserHelper.GetUserId(user);
                     dispatching.Declinedon = TimeHelper.GetPhilippineStandardTime();
                     break;
             }
         }
-        private async Task<Dispatching?> getdispatchingid(int id)
+        private async Task<Dispatching?> PatchDispatchingId(int id)
         {
-            return await _dispatchingQueries.patchmethoddispatchingid(id);
+            return await _dispatchingQueries.PatchDispatchingId(id);
         }
-        private async Task<Dispatching?> getdispatchingdata(int id)
+        private async Task<Dispatching?> GetDispatchingId(int id)
         {
-            return await _dispatchingQueries.getmethoddispatchingid(id);
+            return await _dispatchingQueries.GetDispatchingId(id);
         }
-        private async Task<DispatchingResponse> dispatchingResponse(int id)
+        private async Task<DispatchingResponse> DispatchingResponse(int id)
         {
-            var response = await getdispatchingdata(id);
+            var response = await GetDispatchingId(id);
             return _mapper.Map<DispatchingResponse>(response);
-        }
-        // Validators
-        private async Task<Dispatching> ValidateDispatch(int id)
-        {
-            var dispatch = await getdispatchingid(id);
-            return dispatch ??
-                throw new ArgumentException($"Dispatching data with id {id} not found.");
         }
     }
 }

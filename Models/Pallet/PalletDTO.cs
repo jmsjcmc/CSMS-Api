@@ -76,27 +76,53 @@
         public string Csnumber { get; set; }
         public bool Active { get; set; }
     }
+ 
     public class RepalletizationRequest
     {
-        public int Frompalletid { get; set; }
-        public int Topalletid { get; set; }
-        public List<RepalletizationDetailRequest> RepalletizationDetail { get; set; } 
+        public int Fromreceivingdetailid { get; set; }
+        public int Toreceivingdetailtid { get; set; }
+        public int Quantitymoved { get; set; }
+        public double Weightmoved { get; set; }
+    }
+    public class RepalletizationBulkRequest
+    {
+        public List<RepalletizationRequest> Repalletization { get; set; }
+    }
+    public class RepalletizationBulkResponse
+    {
+        public List<RepalletizationResponse> Repalletization { get; set; }
+        public int Successcount { get; set; }
+        public int Failurecount { get; set; }
     }
     public class RepalletizationResponse
     {
-        public int Frompalletid { get; set; }
-        public int Topalletid { get; set; }
-        public List<RepalletizationDetailResponse> RepalletizationDetail { get; set; }
-    }
-    public class RepalletizationDetailRequest
-    {
-        public int Receivingdetailid { get; set; }
+        public int Id { get; set; }
+        public int Fromreceivingdetailid { get; set; }
+        public int Toreceivingdetailtid { get; set; }
         public int Quantitymoved { get; set; }
+        public double Weightmoved { get; set; }
+        public DateTime Createdon { get; set; }
+        public DateTime Approvedon { get; set; }
+        public UserEsignResponse Creator { get; set; }
+        public int Status { get; set; }
     }
-    public class RepalletizationDetailResponse
+    public class RepalletizationDraftRequest
     {
-        public int Receivingdetailid { get; set; }
+        public int Id { get; set; }
+        public int Status { get; set; }
         public int Quantitymoved { get; set; }
+        public double Weightmoved { get; set; }
+        public ProductBasesPallet Fromreceivingdetail { get; set; }
+        public ProductBasesPallet Toreceivingdetail { get; set; }
+    }
+    public class RepalletizationDraftResponse
+    {
+        public int Id { get; set; }
+        public int Status { get; set; }
+        public int Quantitymoved { get; set; }
+        public double Weightmoved { get; set; }
+        public ProductBasesPallet Fromreceivingdetail { get; set; }
+        public ProductBasesPallet Toreceivingdetail { get; set; }
     }
     public class PalletTypeBasedResponse
     {
@@ -105,7 +131,6 @@
         public string Taggingnumber { get; set; }
         public int? Palletno { get; set; }
     }
-
     public class PalletsCount
     {
         public int Total { get; set; }

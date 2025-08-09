@@ -87,7 +87,17 @@ namespace CSMapi.Validators
                 }
             }
         }
-
+        public async Task ValidateSpecificReceiving(int id)
+        {
+            if (!await _context.Receivings.AnyAsync(r => r.Id == id))
+            {
+                throw new ArgumentException($"Receiving ID {id} not found.");
+            }
+            if (!await _context.Receivingdetails.AnyAsync(r => r.Id == id))
+            {
+                throw new ArgumentException($"Receiving Detail ID {id} not found.");
+            }
+        }
         public void ValidateCategoryRequest(string category)
         {
             if (string.IsNullOrWhiteSpace(category))
@@ -95,7 +105,6 @@ namespace CSMapi.Validators
                 throw new ArgumentException("Category required.");
             }
         }
-
         public int GetNextSequence(IEnumerable<string> documentNos)
         {
             return documentNos
@@ -107,7 +116,6 @@ namespace CSMapi.Validators
                 .DefaultIfEmpty(0)
                 .Max() + 1;
         }
-
         public string? GetPrefixByCategory(string? category)
         {
             if (string.IsNullOrWhiteSpace(category))
@@ -119,7 +127,6 @@ namespace CSMapi.Validators
                 "fresh goods" => "R3",
                 _ => null
             };
-
         } 
            
     }

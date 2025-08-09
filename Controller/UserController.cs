@@ -17,13 +17,13 @@ namespace CSMapi.Controller
         }
         // Count all users
         [HttpGet("users/count-all")]
-        public async Task<ActionResult<UsersCount>> countall()
+        public async Task<ActionResult<UsersCount>> CountAll()
         {
             try
             {
                 var count = new UsersCount
                 {
-                    Total = await _userService.totalcount()
+                    Total = await _userService.TotalCount()
                 };
 
                 return count;
@@ -35,14 +35,14 @@ namespace CSMapi.Controller
         }
         // Fetch all users 
         [HttpGet("users")]
-        public async Task<ActionResult<Pagination<UserResponse>>> allusers(
+        public async Task<ActionResult<Pagination<UserResponse>>> AllUsers(
             [FromQuery] int pageNumber = 1, 
             [FromQuery] int pageSize = 10, 
             [FromQuery] string? searchTerm = null)
         {
             try
             {
-                var response = await _userService.allusers(pageNumber, pageSize, searchTerm);
+                var response = await _userService.AllUsers(pageNumber, pageSize, searchTerm);
                 return response;
             }catch(Exception e)
             {
@@ -51,11 +51,11 @@ namespace CSMapi.Controller
         }
         // Fetch all roles
         [HttpGet("roles")]
-        public async Task<ActionResult<List<RoleResponse>>> allroles()
+        public async Task<ActionResult<List<RoleResponse>>> AllRoles()
         {
             try
             {
-                var response = await _userService.allroles();
+                var response = await _userService.AllRoles();
                 return response;
             } catch (Exception e)
             {
@@ -64,11 +64,11 @@ namespace CSMapi.Controller
         }
         // Fetch all users belongs Business Unit "SubZero Ice and Cold Storage Inc"
         [HttpGet("lessors")]
-        public async Task<ActionResult<List<UserResponse>>> alllessors()
+        public async Task<ActionResult<List<UserResponse>>> AllLessors()
         {
             try
             {
-                var response = await _userService.alllessors();
+                var response = await _userService.AllLessors();
                 return response;
             }catch(Exception e)
             {
@@ -77,11 +77,11 @@ namespace CSMapi.Controller
         }
         // Fetch specific user
         [HttpGet("user/{id}")]
-        public async Task<ActionResult<UserResponse>> getUser(int id)
+        public async Task<ActionResult<UserResponse>> GetUser(int id)
         {
             try
             {
-                var response = await _userService.getuser(id);
+                var response = await _userService.GetUser(id);
                 return response;
             }catch(Exception e)
             {
@@ -90,11 +90,11 @@ namespace CSMapi.Controller
         }
         // Fetch specific role
         [HttpGet("role/{id}")]
-        public async Task<ActionResult<RoleResponse>> getrole(int id)
+        public async Task<ActionResult<RoleResponse>> GetRole(int id)
         {
             try
             {
-                var response = await _userService.getrole(id);
+                var response = await _userService.GetRole(id);
                 return response;
             } catch (Exception e)
             {
@@ -103,25 +103,25 @@ namespace CSMapi.Controller
         }
         // Fetch details for authenticated user
         [HttpGet("user-detail")]
-        public async Task<ActionResult<UserResponse>> getuserdetail()
+        public async Task<ActionResult<UserResponse>> GetUserDetail()
         {
             try
             {
                
-                var response = await _userService.getuserdetail(User);
+                var response = await _userService.GetUserDetail(User);
                 return response;
             }catch (Exception e)
             {
-                return HandleException(e);
+                return HandleLoginException(e);
             }
         }
         // User Login
         [HttpPost("login")]
-        public async Task<ActionResult> login([FromBody] Login request)
+        public async Task<ActionResult> Login([FromBody] Login request)
         {
             try
             {
-                var response = await _userService.login(request);
+                var response = await _userService.Login(request);
                 return Ok(response);
             }
             catch(Exception e)
@@ -131,11 +131,11 @@ namespace CSMapi.Controller
         }
         // Create user
         [HttpPost("user")]
-        public async Task<ActionResult<UserResponse>> createUser([FromBody] UserRequest request)
+        public async Task<ActionResult<UserResponse>> CreateUser([FromBody] UserRequest request)
         {
             try
             {
-                var response = await _userService.createuser(request);
+                var response = await _userService.CreateUser(request);
                 return response;
             }catch(Exception e)
             {
@@ -144,11 +144,11 @@ namespace CSMapi.Controller
         }
         // Create role
         [HttpPost("role")]
-        public async Task<ActionResult<RoleResponse>> addrole([FromBody] RoleRequest request)
+        public async Task<ActionResult<RoleResponse>> AddRole([FromBody] RoleRequest request)
         {
             try
             {
-                var response = await _userService.addrole(request);
+                var response = await _userService.AddRole(request);
                 return response;
             } catch (Exception e)
             {
@@ -157,11 +157,11 @@ namespace CSMapi.Controller
         }
         // Update role
         [HttpPatch("role/update/{id}")]
-        public async Task<ActionResult<RoleResponse>> updaterole([FromBody] RoleRequest request, int id)
+        public async Task<ActionResult<RoleResponse>> UpdateRole([FromBody] RoleRequest request, int id)
         {
             try
             {
-                var response = await _userService.updaterole(request, id);
+                var response = await _userService.UpdateRole(request, id);
                 return response;
             } catch (Exception e)
             {
@@ -170,11 +170,11 @@ namespace CSMapi.Controller
         }
         // Update user
         [HttpPatch("user/update/{id}")]
-        public async Task<ActionResult<UserResponse>> updateuser([FromBody] UserRequest request, int id)
+        public async Task<ActionResult<UserResponse>> UpdateUser([FromBody] UserRequest request, int id)
         {
             try
             {
-                var response = await _userService.updateuser(request, id);
+                var response = await _userService.UpdateUser(request, id);
                 return response;
                 
             } catch (Exception e)
@@ -184,11 +184,11 @@ namespace CSMapi.Controller
         }
         // Add E signature to specific user
         [HttpPatch("user/e-signature/{id}")]
-        public async Task<ActionResult<UserEsignResponse>> addesign(IFormFile file, int id)
+        public async Task<ActionResult<UserEsignResponse>> AddESign(IFormFile file, int id)
         {
             try
             {
-                var response = await _userService.addesign(file, id, User);
+                var response = await _userService.AddEsign(file, id, User);
                 return response;
             }
             catch (Exception e)
@@ -198,11 +198,11 @@ namespace CSMapi.Controller
         }
         // Toggle specific user active status
         [HttpPatch("user/toggle-active")]
-        public async Task<ActionResult<UserResponse>> toggleactive(int id)
+        public async Task<ActionResult<UserResponse>> ToggleActive(int id)
         {
             try
             {
-                var response = await _userService.toggleactive(id);
+                var response = await _userService.ToggleActive(id);
                 return response;
             } catch (Exception e)
             {
@@ -211,11 +211,11 @@ namespace CSMapi.Controller
         }
         // Remove specific user without removing in Database (Soft Delete)
         [HttpPatch("user/hide/{id}")]
-        public async Task<ActionResult<UserResponse>> hideuser(int id)
+        public async Task<ActionResult<UserResponse>> HideUser(int id)
         {
             try
             {
-                var response = await _userService.hideuser(id);
+                var response = await _userService.HideUser(id);
                 return response;
             } catch (Exception e)
             {
@@ -224,11 +224,11 @@ namespace CSMapi.Controller
         }
         // Remove specific role without removing in Database (Soft Delete)
         [HttpPatch("role/hide/{id}")]
-        public async Task<ActionResult<RoleResponse>> hiderole(int id)
+        public async Task<ActionResult<RoleResponse>> HideRole(int id)
         {
             try
             {
-                var response = await _userService.hiderole(id);
+                var response = await _userService.HideRole(id);
                 return response;
             } catch (Exception e)
             {
@@ -237,11 +237,11 @@ namespace CSMapi.Controller
         }
         // Delete specific user in Database
         [HttpDelete("user/delete/{id}")]
-        public async Task<ActionResult<UserResponse>> deleteuser(int id)
+        public async Task<ActionResult<UserResponse>> DeleteUser(int id)
         {
             try
             {
-                var response = await _userService.deleteuser(id);
+                var response = await _userService.DeleteUser(id);
                 return response;
             }
             catch (Exception e)
@@ -251,11 +251,11 @@ namespace CSMapi.Controller
         }
         // Delete specific role in Database
         [HttpDelete("role/delete/{id}")]
-        public async Task<ActionResult<RoleResponse>> deleterole(int id)
+        public async Task<ActionResult<RoleResponse>> DeleteRole(int id)
         {
             try
             {
-                var response = await _userService.deleterole(id);
+                var response = await _userService.DeleteRole(id);
                 return response;
             } catch (Exception e)
             {
