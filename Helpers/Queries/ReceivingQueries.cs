@@ -15,6 +15,19 @@ namespace CSMapi.Helpers.Queries
             _context = context;
             _validator = validator;
         }
+        // Query for fetching receiving details based on status
+        public IQueryable<ReceivingDetail> PaginatedReceivingDetailDraftQuery(int status)
+        {
+            var query = _context.Receivingdetails
+                .AsNoTracking()
+                .Where(r => r.Status == status)
+                .Include(r => r.Pallet)
+                .Include(r => r.PalletPosition.Coldstorage)
+                .OrderByDescending(r => r.Id)
+                .AsQueryable();
+
+            return query;
+        }
         // Query for fetching all receivings in list
         public async Task<List<Receiving>> ReceivingsList()
         {
@@ -294,6 +307,14 @@ namespace CSMapi.Helpers.Queries
                    .OrderByDescending(r => r.Id)
                    .ToListAsync();
             }
+        }
+        // Query for fetching specific receiving detail draft for PATCH/PUT/DELETE methods
+        public async Task<ReceivingDetail?> PatchReceivingDetailId(int id)
+        {
+            return await _context.Receivingdetails
+                .Include(r => r.Pallet)
+                .Include(r => r.PalletPosition.Coldstorage)
+                .FirstOrDefaultAsync(r => r.Id == id);
         }
     }
 }

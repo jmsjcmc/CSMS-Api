@@ -101,6 +101,22 @@ namespace CSMapi.Services
                 .Where(d => !d.Removed && d.Declined)
                 .CountAsync();
         }
+
+        // DispatchingService
+        public async Task<int> DispatchedCountByDate(DateTime date)
+        {
+            var start = date.Date;
+            var end = date.Date.AddDays(1);
+
+            return await _context.Dispatchings
+                .AsNoTracking()
+                .Where(d => !d.Removed && d.Dispatched
+                            && d.Dispatchdate >= start
+                            && d.Dispatchdate < end)
+                .CountAsync();
+        }
+
+
         // [HttpGet("dispatching/{id}")]
         public async Task<DispatchingResponse> GetDispatch(int id)
         {

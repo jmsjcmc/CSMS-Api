@@ -127,6 +127,7 @@ namespace CSMapi.Services
                 .Where(r => !r.Removed && r.Received)
                 .CountAsync();
         }
+
         // [HttpGet("receivings/count-all")] "Declined"
         public async Task<int> DeclinedCount()
         {
@@ -135,6 +136,22 @@ namespace CSMapi.Services
                 .Where(r => !r.Removed && r.Declined)
                 .CountAsync();
         }
+
+        // [HttpGet("customers/count-by-date")]
+        public async Task<int> ReceivedCountByDate(DateTime date)
+        {
+            var start = date.Date;
+            var end = date.Date.AddDays(1);
+
+            return await _context.Receivings
+                .AsNoTracking()
+                .Where(r => !r.Removed && r.Received
+                            && r.Datereceived >= start
+                            && r.Datereceived < end)
+                .CountAsync();
+        }
+
+
         // [HttpPost("receiving")]
         public async Task<ReceivingResponse> AddReceiving(ReceivingRequest request, IFormFile? file, ClaimsPrincipal user)
         {

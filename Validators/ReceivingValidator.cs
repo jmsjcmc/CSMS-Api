@@ -12,75 +12,60 @@ namespace CSMapi.Validators
         }
         public async Task ValidateReceivingRequest(ReceivingRequest request)
         {
-
             if (string.IsNullOrWhiteSpace(request.Documentno))
             {
                 throw new ArgumentException("Document Number required.");
             }
-
             if(await _context.Receivings.AnyAsync(r => r.Document.Documentno == request.Documentno))
             {
                 throw new ArgumentException("Document Number required.");
             }
-
             if (request.Productid < 0)
             {
                 throw new ArgumentException("Product Id required and must be valid identifier.");
             }
-
             if (request.Expirationdate == DateTime.MinValue)
             {
                 throw new ArgumentException("Expiration Date not valid");
             }
-
             if (string.IsNullOrWhiteSpace(request.Cvnumber))
             {
                 throw new ArgumentException("Cv Number required.");
             }
-
             if (string.IsNullOrWhiteSpace(request.Platenumber))
             {
                 throw new ArgumentException("Plate Number required.");
             }
-
             if (request.Arrivaldate == DateTime.MinValue)
             {
                 throw new ArgumentException("Arrival Date not valid.");
             }
-
             if (string.IsNullOrWhiteSpace(request.Unloadingstart))
             {
                 throw new ArgumentException("Unloading Start required.");
             }
-
             if (string.IsNullOrWhiteSpace(request.Unloadingend))
             {
                 throw new ArgumentException("Unloading End required.");
             }
-
             if (request.Overallweight < 0)
             {
                 throw new ArgumentException("Overall Weight required and must be greater than zero.");
             }
-
             if (request.ReceivingDetail == null)
             {
                 throw new ArgumentException("Atleast one receiving detail is required.");
             }
-
             foreach (var detail in request.ReceivingDetail)
-            {
-                
+            {   
                 if (detail.Palletid <= 0)
                 {
                     throw new ArgumentException("Pallet Id required and must be valid identifier.");
                 }
-
                 if (detail.Quantityinapallet <= 0)
                 {
                     throw new ArgumentException("Quantity required and must be greater than zero.");
                 }
-
                 if (detail.Totalweight <= 0)
                 {
                     throw new ArgumentException("Total Weight required and must be greater than zero.");

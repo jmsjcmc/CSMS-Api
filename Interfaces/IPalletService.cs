@@ -6,10 +6,15 @@ namespace CSMapi.Interfaces
     public interface IPalletService
     {
         Task<List<ProductBasedOccupiedPalletResponse>> ProductBasedOccupiedPallets(int id);
-        //Task<Pagination<OccupiedPalletResponse>> occupiedpallets(
-        //    int pageNumber = 1,
-        //    int pageSize = 10,
-        //    string? searchTerm = null);
+        Task<Pagination<OccupiedPalletResponse>> OccupiedPallets(
+            int pageNumber = 1,
+            int pageSize = 10,
+            string? searchTerm = null,
+            int status = 0);
+        Task<Pagination<CsToCsResponse>> PaginatedCsToCsMovement(
+            int pageNumber = 1,
+            int pageSize = 10,
+            int status = 0);
         Task<Pagination<RepalletizationDraftResponse>> PaginatedRepalletizationDraft(
             int pageNumber = 1,
             int pageSize = 10,
@@ -30,14 +35,15 @@ namespace CSMapi.Interfaces
         Task<int> ActiveCount();
         Task<int> OccupiedCount();
         Task<int> RepalletizedCount();
-       
         Task<RepalletizationBulkResponse> BulkRepalletize(RepalletizationBulkRequest request, ClaimsPrincipal user);
         Task<ColdStorageResponse> AddColdStorage(ColdStorageRequest request);
         Task<PalletResponse> AddPallet(PalletRequest request, ClaimsPrincipal user);
         Task<PalletPositionResponse> AddPosition(PalletPositionRequest request);
+        Task<List<CsToCsResponse>> BulkCsToCsMovement(CsToCsBulkRequest request, ClaimsPrincipal user);
         Task<ColdStorageResponse> UpdateColdStorage(ColdStorageRequest request, int id);
         Task<PalletResponse> UpdatePallet(PalletRequest request, int id, ClaimsPrincipal user);
         Task<PalletPositionResponse> UpdatePosition(PalletPositionRequest request, int id);
+        Task<CsToCsBulkResponse> ApproveCsToCsMovement(int id);
         Task<RepalletizationDraftResponse> ApproveRepalletizationDraft(int id);
         Task<ColdStorageResponse> CsToggleActive(int id);
         Task<PalletOnlyResponse> ToggleOccupy(int id, ClaimsPrincipal user);
@@ -47,5 +53,6 @@ namespace CSMapi.Interfaces
         Task<ColdStorageResponse> DeleteColdStorage(int id);
         Task<PalletResponse> DeletePallet(int id);
         Task<PalletPositionResponse> DeletePosition(int id);
+        Task<RepalletizationResponse> DeleteRepalletization(int id);
     }
 }

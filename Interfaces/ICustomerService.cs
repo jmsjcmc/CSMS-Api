@@ -5,6 +5,7 @@ namespace CSMapi.Interfaces
 {
     public interface ICustomerService
     {
+
         Task<Pagination<CustomerResponse>> AllCustomers(
             int pageNumber = 1,
             int pageSize = 10,
@@ -17,5 +18,6 @@ namespace CSMapi.Interfaces
         Task<CustomerResponse> ToggleActive(int id);
         Task<CustomerResponse> HideCustomer(int id);
         Task<CustomerResponse> DeleteCustomer(int id);
+        
     }
 }

@@ -13,11 +13,48 @@ namespace CSMapi.Controller
     {
         private readonly CustomerExcel _customerExcel;
         private readonly CustomerService _customerService;
-        public CustomerController(AppDbContext context, IMapper mapper, CustomerService customerService, CustomerExcel customerExcel) : base (context, mapper)
+        private readonly ReceivingService _receivingService;
+        private readonly DispatchingService _dispatchingService;
+        public CustomerController(AppDbContext context, IMapper mapper, CustomerService customerService, CustomerExcel customerExcel, ReceivingService receivingService, DispatchingService dispatchingService) : base (context, mapper)
         {
             _customerExcel = customerExcel;
             _customerService = customerService;
+            _receivingService = receivingService;
+            _dispatchingService = dispatchingService;
         }
+
+        // Count by date
+        [HttpGet("customers/count-by-date")]
+        public async Task<ActionResult<IEnumerable<DailyCountDto>>> ReceivedAndDispatchCountByDate()
+        {
+            if (_receivingService == null || _dispatchingService == null)
+                return StatusCode(StatusCodes.Status500InternalServerError, "Services are not initialized.");
+
+            var today = DateTime.Today;
+            var startDate = today.AddDays(-30);
+            var result = new List<DailyCountDto>();
+
+            for (var date = startDate; date <= today; date = date.AddDays(1))
+            {
+                var received = await _receivingService.ReceivedCountByDate(date);
+                var dispatched = await _dispatchingService.DispatchedCountByDate(date);
+
+                // Skip if both are zero
+                if (received == 0 && dispatched == 0)
+                    continue;
+
+                result.Add(new DailyCountDto
+                {
+                    Date = date,
+                    Received = received,
+                    Dispatched = dispatched
+                });
+            }
+
+            return Ok(result);
+        }
+
+
         // Fetch all customers
         [HttpGet("customers")]
         public async Task<ActionResult<Pagination<CustomerResponse>>> AllCustomers(

@@ -54,4 +54,12 @@
         public User Creator { get; set; }
         public int Status { get; set; }
     }
+    public class CsMovement
+    {
+        public int Id { get; set; }
+        public int Receivingdetailid { get; set; }
+        public int Frompositionid { get; set; }
+        public int Topositionid { get; set; }
+        public int Status { get; set; }
+    }
 }

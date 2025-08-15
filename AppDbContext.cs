@@ -21,6 +21,8 @@ namespace CSMapi
         // Dispatching
         public DbSet<Dispatching> Dispatchings { get; set; }
         public DbSet<DispatchingDetail> Dispatchingdetails { get; set; }
+        // Cs Movement
+        public DbSet<CsMovement> Csmovements { get; set; }
         // Repalletization
         public DbSet<Repalletization> Repalletizations { get; set; }
         // Document

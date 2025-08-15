@@ -230,11 +230,27 @@ namespace CSMapi.Helpers
                 .ForMember(d => d.Palletno, o => o.MapFrom(s => s.Pallet.Palletno))
                 .ForMember(d => d.Remainingquantity, o => o.Ignore())
                 .ForMember(d => d.Remainingweight, o => o.Ignore())
+                .ForMember(d => d.Csid, o => o.MapFrom(s => s.PalletPosition.Coldstorage.Id))
+                .ForMember(d => d.Positionid, o => o.MapFrom(s => s.PalletPosition.Id))
                 .ForMember(d => d.Csnumber, o => o.MapFrom(s => s.PalletPosition.Coldstorage.Csnumber))
                 .ForMember(d => d.Wing, o => o.MapFrom(s => s.PalletPosition.Wing))
                 .ForMember(d => d.Floor, o => o.MapFrom(s => s.PalletPosition.Floor))
                 .ForMember(d => d.Column, o => o.MapFrom(s => s.PalletPosition.Column))
                 .ForMember(d => d.Side, o => o.MapFrom(s => s.PalletPosition.Side));
+
+            CreateMap<ReceivingDetail, CsToCsResponse>()
+                .ForMember(d => d.User, o => o.MapFrom(s => s.Updater))
+                .ForMember(d => d.Taggingnumber, o => o.MapFrom(s => s.Pallet.Taggingnumber))
+                .ForMember(d => d.Pallettype, o => o.MapFrom(s => s.Pallet.Pallettype))
+                .ForMember(d => d.Palletno, o => o.MapFrom(s => s.Pallet.Palletno))
+                .ForMember(d => d.Positionid, o => o.MapFrom(s => s.PalletPosition.Id))
+                .ForMember(d => d.Wing, o => o.MapFrom(s => s.PalletPosition.Wing))
+                .ForMember(d => d.Floor, o => o.MapFrom(s => s.PalletPosition.Floor))
+                .ForMember(d => d.Column, o => o.MapFrom(s => s.PalletPosition.Column))
+                .ForMember(d => d.Side, o => o.MapFrom(s => s.PalletPosition.Side))
+                .ForMember(d => d.Csid, o => o.MapFrom(s => s.PalletPosition.Coldstorage.Id))
+                .ForMember(d => d.Csnumber, o => o.MapFrom(s => s.PalletPosition.Coldstorage.Csnumber));
+
             // Roles Mapping
             CreateMap<RoleRequest, Role>()
                 .ForMember(d => d.Removed, o => o.Ignore());
@@ -261,12 +277,17 @@ namespace CSMapi.Helpers
                 .ForMember(d => d.Creator, o => o.MapFrom(s => s.Creator));
 
             CreateMap<Repalletization, RepalletizationDraftResponse>()
+                .ForMember(d => d.Productname, o => o.MapFrom(s => s.Fromreceivingdetail.Receiving.Product.Productname))
                 .ForMember(d => d.Fromreceivingdetail, o => o.MapFrom(s => s.Fromreceivingdetail))
                 .ForMember(d => d.Toreceivingdetail, o => o.MapFrom(s => s.Toreceivingdetail));
             // Category Mapping
             CreateMap<CategoryRequest, Category>();
 
             CreateMap<Category, CategoryResponse>();
+            // Cs Movement Mapping
+            CreateMap<CsMovementRequest, CsMovement>();
+
+            CreateMap<CsMovement, CsMovementResponse>();
         }
     }
 }

@@ -48,6 +48,11 @@
         public bool Received { get; set; }
         public bool Partialdispatched { get; set; }
         public bool Fulldispatched { get; set; }
+        public int? Updaterid { get; set; }
+        public User Updater { get; set; }
+        public int Status { get; set; }
+        public DateTime? Updatedon { get; set; } = null;
+        public DateTime? Approvedon { get; set; } = null;
         public ICollection<DispatchingDetail> DispatchingDetail { get; set; }
         public ICollection<Repalletization> Outgoingrepalletization { get; set; }
         public ICollection<Repalletization> Incomingrepalletization { get; set; }

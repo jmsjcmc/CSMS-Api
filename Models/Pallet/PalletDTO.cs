@@ -121,6 +121,7 @@
         public int Status { get; set; }
         public int Quantitymoved { get; set; }
         public double Weightmoved { get; set; }
+        public string Productname { get; set; } // Receiving Detail -> Receiving -> Product
         public ProductBasesPallet Fromreceivingdetail { get; set; }
         public ProductBasesPallet Toreceivingdetail { get; set; }
     }
@@ -137,5 +138,19 @@
         public int Active { get; set; }
         public int Occupied { get; set; }
         public int Repalletized { get; set; }
+    }
+    public class CsMovementRequest
+    {
+        public int Receivingdetailid { get; set; }
+        public int Frompositionid { get; set; }
+        public int Topositionid { get; set; }
+    }
+    public class CsMovementResponse
+    {
+        public int Id { get; set; }
+        public int Receivingdetailid { get; set; }
+        public int Frompositionid { get; set; }
+        public int Topositionid { get; set; }
+        public int Status { get; set; }
     }
 }

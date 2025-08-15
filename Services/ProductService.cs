@@ -194,7 +194,7 @@ namespace CSMapi.Services
                 Productpackaging = p.Productpackaging,
                 Deliveryunit = p.Deliveryunit,
                 Datereceived = r?.Datereceived,
-                Quantityinapallet = r?.Receivingdetails.Sum(r => r.Quantityinapallet) ?? 0
+                Quantityinapallet = r?.Receivingdetails.Sum(r => r.Duquantity) ?? 0
             }).ToList();
 
             return PaginationHelper.PaginatedResponse(mapped, totalCount, pageNumber, pageSize);

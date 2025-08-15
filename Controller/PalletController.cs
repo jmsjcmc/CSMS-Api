@@ -52,32 +52,53 @@ namespace CSMapi.Controller
             }
         }
         // Fetch all occupied pallets
-        //[HttpGet("pallets/occupied")]
-        //public async Task<ActionResult<Pagination<OccupiedPalletResponse>>> OccupiedPallets(
-        //    [FromQuery] int pageNumber = 1,
-        //    [FromQuery] int pageSize = 10,
-        //    [FromQuery] string? searchTerm = null)
-        //{
-        //    try
-        //    {
-        //        var response = await _palletService.occupiedpallets(pageNumber, pageSize, searchTerm);
-        //        return response;
-        //    } catch (Exception e)
-        //    {
-        //        return HandleException(e);
-        //    }
-        //}
-        // 
-        [HttpGet("pallets/repalletization-draft")]
-        public async Task<ActionResult<Pagination<RepalletizationDraftResponse>>> PaginatedRepalletizationDraft(
+        [HttpGet("pallets/occupied")]
+        public async Task<ActionResult<Pagination<OccupiedPalletResponse>>> OccupiedPallets(
             [FromQuery] int pageNumber = 1,
-            [FromQuery] int pageSize = 10)
+            [FromQuery] int pageSize = 10,
+            [FromQuery] string? searchTerm = null,
+            [FromQuery] int status = 0)
         {
             try
             {
-                var response = await _palletService.PaginatedRepalletizationDraft(pageNumber, pageSize);
+                var response = await _palletService.OccupiedPallets(pageNumber, pageSize, searchTerm, status);
                 return response;
-            } catch (Exception e)
+            }
+            catch (Exception e)
+            {
+                return HandleException(e);
+            }
+        }
+        // Fetch all pallets cs movement in draft
+        [HttpGet("pallets/cs-movement-draft")]
+        public async Task<ActionResult<Pagination<CsToCsResponse>>> PaginatedCsToCsMovement(
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10,
+            [FromQuery] int status = 0)
+        {
+            try
+            {
+                var response = await _palletService.PaginatedCsToCsMovement(pageNumber, pageSize, status);
+                return response;
+            }
+            catch (Exception e)
+            {
+                return HandleException(e);
+            }
+        }
+        // Fetch all pallets that are repalletized in draft
+        [HttpGet("pallets/repalletization-draft")]
+        public async Task<ActionResult<Pagination<RepalletizationDraftResponse>>> PaginatedRepalletizationDraft(
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10,
+            [FromQuery] int status = 0)
+        {
+            try
+            {
+                var response = await _palletService.PaginatedRepalletizationDraft(pageNumber, pageSize, status);
+                return response;
+            }
+            catch (Exception e)
             {
                 return HandleException(e);
             }
@@ -276,7 +297,7 @@ namespace CSMapi.Controller
             }
         }
         // Bulk Repalletization
-        [HttpPost("pallet/bulk-repalletization")]
+        [HttpPost("pallets/bulk-repalletization")]
         public async Task<ActionResult<RepalletizationBulkResponse>> BulkRepalletize([FromBody] RepalletizationBulkRequest request)
         {
             try
@@ -367,6 +388,20 @@ namespace CSMapi.Controller
                 return HandleException(e);
             }
         }
+        // Bulk Cold Storage to Cold Storage Movement
+        [HttpPatch("pallets/bulk-cs-movement")]
+        public async Task<ActionResult<List<CsToCsResponse>>> BulkCsToCsMovement([FromBody] CsToCsBulkRequest request)
+        {
+            try
+            {
+                var response = await _palletService.BulkCsToCsMovement(request, User);
+                return response;
+            }
+            catch (Exception e)
+            {
+                return HandleException(e);
+            }
+        }
         // Update specific cold storage
         [HttpPatch("cold-storage/update/{id}")]
         public async Task<ActionResult<ColdStorageResponse>> UpdateColdStorage([FromBody] ColdStorageRequest request, int id)
@@ -409,6 +444,20 @@ namespace CSMapi.Controller
                 return HandleException(e);
             }
         }
+        // Approve cs movement
+        [HttpPatch("pallets/approve-cs-movement-draft")]
+        public async Task<ActionResult<CsToCsBulkResponse>> ApproveCsToCsMovement(int id)
+        {
+            try
+            {
+                var response = await _palletService.ApproveCsToCsMovement(id);
+                return response;
+            }
+            catch (Exception e)
+            {
+                return HandleException(e);
+            }
+        }
         // Approve repalletization draft
         [HttpPatch("pallets/approve-repalletization-draft")]
         public async Task<ActionResult<RepalletizationDraftResponse>> ApproveRepalletizationDraft(int id)
@@ -417,7 +466,8 @@ namespace CSMapi.Controller
             {
                 var response = await _palletService.ApproveRepalletizationDraft(id);
                 return response;
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 return HandleException(e);
             }
@@ -527,6 +577,20 @@ namespace CSMapi.Controller
             try
             {
                 var response = await _palletService.DeletePosition(id);
+                return response;
+            }
+            catch (Exception e)
+            {
+                return HandleException(e);
+            }
+        }
+        // Delete specific pallet repalletization in Database 
+        [HttpDelete("pallet/repalletization/delete/{id}")]
+        public async Task<ActionResult<RepalletizationResponse>> DeleteRepalletization(int id)
+        {
+            try
+            {
+                var response = await _palletService.DeleteRepalletization(id);
                 return response;
             }
             catch (Exception e)

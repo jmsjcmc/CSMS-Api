@@ -34,4 +34,11 @@
         public int Id { get; set; }
         public string Companyname { get; set; }
     }
+
+    public class DailyCountDto
+    {
+        public DateTime Date { get; set; }
+        public int Received { get; set; }
+        public int Dispatched { get; set; }
+    }
 }

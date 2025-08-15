@@ -22,10 +22,12 @@ namespace CSMapi.Helpers.Queries
                 .AsNoTracking()
                 .Where(r => r.Status == status)
                 .Include(r => r.Fromreceivingdetail.Pallet)
+                .Include(r => r.Fromreceivingdetail.Receiving.Product)
                 .Include(r => r.Fromreceivingdetail.PalletPosition.Coldstorage)
                 .Include(r => r.Fromreceivingdetail.DispatchingDetail)
                 .ThenInclude(d => d.Dispatching)
                 .Include(r => r.Toreceivingdetail.Pallet)
+                .Include(r => r.Toreceivingdetail.Receiving.Product)
                 .Include(r => r.Toreceivingdetail.PalletPosition.Coldstorage)
                 .Include(r => r.Toreceivingdetail.DispatchingDetail)
                 .ThenInclude(d => d.Dispatching)
@@ -186,7 +188,10 @@ namespace CSMapi.Helpers.Queries
         public async Task<ColdStorage?> GetColdStorageId(int id)
         {
             // Validate id if it exist
-            await _validator.ValidateSpecificId(id);
+            if (!await _context.Coldstorages.AnyAsync(c => c.Id == id))
+            {
+                throw new ArgumentException($"Cold Storage ID {id} not found.");
+            }
 
             return await _context.Coldstorages
                     .AsNoTracking()
@@ -196,7 +201,10 @@ namespace CSMapi.Helpers.Queries
         public async Task<PalletPosition?> GetPositionId(int id)
         {
             // Validate id if it exist
-            await _validator.ValidateSpecificId(id);
+            if (!await _context.Palletpositions.AnyAsync(p => p.Id == id))
+            {
+                throw new ArgumentException($"Position ID {id} not found.");
+            }
 
             return await _context.Palletpositions
                 .AsNoTracking()
@@ -207,7 +215,10 @@ namespace CSMapi.Helpers.Queries
         public async Task<Repalletization?> GetRepalletizationId(int id)
         {
             // Validate id if it exist
-            await _validator.ValidateSpecificId(id);
+            if (!await _context.Repalletizations.AnyAsync(r => r.Id == id))
+            {
+                throw new ArgumentException($"Repalletization ID {id} not found.");
+            }
 
             return await _context.Repalletizations
                 .AsNoTracking()
@@ -217,7 +228,10 @@ namespace CSMapi.Helpers.Queries
         public async Task<List<PalletPosition>> GetPositionByCs(int id)
         {
             // Validate id if it exist
-            await _validator.ValidateSpecificId(id);
+            if (!await _context.Palletpositions.AnyAsync(p => p.Id == id))
+            {
+                throw new ArgumentException($"Position ID {id} not found.");
+            }
 
             return await _context.Palletpositions
                 .AsNoTracking()
@@ -238,7 +252,10 @@ namespace CSMapi.Helpers.Queries
         public async Task<Pallet?> PatchPalletId(int id)
         {
             // Validate id if it exist
-            await _validator.ValidateSpecificId(id);
+            if (!await _context.Pallets.AnyAsync(p => p.Id == id))
+            {
+                throw new ArgumentException($"Pallet ID {id} not foud.");
+            }
 
             return await _context.Pallets
                 .Include(p => p.Creator)
@@ -250,7 +267,10 @@ namespace CSMapi.Helpers.Queries
         public async Task<PalletPosition?> PatchPositionId(int id)
         {
             // Validate id if it exist
-            await _validator.ValidateSpecificId(id);
+            if (!await _context.Palletpositions.AnyAsync(p => p.Id == id))
+            {
+                throw new ArgumentException($"Position ID {id} not found.");
+            }
 
             return await _context.Palletpositions
                 .Include(p => p.Coldstorage)
@@ -260,7 +280,10 @@ namespace CSMapi.Helpers.Queries
         public async Task<ColdStorage?> PatchCsId(int id)
         {
             // Validate id if it exist
-            await _validator.ValidateSpecificId(id);
+            if (!await _context.Coldstorages.AnyAsync(c => c.Id == id))
+            {
+                throw new ArgumentException($"Cold Storage ID {id} not found.");
+            }
 
             return await _context.Coldstorages.
                 FirstOrDefaultAsync(c => c.Id == id);
@@ -269,7 +292,10 @@ namespace CSMapi.Helpers.Queries
         public async Task<Repalletization?> PatchRepalletizationsDraftId(int id)
         {
             // Validate id if it exist
-            await _validator.ValidateSpecificId(id);
+            if (!await _context.Repalletizations.AnyAsync(r => r.Id == id))
+            {
+                throw new ArgumentException($"Repalletization ID {id} not found.");
+            }
 
             return await _context.Repalletizations
                 .Include(r => r.Fromreceivingdetail.Pallet)
@@ -282,5 +308,23 @@ namespace CSMapi.Helpers.Queries
                 .ThenInclude(d => d.Dispatching)
                 .FirstOrDefaultAsync(r => r.Id == id);
         }
+        // 
+        //public async Task<Repalletization?> GetRepalletizationId(int id)
+        //{
+        //    if (!await _context.Repalletizations.AnyAsync(r => r.Id == id))
+        //        throw new ArgumentException($"Repalletization ID {id} not found.");
+
+        //    return await _context.Repalletizations
+        //        .AsNoTracking()
+        //        .Include(r => r.Fromreceivingdetail.Pallet)
+        //        .Include(r => r.Fromreceivingdetail.PalletPosition.Coldstorage)
+        //        .Include(r => r.Fromreceivingdetail.DispatchingDetail)
+        //        .ThenInclude(d => d.Dispatching)
+        //        .Include(r => r.Toreceivingdetail.Pallet)
+        //        .Include(r => r.Toreceivingdetail.PalletPosition.Coldstorage)
+        //        .Include(r => r.Toreceivingdetail.DispatchingDetail)
+        //        .ThenInclude(d => d.Dispatching)
+        //        .FirstOrDefaultAsync(r => r.Id == id);
+        //}
     }
 }

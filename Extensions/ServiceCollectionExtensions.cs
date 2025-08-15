@@ -5,6 +5,7 @@ using CSMapi.Models;
 using CSMapi.Services;
 using CSMapi.Validators;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
@@ -52,7 +53,7 @@ namespace CSMapi.Extensions
             service.AddScoped<ReceivingQueries>();
             service.AddScoped<UserQueries>();
             service.AddScoped<CategoryQueries>();
-       
+
             return service;
         }
         // Swagger Documentation

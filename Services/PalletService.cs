@@ -13,10 +13,12 @@ namespace CSMapi.Services
     {
         private readonly PalletValidator _palletValidator;
         private readonly PalletQueries _palletQueries;
-        public PalletService(AppDbContext context, IMapper mapper, PalletValidator palletValidator, PalletQueries palletQueries) : base(context, mapper)
+        private readonly ReceivingQueries _receivingQueries;
+        public PalletService(AppDbContext context, IMapper mapper, PalletValidator palletValidator, PalletQueries palletQueries, ReceivingQueries receivingQueries) : base(context, mapper)
         {
             _palletValidator = palletValidator;
             _palletQueries = palletQueries;
+            _receivingQueries = receivingQueries;
         }
         // [HttpGet("pallets/occupied/product-id")]
         public async Task<List<ProductBasedOccupiedPalletResponse>> ProductBasedOccupiedPallets(int id)
@@ -25,110 +27,112 @@ namespace CSMapi.Services
             return _mapper.Map<List<ProductBasedOccupiedPalletResponse>>(pallets);
         }
         // [HttpGet("pallets/occupied")]
-        //public async Task<Pagination<OccupiedPalletResponse>> occupiedpallets(
-        //    int pageNumber = 1,
-        //    int pageSize = 10,
-        //    string? searchTerm = null)
-        //{
-        //    var query = _palletQueries.occupiedpalletsquery(searchTerm);
-        //    var totalCount = await query.CountAsync();
+        public async Task<Pagination<OccupiedPalletResponse>> OccupiedPallets(
+            int pageNumber = 1,
+            int pageSize = 10,
+            string? searchTerm = null,
+            int status = 0)
+        {
+            var query = _palletQueries.OccupiedPalletsQuery(searchTerm);
+            var totalCount = await query.CountAsync();
 
-        //    var pallets = await PaginationHelper.paginateandproject<Pallet, OccupiedPalletResponse>(
-        //        query, pageNumber, pageSize, _mapper);
+            var pallets = await PaginationHelper.PaginatedAndProject<Pallet, OccupiedPalletResponse>(
+                query, pageNumber, pageSize, _mapper);
 
-        //    if (!pallets.Any())
-        //        return PaginationHelper.paginatedresponse(pallets, totalCount, pageNumber, pageSize);
+            var rdIds = pallets.SelectMany(p => p.ReceivingDetail.Select(r => r.Id))
+                .Distinct()
+                .ToList();
 
-        //    // Prefetch all necessary data
-        //    var palletIds = pallets.Select(p => p.Id).ToList();
-        //    var rdIds = pallets.SelectMany(p => p.ReceivingDetail.Select(rd => rd.Id)).Distinct().ToList();
+            var dispatchedAggregates = await _context.Dispatchingdetails
+                .Where(d => rdIds.Contains(d.Receivingdetailid) &&
+                d.Dispatching != null &&
+                d.Dispatching.Dispatched &&
+                !d.Dispatching.Declined &&
+                !d.Dispatching.Removed)
+                .GroupBy(d => d.Receivingdetailid)
+                .Select(g => new
+                {
+                    Receivingdetailid = g.Key,
+                    DispatchedQuantity = g.Sum(d => d.Quantity),
+                    DispatchedWeight = g.Sum(d => d.Totalweight)
+                }).ToDictionaryAsync(x => x.Receivingdetailid);
 
-        //    // Dispatched quantities (grouped by receiving detail)
-        //    var dispatched = await _context.Dispatchingdetails
-        //        .Where(d => rdIds.Contains(d.Receivingdetailid))
-        //        .GroupBy(d => d.Receivingdetailid)
-        //        .Select(g => new { g.Key, Sum = g.Sum(d => (int?)d.Quantity) ?? 0 })
-        //        .ToDictionaryAsync(x => x.Key, x => x.Sum);
+            var outgoingRepalletizations = await _context.Repalletizations
+                .Where(r => rdIds.Contains(r.Fromreceivingdetailid) && r.Status == 2)
+                .GroupBy(r => r.Fromreceivingdetailid)
+                .Select(g => new
+                {
+                    Receivingdetailid = g.Key,
+                    OutQuantity = g.Sum(r => r.Quantitymoved)
+                })
+                .ToDictionaryAsync(x => x.Receivingdetailid);
 
-        //    // Repalletization FROM current pallet (using ReceivingDetail.Palletid)
-        //    var fromRepalletized = await _context.Repalletizationdetails
-        //        .Include(rd => rd.Receivingdetail)  // Need to include ReceivingDetail
-        //        .Where(r => rdIds.Contains(r.Receivingdetailid))
-        //        .GroupBy(r => new
-        //        {
-        //            SourcePalletId = r.Receivingdetail.Palletid,  // Get source pallet from ReceivingDetail
-        //            r.Receivingdetailid
-        //        })
-        //        .Select(g => new
-        //        {
-        //            g.Key.SourcePalletId,
-        //            g.Key.Receivingdetailid,
-        //            Sum = g.Sum(r => (int?)r.Quantitymoved) ?? 0
-        //        })
-        //        .ToListAsync();
+            var incomingRepalletization = await _context.Repalletizations
+                .Where(r => rdIds.Contains(r.Toreceivingdetailtid) &&
+                r.Status == 2)
+                .GroupBy(r => r.Toreceivingdetailtid)
+                .Select(g => new
+                {
+                    Receivingdetailid = g.Key,
+                    InQuantity = g.Sum(r => r.Quantitymoved)
+                })
+                .ToDictionaryAsync(x => x.Receivingdetailid);
 
-        //    var fromRepalletizedDict = fromRepalletized
-        //        .ToDictionary(x => new { PalletId = x.SourcePalletId, Receivingdetailid = x.Receivingdetailid }, x => x.Sum);
+            foreach (var pallet in pallets)
+            {
+                foreach (var rd in pallet.ReceivingDetail)
+                {
+                    int originalQuantity = rd.Quantityinapallet;
+                    double originalWeight = rd.Totalweight;
 
-        //    // Repalletization TO current pallet
-        //    var toRepalletized = await _context.Repalletizationdetails
-        //        .Include(rd => rd.Repalletization)  // Need Repalletization for Topalletid
-        //        .Where(r => rdIds.Contains(r.Receivingdetailid))
-        //        .GroupBy(r => new
-        //        {
-        //            PalletId = r.Repalletization.Topalletid,
-        //            r.Receivingdetailid
-        //        })
-        //        .Select(g => new
-        //        {
-        //            g.Key.PalletId,
-        //            g.Key.Receivingdetailid,
-        //            Sum = g.Sum(r => (int?)r.Quantitymoved) ?? 0
-        //        })
-        //        .ToListAsync();
+                    int dispatchedQuantity = 0;
+                    double dispatchedWeight = 0;
+                    // Get dispatched values
+                    if (dispatchedAggregates.TryGetValue(rd.Id, out var dispatch))
+                    {
+                        dispatchedQuantity = dispatch.DispatchedQuantity;
+                        dispatchedWeight = dispatch.DispatchedWeight;
+                    }
+                    // Get outgoing repalletizations
+                    int outQuantity = 0;
+                    if (outgoingRepalletizations.TryGetValue(rd.Id, out var outgoing))
+                    {
+                        outQuantity = outgoing.OutQuantity;
+                    }
+                    // Get incoming repalletizations
+                    int inQuantity = 0;
+                    if (incomingRepalletization.TryGetValue(rd.Id, out var incoming))
+                    {
+                        inQuantity = incoming.InQuantity;
+                    }
 
-        //    var toRepalletizedDict = toRepalletized
-        //        .ToDictionary(x => new { x.PalletId, x.Receivingdetailid }, x => x.Sum);
+                    int remainingQuantity = Math.Max(0, originalQuantity - dispatchedQuantity - outQuantity + inQuantity);
 
-        //    // Calculate remaining quantities
-        //    foreach (var pallet in pallets)
-        //    {
-        //        foreach (var rd in pallet.ReceivingDetail)
-        //        {
-        //            int dispatchedQty = dispatched.TryGetValue(rd.Id, out var dVal) ? dVal : 0;
+                    double wpu = originalQuantity > 0 ? originalQuantity / originalQuantity : 0;
+                    double remainingWeight = Math.Max(0, Math.Round(
+                        originalWeight - dispatchedWeight - (outQuantity * wpu) + (inQuantity * wpu), 2));
 
-        //            // Use PalletId
-        //            var fromKey = new { PalletId = pallet.Id, Receivingdetailid = rd.Id };
-        //            int fromQty = fromRepalletizedDict.TryGetValue(fromKey, out var fVal) ? fVal : 0;
-
-        //            var toKey = new { PalletId = pallet.Id, Receivingdetailid = rd.Id };
-        //            int toQty = toRepalletizedDict.TryGetValue(toKey, out var tVal) ? tVal : 0;
-
-        //            rd.Quantityinapallet = rd.Quantityinapallet - dispatchedQty - fromQty + toQty;
-        //        }
-        //    }
-
-        //    return PaginationHelper.paginatedresponse(pallets, totalCount, pageNumber, pageSize);
-        //}
-        //public async Task<Pagination<OccupiedPalletResponse>> occupiedpallets(
-        //    int pageNumber = 1,
-        //    int pageSize = 10,
-        //    string? searchTerm = null)
-        //{
-        //    var query = _palletQueries.occupiedpalletsquery(searchTerm);
-        //    var totalCount = await query.CountAsync();
-
-        //    var pallets = await PaginationHelper.paginateandproject<Pallet, OccupiedPalletResponse>(
-        //        query, pageNumber, pageSize, _mapper);
-
-        //    // Return without recalculating - quantities are already updated in DB
-        //    return PaginationHelper.paginatedresponse(pallets, totalCount, pageNumber, pageSize);
-        //}
-        // [HttpGet("pallets/repalletization-draft")]
-        public async Task<Pagination<RepalletizationDraftResponse>> PaginatedRepalletizationDraft(
+                    rd.Quantityinapallet = remainingQuantity;
+                    rd.Totalweight = remainingWeight;
+                }
+            }
+            return PaginationHelper.PaginatedResponse(pallets, totalCount, pageNumber, pageSize);
+        }
+        // [HttpGet("pallets/cs-movement-draft")]
+        public async Task<Pagination<CsToCsResponse>> PaginatedCsToCsMovement(
             int pageNumber = 1,
             int pageSize = 10,
             int status = 0)
+        {
+            var query = _receivingQueries.PaginatedReceivingDetailDraftQuery(status);
+            return await PaginationHelper.PaginateAndMap<ReceivingDetail, CsToCsResponse>(query, pageNumber, pageSize, _mapper);
+
+        }
+        // [HttpGet("pallets/repalletization-draft")]
+        public async Task<Pagination<RepalletizationDraftResponse>> PaginatedRepalletizationDraft(
+           int pageNumber = 1,
+           int pageSize = 10,
+           int status = 0)
         {
             var query = _palletQueries.PaginatedRepalletizationDraftQuery(status);
             var totalCount = await query.CountAsync();
@@ -305,6 +309,9 @@ namespace CSMapi.Services
                     var toDetail = await _context.Receivingdetails
                         .FirstOrDefaultAsync(r => r.Id == repallet.Toreceivingdetailtid);
 
+                    if (repallet.Fromreceivingdetailid == repallet.Toreceivingdetailtid)
+                        throw new Exception("Source and destination receiving detail cannot be the same.");
+
                     if (fromDetail == null || toDetail == null)
                         throw new Exception("From or to pallet not found.");
 
@@ -399,6 +406,37 @@ namespace CSMapi.Services
             var savedPosition = await GetPositionId(position.Id);
             return _mapper.Map<PalletPositionResponse>(savedPosition);
         }
+        // [HttpPatch("pallets/bulk-cs-movement")]
+        public async Task<List<CsToCsResponse>> BulkCsToCsMovement(CsToCsBulkRequest request, ClaimsPrincipal user)
+        {
+            var csIds = request.Cs.Select(c => c.Csid).ToList();
+
+            var receivingDetails = await _context.Receivingdetails
+                .Where(r => csIds.Contains(r.Id))
+                .ToListAsync();
+
+            var movements = new List<CsMovement>();
+            foreach (var rd in receivingDetails)
+            {
+                var updatedDto = request.Cs.First(c => c.Csid == rd.Id);
+                var movement = new CsMovement
+                {
+                    Receivingdetailid = rd.Id,
+                    Frompositionid = rd.Id,
+                    Topositionid = updatedDto.Positionid,
+                    Status = 1
+                };
+                movements.Add(movement);
+                rd.Positionid = updatedDto.Positionid;
+                rd.Updaterid = AuthUserHelper.GetUserId(user);
+                rd.Updatedon = TimeHelper.GetPhilippineStandardTime();
+                rd.Status = 1;
+            }
+            await _context.Csmovements.AddRangeAsync(movements);
+            await _context.SaveChangesAsync();
+
+            return _mapper.Map<List<CsToCsResponse>>(receivingDetails);
+        }
         // [HttpPatch("cold-storage/update/{id}")]
         public async Task<ColdStorageResponse> UpdateColdStorage(ColdStorageRequest request, int id)
         {
@@ -435,6 +473,20 @@ namespace CSMapi.Services
             await _context.SaveChangesAsync();
 
             return await PositionResponse(position.Id);
+        }
+        // [HttpPatch("pallets/approve-cs-movement-draft")]
+        public async Task<CsToCsBulkResponse> ApproveCsToCsMovement(int id)
+        {
+            var draft = await _receivingQueries.PatchReceivingDetailId(id);
+
+            draft.Status = 2;
+            draft.Approvedon = TimeHelper.GetPhilippineStandardTime();
+
+            _context.Receivingdetails.Update(draft);
+
+            await _context.SaveChangesAsync();
+
+            return _mapper.Map<CsToCsBulkResponse>(draft);
         }
         // [HttpPatch("pallets/approve-repalletization-draft")]
         public async Task<RepalletizationDraftResponse> ApproveRepalletizationDraft(int id)
@@ -547,6 +599,16 @@ namespace CSMapi.Services
 
             return await PositionResponse(position.Id);
         }
+        // [HttpDelete("pallets/repalletization/delete/{id}")]
+        public async Task<RepalletizationResponse> DeleteRepalletization(int id)
+        {
+            var repallet = await PatchRepalletizationId(id);
+
+            _context.Repalletizations.Remove(repallet);
+            await _context.SaveChangesAsync();
+
+            return await RepalletizationResponse(repallet.Id);
+        }
         // Helpers
         private async Task<Pallet?> PatchPalletId(int id)
         {
@@ -559,6 +621,10 @@ namespace CSMapi.Services
         private async Task<ColdStorage?> PatchCsId(int id)
         {
             return await _palletQueries.PatchCsId(id);
+        }
+        private async Task<Repalletization?> PatchRepalletizationId(int id)
+        {
+            return await _palletQueries.PatchRepalletizationsDraftId(id);
         }
         private async Task<Pallet?> GetPalletId(int id)
         {
@@ -590,6 +656,11 @@ namespace CSMapi.Services
         {
             var response = await GetCsId(id);
             return _mapper.Map<ColdStorageResponse>(response);
+        }
+        private async Task<RepalletizationResponse> RepalletizationResponse(int id)
+        {
+            var response = await GetRepalletizationId(id);
+            return _mapper.Map<RepalletizationResponse>(response);
         }
         private ProductBasesPallet MapToProductBasesPalletWithRemaining(ReceivingDetail rd)
         {

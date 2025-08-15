@@ -92,6 +92,9 @@ namespace CSMapi.Models
     {
         public int Id { get; set; }
         public int Quantityinapallet { get; set; }
+        public double Totalweight { get; set; }
+        public int Remainingquantity { get; set; }
+        public double Remainingweight { get; set; }
     }
     public class ProductReceivingDetailResponse
     {
@@ -190,11 +193,43 @@ namespace CSMapi.Models
         public int Quantityinapallet { get; set; }
         public int Remainingquantity { get; set; }
         public double Remainingweight { get; set; }
+        public int Csid { get; set; } // Pallet Position -> Cold Storage
         public string Csnumber { get; set; } // Pallet Position -> Cold Storage
+        public int Positionid { get; set; } // Pallet Position
         public string Wing { get; set; } // Pallet Position
         public string Floor { get; set; } // Pallet Position
         public string? Column { get; set; } // Pallet Position
         public string? Side { get; set; } // Pallet Position
         public double Totalweight { get; set; }
+    }
+    public class CsToCsBulkRequest
+    {
+        public List<CsToCsRequest> Cs { get; set; }
+    }
+    public class CsToCsBulkResponse
+    {
+        public List<CsToCsResponse> Cs { get; set; }
+    }
+    public class CsToCsRequest
+    {
+        public int Csid { get; set; }
+        public int Positionid { get; set; }
+    }
+
+    public class CsToCsResponse
+    {
+        public int Id { get; set; }
+        public string Taggingnumber { get; set; } // Pallet
+        public string Pallettype { get; set; } // Pallet
+        public int? Palletno { get; set; } // Pallet
+        public int Positionid { get; set; } // Pallet Position
+        public string Wing { get; set; } // Pallet Position
+        public string Floor { get; set; } // Pallet Position
+        public string? Column { get; set; } // Pallet Position
+        public string? Side { get; set; } // Pallet Position
+        public int Csid { get; set; } // Pallet Position -> Cold Storage
+        public string Csnumber { get; set; } // Pallet Position -> Cold Storage
+        public int Status { get; set; }
+        public UserEsignResponse User { get; set; }
     }
 }
