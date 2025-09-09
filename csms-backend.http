@@ -1,0 +1,6 @@
+@csms_backend_HostAddress = http://localhost:5244
+
+GET {{csms_backend_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
