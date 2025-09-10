@@ -23,6 +23,7 @@ namespace csms_backend.Controllers
             string? searchTerm)
         {
             var query = _userQuery.PaginatedUsers(searchTerm);
+
             return await PaginationHelper.PaginateAndMap<User, UserResponse>(query, pageNumber, pageSize, _mapper);
         }
         // [HttpGet("users/list")]
@@ -43,12 +44,14 @@ namespace csms_backend.Controllers
         {
             int userId = UserValidators.ValidateUserClaim(detail);
             var user = await _userQuery.GetUserById(userId);
+
             return _mapper.Map<UserResponse>(user);
         }
         // [HttpPost("user/create")]
         public async Task<UserResponse> CreateUser(UserRequest request)
         {
             var buExist = await _context.BusinessUnit.AnyAsync(b => b.Id == request.BusinessUnitId);
+
             if (!buExist)
                 throw new Exception("Invalid Business unit ID.");
 
@@ -56,8 +59,12 @@ namespace csms_backend.Controllers
                 .Where(r => request.RoleId.Contains(r.Id))
                 .Select(r => r.Id)
                 .ToListAsync();
+
             if (roleExist.Count != request.RoleId.Count)
                 throw new Exception("One or more Role IDs are invalid.");
+
+            if (await _context.User.AnyAsync(u => u.Username == request.Username))
+                throw new Exception($"Username {request.Username} already used.");
 
             var user = _mapper.Map<User>(request);
             user.CreatedAt = DateTimeHelper.GetPhilippineTime();
@@ -72,7 +79,14 @@ namespace csms_backend.Controllers
                 .ProjectTo<UserResponse>(_mapper.ConfigurationProvider)
                 .FirstOrDefaultAsync();
 
-            return savedUser;
+            if (savedUser == null)
+            {
+                throw new Exception("No user response");
+            }
+            else
+            {
+                return savedUser;
+            }
         }
 
     }
