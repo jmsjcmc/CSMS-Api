@@ -10,12 +10,15 @@ builder.Services.AddDbContext<Context>(o =>
 });
 builder.Services.AddQueries();
 builder.Services.AddServices();
+builder.Services.AddSwaggerDocumentation();
+builder.Services.AddJwtAuthentication(builder.Configuration);
+builder.Services.AddCustomCORS();
 builder.Services.AddControllers();
+builder.Services.AddHelpers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 var app = builder.Build();
-
 
 if (app.Environment.IsDevelopment())
 {

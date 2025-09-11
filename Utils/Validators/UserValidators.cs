@@ -22,6 +22,7 @@ namespace csms_backend.Utils.Validators
 
             return userId;
         }
+
         public static JwtSetting GetJwtSetting(IConfiguration configuration)
         {
             var key = configuration["Jwt:Key"] ??

@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
 using csms_backend.Models;
 
-namespace csms_backend.Utils.AutoMapper
+namespace csms_backend.Models.Entities
 {
-    public class UserProfile : Profile
+    public class UserMapper : Profile
     {
-        public UserProfile()
+        public UserMapper()
         {
             CreateMap<UserRequest, User>()
                 .ForMember(d => d.Password, o => o.Ignore())

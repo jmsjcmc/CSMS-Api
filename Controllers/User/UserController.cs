@@ -27,6 +27,20 @@ namespace csms_backend.Controllers
             }
         }
 
+        [HttpPost("user/log-in")]
+        public async Task<ActionResult<UserLoginResponse>> UserLogin(UserLoginRequest request)
+        {
+            try
+            {
+                var response = await _userService.UserLogin(request);
+                return response;
+            }
+            catch (Exception e)
+            {
+                return HandleException(e);
+            }
+        }
+
         [HttpGet("users/paginated")]
         public async Task<ActionResult<Pagination<UserResponse>>> PaginatedUsers(
             [FromQuery] int pageNumber = 1,

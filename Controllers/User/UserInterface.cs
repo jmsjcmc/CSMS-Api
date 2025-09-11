@@ -13,5 +13,7 @@ namespace csms_backend.Controllers
         Task<UserResponse> GetUserById(int id);
         Task<UserResponse> AuthUserDetail(ClaimsPrincipal detail);
         Task<UserResponse> CreateUser(UserRequest request);
+        Task<UserLoginResponse> UserLogin(UserLoginRequest request);
+
     }
 }

@@ -59,7 +59,7 @@ namespace csms_backend.Controllers
                 bu.Status = bu.Status == Status.Active
                 ? Status.Inactive
                 : Status.Active;
-                bu.DateCreated = DateTimeHelper.GetPhilippineTime();
+                bu.DateUpdated = DateTimeHelper.GetPhilippineTime();
 
                 await _context.SaveChangesAsync();
                 return _mapper.Map<BusinessUnitResponse>(bu);

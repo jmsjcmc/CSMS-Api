@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
 using csms_backend.Models;
 
-namespace csms_backend.Utils.AutoMapper
+namespace csms_backend.Models.Entities
 {
-    public class BusinessUnitProfile : Profile
+    public class BusinessUnitMapper : Profile
     {
-        public BusinessUnitProfile()
+        public BusinessUnitMapper()
         {
             CreateMap<BusinessUnitRequest, BusinessUnit>();
 

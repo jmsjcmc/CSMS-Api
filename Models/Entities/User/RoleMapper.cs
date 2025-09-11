@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
 using csms_backend.Models;
 
-namespace csms_backend.Utils.AutoMapper
+namespace csms_backend.Models.Entities
 {
-    public class RoleProfile : Profile
+    public class RoleMapper : Profile
     {
-        public RoleProfile()
+        public RoleMapper()
         {
             CreateMap<RoleRequest, Role>();
 

@@ -4,6 +4,7 @@ using csms_backend.Models;
 using csms_backend.Models.Entities;
 using csms_backend.Utils;
 using csms_backend.Utils.Validators;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
@@ -12,9 +13,11 @@ namespace csms_backend.Controllers
     public class UserService : BaseService, UserInterface
     {
         private readonly UserQuery _userQuery;
-        public UserService(Context context, IMapper mapper, UserQuery userQuery) : base(context, mapper)
+        private readonly AuthenticatedUserHelper _authHelper;
+        public UserService(Context context, IMapper mapper, UserQuery userQuery, AuthenticatedUserHelper authHelper) : base(context, mapper)
         {
             _userQuery = userQuery;
+            _authHelper = authHelper;
         }
         // [HttpGet("users/paginated")]
         public async Task<Pagination<UserResponse>> PaginatedUsers(
@@ -88,6 +91,26 @@ namespace csms_backend.Controllers
                 return savedUser;
             }
         }
+        // [HttpPost("user/log-in")]
+        public async Task<UserLoginResponse> UserLogin(UserLoginRequest request)
+        {
+            var user = await _context.User
+                .SingleOrDefaultAsync(u => u.Username == request.Username);
 
+            if (user == null)
+            {
+                throw new NullReferenceException($"Username {request.Username} not found.");
+            }
+            else
+            {
+                var accessToken = _authHelper.GenerateAccessToken(user);
+                await _context.SaveChangesAsync();
+
+                return new UserLoginResponse
+                {
+                    AccessToken = accessToken
+                };
+            }
+        }
     }
 }

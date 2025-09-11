@@ -1,4 +1,5 @@
 ﻿using csms_backend.Controllers;
+using csms_backend.Models;
 using csms_backend.Models.Entities;
 using csms_backend.Utils.Validators;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -15,6 +16,8 @@ namespace csms_backend.Utils
             service.AddScoped<UserService>();
             service.AddScoped<BusinessUnitService>();
             service.AddScoped<RoleService>();
+            service.AddScoped<CompanyService>();
+
             return service;
         }
         public static IServiceCollection AddQueries(this IServiceCollection service)
@@ -22,6 +25,14 @@ namespace csms_backend.Utils
             service.AddScoped<UserQuery>();
             service.AddScoped<BusinessUnitQuery>();
             service.AddScoped<RoleQuery>();
+            service.AddScoped<CompanyQuery>();
+            service.AddScoped<RepresentativeQuery>();
+            service.AddScoped<ProductQuery>();
+            return service;
+        }
+        public static IServiceCollection AddHelpers(this IServiceCollection service)
+        {
+            service.AddScoped<AuthenticatedUserHelper>();
             return service;
         }
         public static IServiceCollection AddSwaggerDocumentation(this IServiceCollection service)
@@ -86,6 +97,21 @@ namespace csms_backend.Utils
                         }
                     };
                 });
+            return service;
+        }
+        public static IServiceCollection AddCustomCORS(this IServiceCollection service)
+        {
+            service.AddCors(options =>
+            {
+                options.AddPolicy("AllowSpecificOrigin", builder =>
+                {
+                    builder
+                    .WithOrigins("http://localhost:4200")
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials();
+                });
+            });
             return service;
         }
     }
