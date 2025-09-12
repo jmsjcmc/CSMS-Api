@@ -13,4 +13,13 @@ namespace csms_backend.Models
                 .ForMember(d => d.Representative, o => o.MapFrom(s => s.Representative));
         }
     }
+    public class RepresentativeMapper : Profile
+    {
+        public RepresentativeMapper()
+        {
+            CreateMap<RepresentativeRequest, Representative>();
+
+            CreateMap<Representative, RepresentativeResponse>();
+        }
+    }
 }

@@ -22,4 +22,22 @@ namespace csms_backend.Models.Entities
             CreateMap<UserLoginRequest, User>();
         }
     }
+    public class BusinessUnitMapper : Profile
+    {
+        public BusinessUnitMapper()
+        {
+            CreateMap<BusinessUnitRequest, BusinessUnit>();
+
+            CreateMap<BusinessUnit, BusinessUnitResponse>();
+        }
+    }
+    public class RoleMapper : Profile
+    {
+        public RoleMapper()
+        {
+            CreateMap<RoleRequest, Role>();
+
+            CreateMap<Role, RoleResponse>();
+        }
+    }
 }

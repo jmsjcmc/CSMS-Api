@@ -15,6 +15,9 @@ namespace csms_backend
         public DbSet<Representative> Representative { get; set; }
         public DbSet<Product> Product { get; set; }
         public DbSet<Category> Category { get; set; }
+        public DbSet<Pallet> Pallet { get; set; }
+        public DbSet<PalletPosition> PalletPosition { get; set; }
+        public DbSet<ColdStorage> ColdStorage { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
