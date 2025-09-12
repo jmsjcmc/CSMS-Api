@@ -14,7 +14,8 @@ namespace csms_backend.Controllers
         }
 
         [HttpPost("business-unit/create")]
-        public async Task<ActionResult<BusinessUnitResponse>> CreateBU(BusinessUnitRequest request)
+        public async Task<ActionResult<BusinessUnitResponse>> CreateBU(
+            [FromBody] BusinessUnitRequest request)
         {
             try
             {
@@ -28,7 +29,8 @@ namespace csms_backend.Controllers
         }
 
         [HttpPut("business-unit/toggle-status")]
-        public async Task<ActionResult<BusinessUnitResponse>> ToggleStatus(int id)
+        public async Task<ActionResult<BusinessUnitResponse>> ToggleStatus(
+            [FromQuery] int id)
         {
             try
             {
@@ -42,7 +44,8 @@ namespace csms_backend.Controllers
         }
 
         [HttpDelete("business-unit/delete/{id}")]
-        public async Task<ActionResult<BusinessUnitResponse>> DeleteBU(int id)
+        public async Task<ActionResult<BusinessUnitResponse>> DeleteBU(
+            [FromQuery] int id)
         {
             try
             {
@@ -73,7 +76,8 @@ namespace csms_backend.Controllers
         }
 
         [HttpGet("business-units/list")]
-        public async Task<ActionResult<List<BusinessUnitResponse>>> ListedBUs(string? searchTerm)
+        public async Task<ActionResult<List<BusinessUnitResponse>>> ListedBUs(
+            [FromQuery] string? searchTerm)
         {
             try
             {
@@ -87,7 +91,8 @@ namespace csms_backend.Controllers
         }
 
         [HttpGet("business-unit/{id}")]
-        public async Task<ActionResult<BusinessUnitResponse>> GetBUById(int id)
+        public async Task<ActionResult<BusinessUnitResponse>> GetBUById(
+            [FromQuery] int id)
         {
             try
             {

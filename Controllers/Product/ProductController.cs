@@ -105,4 +105,97 @@ namespace csms_backend.Controllers
             }
         }
     }
+    public class CategoryController : BaseController
+    {
+        private readonly CategoryService _categoryService;
+        public CategoryController(Context context, CategoryService categoryService) : base (context)
+        {
+            _categoryService = categoryService;
+        }
+
+        [HttpPost("category/create")]
+        public async Task<ActionResult<CategoryResponse>> CreateCategory(
+            [FromBody] CategoryRequest request)
+        {
+            try
+            {
+                var response = await _categoryService.CreateCategory(request);
+                return response;
+            } catch (Exception e)
+            {
+                return HandleException(e);
+            }
+        }
+
+        [HttpPut("category/toggle-status")]
+        public async Task<ActionResult<CategoryResponse>> ToggleStatus(
+            [FromQuery] int id)
+        {
+            try
+            {
+                var response = await _categoryService.ToggleStatus(id);
+                return response;
+            } catch (Exception e)
+            {
+                return HandleException(e);
+            }
+        }
+
+        [HttpPut("category/update/{id}")]
+        public async Task<ActionResult<CategoryResponse>> UpdateCategory(
+            [FromBody] CategoryRequest request,
+            [FromQuery] int id)
+        {
+            try
+            {
+                var response = await _categoryService.UpdateCategory(request, id);
+                return response;
+            } catch (Exception e)
+            {
+                return HandleException(e);
+            }
+        }
+
+        [HttpDelete("category/delete/{id}")]
+        public async Task<ActionResult<CategoryResponse>> DeleteCategory(
+            [FromQuery] int id)
+        {
+            try
+            {
+                var response = await _categoryService.DeleteCategory(id);
+                return response;
+            } catch (Exception e)
+            {
+                return HandleException(e);
+            }
+        }
+
+        [HttpGet("categories/list")]
+        public async Task<ActionResult<List<CategoryResponse>>> ListedCategories(
+            [FromQuery] string? searchTerm)
+        {
+            try
+            {
+                var response = await _categoryService.ListedCategories(searchTerm);
+                return response;
+            } catch (Exception e)
+            {
+                return HandleException(e);
+            }
+        }
+
+        [HttpGet("category/{id}")]
+        public async Task<ActionResult<CategoryResponse>> GetCategoryById(
+            [FromQuery] int id)
+        {
+            try
+            {
+                var response = await _categoryService.GetCategoryById(id);
+                return response;
+            } catch (Exception e)
+            {
+                return HandleException(e);
+            }
+        }
+    }
 }

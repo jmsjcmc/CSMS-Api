@@ -14,7 +14,8 @@ namespace csms_backend.Controllers
         }
 
         [HttpPost("user/create")]
-        public async Task<ActionResult<UserResponse>> CreateUser(UserRequest request)
+        public async Task<ActionResult<UserResponse>> CreateUser(
+            [FromBody] UserRequest request)
         {
             try
             {
@@ -28,7 +29,8 @@ namespace csms_backend.Controllers
         }
 
         [HttpPost("user/log-in")]
-        public async Task<ActionResult<UserLoginResponse>> UserLogin(UserLoginRequest request)
+        public async Task<ActionResult<UserLoginResponse>> UserLogin(
+            [FromBody] UserLoginRequest request)
         {
             try
             {
@@ -36,6 +38,49 @@ namespace csms_backend.Controllers
                 return response;
             }
             catch (Exception e)
+            {
+                return HandleException(e);
+            }
+        }
+
+        [HttpPut("user/toggle-status")]
+        public async Task<ActionResult<UserResponse>> ToggleStatus(
+            [FromQuery] int id)
+        {
+            try
+            {
+                var response = await _userService.ToggleStatus(id);
+                return response;
+            } catch (Exception e)
+            {
+                return HandleException(e);
+            }
+        }
+
+        [HttpPut("user/update/{id}")]
+        public async Task<ActionResult<UserResponse>> UpdateUser(
+            [FromBody] UserRequest request,
+            [FromQuery] int id)
+        {
+            try
+            {
+                var response = await _userService.UpdateUser(request, id);
+                return response;
+            } catch (Exception e)
+            {
+                return HandleException(e);
+            }
+        }
+
+        [HttpDelete("user/delete/{id}")]
+        public async Task<ActionResult<UserResponse>> DeleteUser(
+            [FromQuery] int id)
+        {
+            try
+            {
+                var response = await _userService.DeleteUser(id);
+                return response;
+            } catch (Exception e)
             {
                 return HandleException(e);
             }
@@ -59,7 +104,8 @@ namespace csms_backend.Controllers
         }
 
         [HttpGet("users/list")]
-        public async Task<ActionResult<List<UserResponse>>> ListedUsers(string? searchTerm)
+        public async Task<ActionResult<List<UserResponse>>> ListedUsers(
+            [FromQuery] string? searchTerm)
         {
             try
             {
@@ -73,7 +119,8 @@ namespace csms_backend.Controllers
         }
 
         [HttpGet("user/{id}")]
-        public async Task<ActionResult<UserResponse>> GetUserById(int id)
+        public async Task<ActionResult<UserResponse>> GetUserById(
+            [FromQuery] int id)
         {
             try
             {

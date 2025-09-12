@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using csms_backend.Models;
 using csms_backend.Models.Entities;
 using csms_backend.Utils;
+using Microsoft.EntityFrameworkCore;
 
 namespace csms_backend.Controllers
 {
@@ -77,6 +79,98 @@ namespace csms_backend.Controllers
                 await _context.SaveChangesAsync();
 
                 return _mapper.Map<ProductResponse>(product);
+            }
+        }
+    }
+    public class CategoryService : BaseService, CategoryInterface
+    {
+        private readonly CategoryQuery _categoryQuery;
+        public CategoryService(Context context, IMapper mapper, CategoryQuery categoryQuery) : base (context, mapper)
+        {
+            _categoryQuery = categoryQuery;
+        }
+        // [HttpGet("categories/list")]
+        public async Task<List<CategoryResponse>> ListedCategories(string? searchTerm)
+        {
+            var categories = await _categoryQuery.ListedCategories(searchTerm);
+
+            return _mapper.Map<List<CategoryResponse>>(categories);
+        }
+        // [HttpGet("category/{id}")]
+        public async Task<CategoryResponse> GetCategoryById(int id)
+        {
+            var category = await _categoryQuery.GetCategoryById(id);
+            return _mapper.Map<CategoryResponse>(category);
+        }
+        // [HttpPost("category/create")]
+        public async Task<CategoryResponse> CreateCategory(CategoryRequest request)
+        {
+            var category = _mapper.Map<Category>(request);
+            category.Status = Status.Active;
+
+            await _context.Category.AddAsync(category);
+            await _context.SaveChangesAsync();
+
+            return _mapper.Map<CategoryResponse>(category);
+        }
+        // [HttpPut("category/update/{id}")]
+        public async Task<CategoryResponse> UpdateCategory(CategoryRequest request, int id)
+        {
+            var category = await _categoryQuery.PatchCategoryById(id);
+            if (category == null)
+            {
+                throw new Exception($"Category with ID {id} not found.");
+            } else
+            {
+                _mapper.Map(request, id);
+
+                await _context.SaveChangesAsync();
+
+                var updatedCategory = await _context.Category
+                    .Where(c => c.Id == category.Id)
+                    .ProjectTo<CategoryResponse>(_mapper.ConfigurationProvider)
+                    .FirstOrDefaultAsync();
+
+                if (updatedCategory == null)
+                {
+                    throw new Exception("No user response.");
+                } else
+                {
+                    return updatedCategory;
+                }
+            }
+        }
+        // [HttpPut("category/toggle-status")]
+        public async Task<CategoryResponse> ToggleStatus(int id)
+        {
+            var category = await _categoryQuery.PatchCategoryById(id);
+            if (category == null)
+            {
+                throw new Exception($"Category with ID {id} not found.");
+            }
+            else
+            {
+                category.Status = category.Status == Status.Active
+                    ? Status.Inactive
+                    : Status.Active;
+
+                await _context.SaveChangesAsync();
+                return _mapper.Map<CategoryResponse>(category);
+            }
+        }
+        // [HttpDelete("category/delete/{id}")]
+        public async Task<CategoryResponse> DeleteCategory(int id)
+        {
+            var category = await _categoryQuery.PatchCategoryById(id);
+            if (category == null)
+            {
+                throw new Exception($"Category with ID {id} not found.");
+            } else
+            {
+                _context.Category.Remove(category);
+                await _context.SaveChangesAsync();
+
+                return _mapper.Map<CategoryResponse>(category);
             }
         }
     }

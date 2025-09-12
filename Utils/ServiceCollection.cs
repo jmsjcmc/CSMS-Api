@@ -17,7 +17,7 @@ namespace csms_backend.Utils
             service.AddScoped<BusinessUnitService>();
             service.AddScoped<RoleService>();
             service.AddScoped<CompanyService>();
-
+            service.AddScoped<CategoryService>();
             return service;
         }
         public static IServiceCollection AddQueries(this IServiceCollection service)
@@ -28,6 +28,7 @@ namespace csms_backend.Utils
             service.AddScoped<CompanyQuery>();
             service.AddScoped<RepresentativeQuery>();
             service.AddScoped<ProductQuery>();
+            service.AddScoped<CategoryQuery>();
             return service;
         }
         public static IServiceCollection AddHelpers(this IServiceCollection service)

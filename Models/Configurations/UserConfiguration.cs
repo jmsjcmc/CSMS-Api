@@ -14,6 +14,10 @@ namespace csms_backend.Models.Configurations
             builder.HasMany(u => u.UserRole)
                 .WithOne(ur => ur.User)
                 .HasForeignKey(ur => ur.UserId);
+
+            builder.HasMany(u => u.Pallet)
+                .WithOne(p => p.Creator)
+                .HasForeignKey(p => p.CreatorId);
         }
     }
 }

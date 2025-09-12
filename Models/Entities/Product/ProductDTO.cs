@@ -31,4 +31,14 @@
         public int CompanyId { get; set; }
         public int CategoryId { get; set; }
     }
+    public class CategoryResponse
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public Status Status { get; set; }
+    }
+    public class CategoryRequest
+    {
+        public string Name { get; set; }
+    }
 }

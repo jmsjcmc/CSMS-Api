@@ -84,4 +84,72 @@ namespace csms_backend.Models.Entities
                     .FirstOrDefaultAsync(p => p.Id == id);
         }
     }
+    public class CategoryQuery
+    {
+        private readonly Context _context;
+        public CategoryQuery(Context context)
+        {
+            _context = context;
+        }
+
+        public IQueryable<Category> PaginatedCategories(string? searchTerm)
+        {
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                var query = _context.Category
+                    .AsNoTracking()
+                    .Where(c => c.Name.Contains(searchTerm))
+                    .Include(c => c.Product)
+                    .OrderByDescending(c => c.Id)
+                    .AsQueryable();
+
+                return query;
+            }
+            else
+            {
+                var query = _context.Category
+                    .AsNoTracking()
+                    .Include(c => c.Product)
+                    .OrderByDescending(c => c.Id)
+                    .AsQueryable();
+
+                return query;
+            }
+        }
+
+        public async Task<List<Category>> ListedCategories(string? searchTerm)
+        {
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                return await _context.Category
+                    .AsNoTracking()
+                    .Where(c => c.Name.Contains(searchTerm))
+                    .Include(c => c.Product)
+                    .OrderByDescending(c => c.Id)
+                    .ToListAsync();
+            } else
+            {
+                return await _context.Category
+                    .AsNoTracking()
+                    .Include(c => c.Product)
+                    .OrderByDescending(c => c.Id)
+                    .ToListAsync();
+            }
+        }
+
+        public async Task<Category?> GetCategoryById(int id)
+        {
+            return await _context.Category
+                .AsNoTracking()
+                .Include(c => c.Product)
+                .FirstOrDefaultAsync(c => c.Id == id);
+        }
+
+        public async Task<Category?> PatchCategoryById(int id)
+        {
+            return await _context.Category
+                .Include(c => c.Product)
+                .FirstOrDefaultAsync(c => c.Id == id);
+        }
+    }
 }

@@ -4,7 +4,6 @@ using csms_backend.Models;
 using csms_backend.Models.Entities;
 using csms_backend.Utils;
 using csms_backend.Utils.Validators;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
@@ -110,6 +109,69 @@ namespace csms_backend.Controllers
                 {
                     AccessToken = accessToken
                 };
+            }
+        }
+        // [HttpPut("user/toggle-status")]
+        public async Task<UserResponse> ToggleStatus(int id)
+        {
+            var user = await _userQuery.PatchUserById(id);
+
+            if (user == null)
+            {
+                throw new Exception($"User with ID {id} not found.");
+            } else
+            {
+                user.Status = user.Status == Status.Active
+                    ? Status.Inactive
+                    : Status.Active;
+                user.UpdatedAt = DateTimeHelper.GetPhilippineTime();
+
+                await _context.SaveChangesAsync();
+                return _mapper.Map<UserResponse>(user);
+            }
+        }
+        // [HttpPut("user/update/{id}")]
+        public async Task<UserResponse> UpdateUser(UserRequest request, int id)
+        {
+            var user = await _userQuery.PatchUserById(id);
+            if (user == null)
+            {
+                throw new Exception($"User with ID {id} not found.");
+            } else
+            {
+                _mapper.Map(request, id);
+                user.Password = BCrypt.Net.BCrypt.HashPassword(request.Password);
+                user.UpdatedAt = DateTimeHelper.GetPhilippineTime();
+
+                await _context.SaveChangesAsync();
+
+                var updatedUser = await _context.User
+                    .Where(u => u.Id == user.Id)
+                    .ProjectTo<UserResponse>(_mapper.ConfigurationProvider)
+                    .FirstOrDefaultAsync();
+
+                if (updatedUser == null)
+                {
+                    throw new Exception($"No user response.");
+                } else
+                {
+                    return updatedUser;
+                }
+            }
+        }
+        // [HttpDelete("user/delete/{id}")]
+        public async Task<UserResponse> DeleteUser(int id)
+        {
+            var user = await _userQuery.PatchUserById(id);
+            if (user == null)
+            {
+                throw new Exception($"User with ID {id} not found.");
+            } else
+            {
+                _context.User.Remove(user);
+                await _context.SaveChangesAsync();
+
+                return _mapper.Map<UserResponse>(user);
             }
         }
     }

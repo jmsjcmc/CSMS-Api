@@ -14,7 +14,8 @@ namespace csms_backend.Controllers
         }
 
         [HttpPost("company/create")]
-        public async Task<ActionResult<CompanyResponse>> CreateCompany(CompanyRequest request)
+        public async Task<ActionResult<CompanyResponse>> CreateCompany(
+            [FromBody] CompanyRequest request)
         {
             try
             {
@@ -28,7 +29,8 @@ namespace csms_backend.Controllers
         }
 
         [HttpDelete("company/delete/{id}")]
-        public async Task<ActionResult<CompanyResponse>> DeleteCompany(int id)
+        public async Task<ActionResult<CompanyResponse>> DeleteCompany(
+            [FromQuery] int id)
         {
             try
             {
@@ -59,7 +61,8 @@ namespace csms_backend.Controllers
         }
 
         [HttpGet("companies/list")]
-        public async Task<ActionResult<List<CompanyResponse>>> ListedCompanies(string? searchTerm)
+        public async Task<ActionResult<List<CompanyResponse>>> ListedCompanies(
+            [FromQuery] string? searchTerm)
         {
             try
             {
@@ -73,7 +76,8 @@ namespace csms_backend.Controllers
         }
 
         [HttpGet("company/{id}")]
-        public async Task<ActionResult<CompanyResponse>> GetCompanyById(int id)
+        public async Task<ActionResult<CompanyResponse>> GetCompanyById(
+            [FromQuery] int id)
         {
             try
             {

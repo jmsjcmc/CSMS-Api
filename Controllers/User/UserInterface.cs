@@ -14,6 +14,8 @@ namespace csms_backend.Controllers
         Task<UserResponse> AuthUserDetail(ClaimsPrincipal detail);
         Task<UserResponse> CreateUser(UserRequest request);
         Task<UserLoginResponse> UserLogin(UserLoginRequest request);
-
+        Task<UserResponse> ToggleStatus(int id);
+        Task<UserResponse> UpdateUser(UserRequest request, int id);
+        Task<UserResponse> DeleteUser(int id);
     }
 }
