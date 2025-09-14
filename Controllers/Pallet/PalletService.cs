@@ -124,4 +124,13 @@ namespace csms_backend.Controllers
             }
         }
     }
+    public class PalletPositionService : BaseService, PalletPositionInterface
+    {
+        private readonly PalletQuery _palletQuery;
+        public PalletService(Context context, IMapper mapper, PalletQuery palletQuery) : base(context, mapper)
+        {
+            _palletQuery = palletQuery;
+        }
+        
+    }
 }
