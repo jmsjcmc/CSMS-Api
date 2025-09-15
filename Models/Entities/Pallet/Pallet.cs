@@ -11,6 +11,7 @@
         public DateTime? DateUpdated { get; set; }
         public Status Status { get; set; }
     }
+
     public class PalletPosition
     {
         public int Id { get; set; }
@@ -22,6 +23,7 @@
         public string Side { get; set; }
         public Status Status { get; set; }
     }
+
     public class ColdStorage
     {
         public int Id { get; set; }

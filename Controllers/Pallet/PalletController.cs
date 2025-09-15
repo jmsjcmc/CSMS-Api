@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using csms_backend.Models;
 using csms_backend.Utils;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace csms_backend.Controllers
@@ -252,6 +251,130 @@ namespace csms_backend.Controllers
             try
             {
                 var response = await _palletPositionService.GetPalletPositionById(id);
+                return response;
+            }
+            catch (Exception e)
+            {
+                return HandleException(e);
+            }
+        }
+    }
+
+    public class ColdStorageController : BaseController
+    {
+        private readonly ColdStorageService _csService;
+
+        public ColdStorageController(Context context, ColdStorageService csService)
+            : base(context)
+        {
+            _csService = csService;
+        }
+
+        [HttpPost("cs/create")]
+        public async Task<ActionResult<ColdStorageResponse>> CreateColdStorage(
+            [FromBody] ColdStorageRequest request
+        )
+        {
+            try
+            {
+                var response = await _csService.CreateColdStorage(request);
+                return response;
+            }
+            catch (Exception e)
+            {
+                return HandleException(e);
+            }
+        }
+
+        [HttpPut("cs/toggle-status")]
+        public async Task<ActionResult<ColdStorageResponse>> ToggleStatus([FromQuery] int id)
+        {
+            try
+            {
+                var response = await _csService.ToggleStatus(id);
+                return response;
+            }
+            catch (Exception e)
+            {
+                return HandleException(e);
+            }
+        }
+
+        [HttpPut("cs/update/{id}")]
+        public async Task<ActionResult<ColdStorageResponse>> UpdateColdStorage(
+            [FromBody] ColdStorageRequest request,
+            [FromQuery] int id
+        )
+        {
+            try
+            {
+                var response = await _csService.UpdateColdStorage(request, id);
+                return response;
+            }
+            catch (Exception e)
+            {
+                return HandleException(e);
+            }
+        }
+
+        [HttpDelete("cs/delete/{id}")]
+        public async Task<ActionResult<ColdStorageResponse>> DeleteColdStorage([FromQuery] int id)
+        {
+            try
+            {
+                var response = await _csService.DeleteColdStorage(id);
+                return response;
+            }
+            catch (Exception e)
+            {
+                return HandleException(e);
+            }
+        }
+
+        [HttpGet("cs/paginated")]
+        public async Task<ActionResult<Pagination<ColdStorageResponse>>> PaginatedColdStorages(
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10,
+            [FromQuery] string? searchTerm = null
+        )
+        {
+            try
+            {
+                var response = await _csService.PaginatedColdStorages(
+                    pageNumber,
+                    pageSize,
+                    searchTerm
+                );
+                return response;
+            }
+            catch (Exception e)
+            {
+                return HandleException(e);
+            }
+        }
+
+        [HttpGet("cs/list")]
+        public async Task<ActionResult<List<ColdStorageResponse>>> ListedColdStorages(
+            [FromQuery] string? searchTerm
+        )
+        {
+            try
+            {
+                var response = await _csService.ListedColdStorages(searchTerm);
+                return response;
+            }
+            catch (Exception e)
+            {
+                return HandleException(e);
+            }
+        }
+
+        [HttpGet("cs/{id}")]
+        public async Task<ActionResult<ColdStorageResponse>> GetColdStorageById([FromQuery] int id)
+        {
+            try
+            {
+                var response = await _csService.GetColdStorageById(id);
                 return response;
             }
             catch (Exception e)

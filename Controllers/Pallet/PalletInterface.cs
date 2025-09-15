@@ -40,7 +40,8 @@ namespace csms_backend.Controllers
             string? searchTerm
         );
         Task<List<ColdStorageResponse>> ListedColdStorages(string? searchTerm);
-        Task<ColdStorageResponse> CreateColdStorages(ColdStorageRequest request);
+        Task<ColdStorageResponse> GetColdStorageById(int id);
+        Task<ColdStorageResponse> CreateColdStorage(ColdStorageRequest request);
         Task<ColdStorageResponse> UpdateColdStorage(ColdStorageRequest request, int id);
         Task<ColdStorageResponse> ToggleStatus(int id);
         Task<ColdStorageResponse> DeleteColdStorage(int id);

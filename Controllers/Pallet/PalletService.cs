@@ -291,7 +291,13 @@ namespace csms_backend.Controllers
             return _mapper.Map<List<ColdStorageResponse>>(csList);
         }
 
-        public async Task<ColdStorageResponse> CreateColdStorages(ColdStorageRequest request)
+        public async Task<ColdStorageResponse> GetColdStorageById(int id)
+        {
+            var cs = await _coldStorageQuery.GetColdStorageById(id);
+            return _mapper.Map<ColdStorageResponse>(cs);
+        }
+
+        public async Task<ColdStorageResponse> CreateColdStorage(ColdStorageRequest request)
         {
             var cs = _mapper.Map<ColdStorage>(request);
             cs.Status = Status.Active;

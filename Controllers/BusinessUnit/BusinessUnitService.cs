@@ -2,6 +2,7 @@
 using csms_backend.Models;
 using csms_backend.Models.Entities;
 using csms_backend.Utils;
+using Microsoft.EntityFrameworkCore;
 
 namespace csms_backend.Controllers
 {
@@ -49,6 +50,9 @@ namespace csms_backend.Controllers
         // [HttpPost("business-unit/create")]
         public async Task<BusinessUnitResponse> CreateBU(BusinessUnitRequest request)
         {
+            if (await _context.BusinessUnit.AnyAsync(bu => bu.Name == request.Name))
+                throw new Exception($"Business Unit {request.Name} already added.");
+
             var bu = _mapper.Map<BusinessUnit>(request);
             bu.Status = Status.Active;
             bu.DateCreated = DateTimeHelper.GetPhilippineTime();

@@ -1,11 +1,11 @@
-﻿using AutoMapper;
+﻿using System.Security.Claims;
+using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using csms_backend.Models;
 using csms_backend.Models.Entities;
 using csms_backend.Utils;
 using csms_backend.Utils.Validators;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
 
 namespace csms_backend.Controllers
 {
@@ -13,27 +13,43 @@ namespace csms_backend.Controllers
     {
         private readonly UserQuery _userQuery;
         private readonly AuthenticatedUserHelper _authHelper;
-        public UserService(Context context, IMapper mapper, UserQuery userQuery, AuthenticatedUserHelper authHelper) : base(context, mapper)
+
+        public UserService(
+            Context context,
+            IMapper mapper,
+            UserQuery userQuery,
+            AuthenticatedUserHelper authHelper
+        )
+            : base(context, mapper)
         {
             _userQuery = userQuery;
             _authHelper = authHelper;
         }
+
         // [HttpGet("users/paginated")]
         public async Task<Pagination<UserResponse>> PaginatedUsers(
             int pageNumber,
             int pageSize,
-            string? searchTerm)
+            string? searchTerm
+        )
         {
             var query = _userQuery.PaginatedUsers(searchTerm);
 
-            return await PaginationHelper.PaginateAndMap<User, UserResponse>(query, pageNumber, pageSize, _mapper);
+            return await PaginationHelper.PaginateAndMap<User, UserResponse>(
+                query,
+                pageNumber,
+                pageSize,
+                _mapper
+            );
         }
+
         // [HttpGet("users/list")]
         public async Task<List<UserResponse>> ListedUsers(string? searchTerm)
         {
             var users = await _userQuery.ListedUsers(searchTerm);
             return _mapper.Map<List<UserResponse>>(users);
         }
+
         // [HttpGet("user/{id}")]
         public async Task<UserResponse> GetUserById(int id)
         {
@@ -41,6 +57,7 @@ namespace csms_backend.Controllers
 
             return _mapper.Map<UserResponse>(user);
         }
+
         // [HttpGet("user/user-detail")]
         public async Task<UserResponse> AuthUserDetail(ClaimsPrincipal detail)
         {
@@ -49,6 +66,7 @@ namespace csms_backend.Controllers
 
             return _mapper.Map<UserResponse>(user);
         }
+
         // [HttpPost("user/create")]
         public async Task<UserResponse> CreateUser(UserRequest request)
         {
@@ -57,8 +75,8 @@ namespace csms_backend.Controllers
             if (!buExist)
                 throw new Exception("Invalid Business unit ID.");
 
-            var roleExist = await _context.Role
-                .Where(r => request.RoleId.Contains(r.Id))
+            var roleExist = await _context
+                .Role.Where(r => request.RoleId.Contains(r.Id))
                 .Select(r => r.Id)
                 .ToListAsync();
 
@@ -76,8 +94,8 @@ namespace csms_backend.Controllers
             await _context.User.AddAsync(user);
             await _context.SaveChangesAsync();
 
-            var savedUser = await _context.User
-                .Where(u => u.Id == user.Id)
+            var savedUser = await _context
+                .User.Where(u => u.Id == user.Id)
                 .ProjectTo<UserResponse>(_mapper.ConfigurationProvider)
                 .FirstOrDefaultAsync();
 
@@ -90,11 +108,13 @@ namespace csms_backend.Controllers
                 return savedUser;
             }
         }
+
         // [HttpPost("user/log-in")]
         public async Task<UserLoginResponse> UserLogin(UserLoginRequest request)
         {
-            var user = await _context.User
-                .SingleOrDefaultAsync(u => u.Username == request.Username);
+            var user = await _context.User.SingleOrDefaultAsync(u =>
+                u.Username == request.Username
+            );
 
             if (user == null)
             {
@@ -105,12 +125,10 @@ namespace csms_backend.Controllers
                 var accessToken = _authHelper.GenerateAccessToken(user);
                 await _context.SaveChangesAsync();
 
-                return new UserLoginResponse
-                {
-                    AccessToken = accessToken
-                };
+                return new UserLoginResponse { AccessToken = accessToken };
             }
         }
+
         // [HttpPut("user/toggle-status")]
         public async Task<UserResponse> ToggleStatus(int id)
         {
@@ -119,17 +137,17 @@ namespace csms_backend.Controllers
             if (user == null)
             {
                 throw new Exception($"User with ID {id} not found.");
-            } else
+            }
+            else
             {
-                user.Status = user.Status == Status.Active
-                    ? Status.Inactive
-                    : Status.Active;
+                user.Status = user.Status == Status.Active ? Status.Inactive : Status.Active;
                 user.UpdatedAt = DateTimeHelper.GetPhilippineTime();
 
                 await _context.SaveChangesAsync();
                 return _mapper.Map<UserResponse>(user);
             }
         }
+
         // [HttpPut("user/update/{id}")]
         public async Task<UserResponse> UpdateUser(UserRequest request, int id)
         {
@@ -137,7 +155,8 @@ namespace csms_backend.Controllers
             if (user == null)
             {
                 throw new Exception($"User with ID {id} not found.");
-            } else
+            }
+            else
             {
                 _mapper.Map(request, id);
                 user.Password = BCrypt.Net.BCrypt.HashPassword(request.Password);
@@ -145,20 +164,22 @@ namespace csms_backend.Controllers
 
                 await _context.SaveChangesAsync();
 
-                var updatedUser = await _context.User
-                    .Where(u => u.Id == user.Id)
+                var updatedUser = await _context
+                    .User.Where(u => u.Id == user.Id)
                     .ProjectTo<UserResponse>(_mapper.ConfigurationProvider)
                     .FirstOrDefaultAsync();
 
                 if (updatedUser == null)
                 {
                     throw new Exception($"No user response.");
-                } else
+                }
+                else
                 {
                     return updatedUser;
                 }
             }
         }
+
         // [HttpDelete("user/delete/{id}")]
         public async Task<UserResponse> DeleteUser(int id)
         {
@@ -166,7 +187,8 @@ namespace csms_backend.Controllers
             if (user == null)
             {
                 throw new Exception($"User with ID {id} not found.");
-            } else
+            }
+            else
             {
                 _context.User.Remove(user);
                 await _context.SaveChangesAsync();
