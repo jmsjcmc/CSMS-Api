@@ -7,14 +7,15 @@ namespace csms_backend.Controllers
         Task<Pagination<CompanyResponse>> PaginatedCompanies(
             int pageNumber,
             int pageSize,
-            string? searchTerm);
+            string? searchTerm
+        );
         Task<List<CompanyResponse>> ListedCompanies(string? searchTerm);
         Task<CompanyResponse> GetCompanyById(int id);
         Task<CompanyResponse> CreateCompany(CompanyRequest request);
         Task<CompanyResponse> ToggleStatus(int id);
         Task<CompanyResponse> DeleteCompany(int id);
-        
     }
+
     public interface RepresentativeInterface
     {
         Task<List<RepresentativeResponse>> ListedRepresentatives(string? searchTerm);

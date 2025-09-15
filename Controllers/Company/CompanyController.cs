@@ -8,14 +8,17 @@ namespace csms_backend.Controllers
     public class CompanyController : BaseController
     {
         private readonly CompanyService _companyService;
-        public CompanyController(Context context, CompanyService companyService) : base(context)
+
+        public CompanyController(Context context, CompanyService companyService)
+            : base(context)
         {
             _companyService = companyService;
         }
 
         [HttpPost("company/create")]
         public async Task<ActionResult<CompanyResponse>> CreateCompany(
-            [FromBody] CompanyRequest request)
+            [FromBody] CompanyRequest request
+        )
         {
             try
             {
@@ -29,8 +32,7 @@ namespace csms_backend.Controllers
         }
 
         [HttpDelete("company/delete/{id}")]
-        public async Task<ActionResult<CompanyResponse>> DeleteCompany(
-            [FromQuery] int id)
+        public async Task<ActionResult<CompanyResponse>> DeleteCompany([FromQuery] int id)
         {
             try
             {
@@ -47,11 +49,16 @@ namespace csms_backend.Controllers
         public async Task<ActionResult<Pagination<CompanyResponse>>> PaginatedCompanies(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 10,
-            [FromQuery] string? searchTerm = null)
+            [FromQuery] string? searchTerm = null
+        )
         {
             try
             {
-                var response = await _companyService.PaginatedCompanies(pageNumber, pageSize, searchTerm);
+                var response = await _companyService.PaginatedCompanies(
+                    pageNumber,
+                    pageSize,
+                    searchTerm
+                );
                 return response;
             }
             catch (Exception e)
@@ -62,7 +69,8 @@ namespace csms_backend.Controllers
 
         [HttpGet("companies/list")]
         public async Task<ActionResult<List<CompanyResponse>>> ListedCompanies(
-            [FromQuery] string? searchTerm)
+            [FromQuery] string? searchTerm
+        )
         {
             try
             {
@@ -76,8 +84,7 @@ namespace csms_backend.Controllers
         }
 
         [HttpGet("company/{id}")]
-        public async Task<ActionResult<CompanyResponse>> GetCompanyById(
-            [FromQuery] int id)
+        public async Task<ActionResult<CompanyResponse>> GetCompanyById([FromQuery] int id)
         {
             try
             {

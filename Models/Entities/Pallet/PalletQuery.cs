@@ -2,6 +2,7 @@
 
 namespace csms_backend.Models.Entities
 {
+    // PALLET QUERIES
     public class PalletQuery
     {
         private readonly Context _context;
@@ -72,6 +73,7 @@ namespace csms_backend.Models.Entities
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
     }
+    // PALLET POSITIONS QUERIES
     public class PalletPositionQuery
     {
         private readonly Context _context;
@@ -147,6 +149,7 @@ namespace csms_backend.Models.Entities
                     .FirstOrDefaultAsync(p => p.Id == id);
         }
     }
+    // COLD STORAGE QUERIES
     public class ColdStorageQuery
     {
         private readonly Context _context;

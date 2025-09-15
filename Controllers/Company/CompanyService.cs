@@ -2,13 +2,14 @@
 using csms_backend.Models;
 using csms_backend.Utils;
 
-
 namespace csms_backend.Controllers
 {
     public class CompanyService : BaseService, CompanyInterface
     {
         private readonly CompanyQuery _companyQuery;
-        public CompanyService(Context context, IMapper mapper, CompanyQuery companyQuery) : base(context, mapper)
+
+        public CompanyService(Context context, IMapper mapper, CompanyQuery companyQuery)
+            : base(context, mapper)
         {
             _companyQuery = companyQuery;
         }
@@ -16,11 +17,17 @@ namespace csms_backend.Controllers
         public async Task<Pagination<CompanyResponse>> PaginatedCompanies(
             int pageNumber,
             int pageSize,
-            string? searchTerm)
+            string? searchTerm
+        )
         {
             var query = _companyQuery.PaginatedCompanies(searchTerm);
 
-            return await PaginationHelper.PaginateAndMap<Company, CompanyResponse>(query, pageNumber, pageSize, _mapper);
+            return await PaginationHelper.PaginateAndMap<Company, CompanyResponse>(
+                query,
+                pageNumber,
+                pageSize,
+                _mapper
+            );
         }
 
         public async Task<List<CompanyResponse>> ListedCompanies(string? searchTerm)
@@ -57,15 +64,14 @@ namespace csms_backend.Controllers
         public async Task<CompanyResponse> ToggleStatus(int id)
         {
             var company = await _companyQuery.PatchCompanyById(id);
-            
+
             if (company == null)
             {
                 throw new Exception($"Company with id {id} not found.");
-            } else
+            }
+            else
             {
-                company.Status = company.Status == Status.Active
-                    ? Status.Inactive
-                    : Status.Active;
+                company.Status = company.Status == Status.Active ? Status.Inactive : Status.Active;
                 company.DateUpdated = DateTimeHelper.GetPhilippineTime();
 
                 await _context.SaveChangesAsync();
@@ -76,11 +82,12 @@ namespace csms_backend.Controllers
         public async Task<CompanyResponse> DeleteCompany(int id)
         {
             var company = await _companyQuery.PatchCompanyById(id);
-            
+
             if (company == null)
             {
                 throw new Exception($"Company with id {id} not found.");
-            } else
+            }
+            else
             {
                 _context.Company.Remove(company);
                 await _context.SaveChangesAsync();

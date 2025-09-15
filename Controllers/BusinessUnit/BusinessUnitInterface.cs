@@ -7,7 +7,8 @@ namespace csms_backend.Controllers
         Task<Pagination<BusinessUnitResponse>> PaginatedBUs(
             int pageNumber,
             int pageSize,
-            string? searchTerm);
+            string? searchTerm
+        );
         Task<List<BusinessUnitResponse>> ListedBUs(string? searchTerm);
         Task<BusinessUnitResponse> GetBUById(int id);
         Task<BusinessUnitResponse> CreateBU(BusinessUnitRequest request);

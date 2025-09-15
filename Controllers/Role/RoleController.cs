@@ -9,14 +9,15 @@ namespace csms_backend.Controllers
     public class RoleController : BaseController
     {
         private readonly RoleService _roleService;
-        public RoleController(Context context, RoleService roleService) : base(context)
+
+        public RoleController(Context context, RoleService roleService)
+            : base(context)
         {
             _roleService = roleService;
         }
 
         [HttpPost("role/create")]
-        public async Task<ActionResult<RoleResponse>> CreateRole(
-            [FromBody] RoleRequest request)
+        public async Task<ActionResult<RoleResponse>> CreateRole([FromBody] RoleRequest request)
         {
             try
             {
@@ -30,8 +31,7 @@ namespace csms_backend.Controllers
         }
 
         [HttpPut("role/toggle-status")]
-        public async Task<ActionResult<RoleResponse>> ToggleStatus(
-            [FromQuery] int id)
+        public async Task<ActionResult<RoleResponse>> ToggleStatus([FromQuery] int id)
         {
             try
             {
@@ -45,14 +45,14 @@ namespace csms_backend.Controllers
         }
 
         [HttpDelete("role/delete/{id}")]
-        public async Task<ActionResult<RoleResponse>> DeleteRole(
-            [FromQuery] int id)
+        public async Task<ActionResult<RoleResponse>> DeleteRole([FromQuery] int id)
         {
             try
             {
                 var response = await _roleService.DeleteRole(id);
                 return response;
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 return HandleException(e);
             }
@@ -62,7 +62,8 @@ namespace csms_backend.Controllers
         public async Task<ActionResult<Pagination<RoleResponse>>> PaginatedRoles(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 10,
-            [FromQuery] string? searchTerm = null)
+            [FromQuery] string? searchTerm = null
+        )
         {
             try
             {
@@ -77,7 +78,8 @@ namespace csms_backend.Controllers
 
         [HttpGet("roles/list")]
         public async Task<ActionResult<List<RoleResponse>>> ListedRoles(
-            [FromQuery] string? searchTerm)
+            [FromQuery] string? searchTerm
+        )
         {
             try
             {
@@ -92,7 +94,8 @@ namespace csms_backend.Controllers
 
         [HttpGet("roles/active")]
         public async Task<ActionResult<List<RoleResponse>>> ActiveListedRoles(
-            [FromQuery] string? searchTerm)
+            [FromQuery] string? searchTerm
+        )
         {
             try
             {
@@ -106,8 +109,7 @@ namespace csms_backend.Controllers
         }
 
         [HttpGet("role/{id}")]
-        public async Task<ActionResult<RoleResponse>> GetRoleById(
-            [FromQuery] int id)
+        public async Task<ActionResult<RoleResponse>> GetRoleById([FromQuery] int id)
         {
             try
             {

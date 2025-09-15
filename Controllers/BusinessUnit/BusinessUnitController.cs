@@ -8,14 +8,17 @@ namespace csms_backend.Controllers
     public class BusinessUnitController : BaseController
     {
         private readonly BusinessUnitService _buService;
-        public BusinessUnitController(Context context, BusinessUnitService buService) : base(context)
+
+        public BusinessUnitController(Context context, BusinessUnitService buService)
+            : base(context)
         {
             _buService = buService;
         }
 
         [HttpPost("business-unit/create")]
         public async Task<ActionResult<BusinessUnitResponse>> CreateBU(
-            [FromBody] BusinessUnitRequest request)
+            [FromBody] BusinessUnitRequest request
+        )
         {
             try
             {
@@ -29,8 +32,7 @@ namespace csms_backend.Controllers
         }
 
         [HttpPut("business-unit/toggle-status")]
-        public async Task<ActionResult<BusinessUnitResponse>> ToggleStatus(
-            [FromQuery] int id)
+        public async Task<ActionResult<BusinessUnitResponse>> ToggleStatus([FromQuery] int id)
         {
             try
             {
@@ -44,8 +46,7 @@ namespace csms_backend.Controllers
         }
 
         [HttpDelete("business-unit/delete/{id}")]
-        public async Task<ActionResult<BusinessUnitResponse>> DeleteBU(
-            [FromQuery] int id)
+        public async Task<ActionResult<BusinessUnitResponse>> DeleteBU([FromQuery] int id)
         {
             try
             {
@@ -62,7 +63,8 @@ namespace csms_backend.Controllers
         public async Task<ActionResult<Pagination<BusinessUnitResponse>>> PaginatedBUs(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 10,
-            [FromQuery] string? searchTerm = null)
+            [FromQuery] string? searchTerm = null
+        )
         {
             try
             {
@@ -77,7 +79,8 @@ namespace csms_backend.Controllers
 
         [HttpGet("business-units/list")]
         public async Task<ActionResult<List<BusinessUnitResponse>>> ListedBUs(
-            [FromQuery] string? searchTerm)
+            [FromQuery] string? searchTerm
+        )
         {
             try
             {
@@ -91,8 +94,7 @@ namespace csms_backend.Controllers
         }
 
         [HttpGet("business-unit/{id}")]
-        public async Task<ActionResult<BusinessUnitResponse>> GetBUById(
-            [FromQuery] int id)
+        public async Task<ActionResult<BusinessUnitResponse>> GetBUById([FromQuery] int id)
         {
             try
             {
